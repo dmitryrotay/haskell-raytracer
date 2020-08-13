@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b5a5d44274d17b25e7518b7f9b5a473baad89d1deaf3471c6adcb5c4fd6b4446
+-- hash: 0bb9700fb69c35f442a8220b4c92c4763abfbc9a129011d18021159544dc65b0
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -60,4 +60,6 @@ test-suite haskell-raytracer-test
   build-depends:
       base >=4.7 && <5
     , haskell-raytracer
+    , hspec
+    , hspec-discover
   default-language: Haskell2010

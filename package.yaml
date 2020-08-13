@@ -46,3 +46,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - haskell-raytracer
+    - hspec
+    - hspec-discover
