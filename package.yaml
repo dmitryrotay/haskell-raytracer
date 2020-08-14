@@ -48,3 +48,4 @@ tests:
     - haskell-raytracer
     - hspec
     - hspec-discover
+    - QuickCheck

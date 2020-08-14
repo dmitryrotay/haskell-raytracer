@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0bb9700fb69c35f442a8220b4c92c4763abfbc9a129011d18021159544dc65b0
+-- hash: b942c970cd605478ba10112860f70b260e2931c9446bcd7b965d255c8abf1c20
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Geometry
+      Space
   other-modules:
       Paths_haskell_raytracer
   hs-source-dirs:
@@ -52,13 +52,14 @@ test-suite haskell-raytracer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      GeometrySpec
+      SpaceSpec
       Paths_haskell_raytracer
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , haskell-raytracer
     , hspec
     , hspec-discover
