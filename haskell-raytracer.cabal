@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b942c970cd605478ba10112860f70b260e2931c9446bcd7b965d255c8abf1c20
+-- hash: b632d288a038b6143ab2935ed8779c817ba0dababbd7b5d11b41c9e550eecf6b
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Common
+      Drawing
       Space
   other-modules:
       Paths_haskell_raytracer
@@ -52,6 +54,7 @@ test-suite haskell-raytracer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      DrawingSpec
       SpaceSpec
       Paths_haskell_raytracer
   hs-source-dirs:
