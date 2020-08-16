@@ -1,7 +1,7 @@
 module SpaceSpec where
 
-import Space
 import Common
+import Space
 
 import Test.Hspec
 

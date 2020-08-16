@@ -7,10 +7,15 @@ module Drawing
     , Canvas (..)
     , canvas
     , setPixel
+    , setPixelMap
     , pixelAt
+    , getCoords
     ) where
 
-import Common
+import           Common
+import qualified Data.HashMap.Strict as M
+
+import           Data.Maybe
 
 data Color = Color { red :: Float, green :: Float, blue :: Float } deriving (Show)
 
@@ -41,18 +46,29 @@ canvas w h =
 
 setPixel :: Int -> Int -> Color -> Canvas -> Canvas
 setPixel x y c (Canvas w h ps) =
-    let n = getIndex w h x y
+    let n = getIndex w x y
         ps' = replaceNth n c ps
+    in Canvas w h ps'
+
+setPixelMap :: M.HashMap (Int, Int) Color -> Canvas -> Canvas
+setPixelMap m (Canvas w h ps) =
+    let ps' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m))) (map (getCoords w) [0..]) ps
     in Canvas w h ps'
 
 pixelAt :: Canvas -> Int -> Int -> Color
 pixelAt (Canvas w h ps) x y =
-    let n = getIndex w h x y
+    let n = getIndex w x y
     in ps !! n
 
-getIndex :: Int -> Int -> Int -> Int -> Int
-getIndex w h x y =
+getIndex :: Int -> Int -> Int -> Int
+getIndex w x y =
     w * y + x
+
+getCoords :: Int -> Int -> (Int, Int)
+getCoords w i =
+    let y = i `div` w
+        x = i - w * y
+    in (x, y)
 
 replaceNth :: Int -> a -> [a] -> [a]
 replaceNth _ _ [] = []

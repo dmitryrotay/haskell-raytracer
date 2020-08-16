@@ -1,1 +1,1 @@
-# haskell-raytracer
+# The Ray Tracer Challenge With Haskell
