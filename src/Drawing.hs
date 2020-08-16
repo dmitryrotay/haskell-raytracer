@@ -39,8 +39,8 @@ canvas w h =
     let pixels = [Color 0 0 0 | _ <- [1..w * h]]
     in Canvas w h pixels
 
-setPixel :: Canvas -> Int -> Int -> Color -> Canvas
-setPixel (Canvas w h ps) x y c =
+setPixel :: Int -> Int -> Color -> Canvas -> Canvas
+setPixel x y c (Canvas w h ps) =
     let n = getIndex w h x y
         ps' = replaceNth n c ps
     in Canvas w h ps'
@@ -52,7 +52,7 @@ pixelAt (Canvas w h ps) x y =
 
 getIndex :: Int -> Int -> Int -> Int -> Int
 getIndex w h x y =
-    w * y + x + 1
+    w * y + x
 
 replaceNth :: Int -> a -> [a] -> [a]
 replaceNth _ _ [] = []

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b632d288a038b6143ab2935ed8779c817ba0dababbd7b5d11b41c9e550eecf6b
+-- hash: 0afb5423c3c16e7df492f375210b2ec387008af307393b56098fd6b89eab2062
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Common
       Drawing
+      Drawing.Output
       Space
   other-modules:
       Paths_haskell_raytracer
@@ -36,6 +37,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , text
   default-language: Haskell2010
 
 executable haskell-raytracer-exe
@@ -48,12 +50,14 @@ executable haskell-raytracer-exe
   build-depends:
       base >=4.7 && <5
     , haskell-raytracer
+    , text
   default-language: Haskell2010
 
 test-suite haskell-raytracer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Drawing.OutputSpec
       DrawingSpec
       SpaceSpec
       Paths_haskell_raytracer
@@ -66,4 +70,5 @@ test-suite haskell-raytracer-test
     , haskell-raytracer
     , hspec
     , hspec-discover
+    , text
   default-language: Haskell2010
