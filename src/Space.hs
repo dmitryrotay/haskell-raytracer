@@ -24,7 +24,7 @@ class SpaceElement a where
     getZ :: a -> Float
 
 eq :: (SpaceElement a) => a -> a -> Bool
-e1 `eq` e2 = (getX e1 `floatEq` getX e2) && (getY e1 `floatEq` getY e2) && (getZ e1 `floatEq` getZ e2)
+e1 `eq` e2 = (getX e1 ~== getX e2) && (getY e1 ~== getY e2) && (getZ e1 ~== getZ e2)
 
 data Point = Point { px :: Float, py :: Float, pz :: Float } deriving (Show)
 

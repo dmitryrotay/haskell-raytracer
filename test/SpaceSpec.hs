@@ -51,7 +51,7 @@ spec = do
                 normalize (Vector 1 2 3) == Vector 0.26726 0.53452 0.80178
             it "normalizes Vector 1 2 3 to Vector with magnitude == 1" $
                 let normalized = normalize (Vector 1 2 3)
-                in magnitude normalized `floatEq` 1.0
+                in magnitude normalized ~== 1.0
             it "calculates dot product of Vector 1 2 3 and Vector 2 3 4 as 20" $
                 dot (Vector 1 2 3) (Vector 2 3 4) == 20
             it "calculates cross product of Vector 1 2 3 and Vector 2 3 4 as Vector (-1) 2 (-1)" $

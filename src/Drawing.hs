@@ -20,7 +20,7 @@ import           Data.Maybe
 data Color = Color { red :: Float, green :: Float, blue :: Float } deriving (Show)
 
 instance Eq Color where
-    Color r1 g1 b1 == Color r2 g2 b2 = (r1 `floatEq` r2) && (g1 `floatEq` g2) && (b1 `floatEq` b2)
+    Color r1 g1 b1 == Color r2 g2 b2 = (r1 ~== r2) && (g1 ~== g2) && (b1 ~== b2)
 
 addColor :: Color -> Color -> Color
 Color r1 g1 b1 `addColor` Color r2 g2 b2 = Color (r1 + r2) (g1 + g2) (b1 + b2)
