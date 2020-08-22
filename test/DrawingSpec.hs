@@ -25,4 +25,3 @@ spec = do
                     red = Color 1 0 0
                     c' = setPixel 2 3 red c
                 in pixelAt c' 2 3 `shouldBe` red
-
