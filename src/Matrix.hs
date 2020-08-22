@@ -10,6 +10,8 @@ module Matrix
     , submatrix
     , multiply
     , identity
+    , invertible
+    , inverse
     ) where
 
 import Common
@@ -98,3 +100,17 @@ m1 `multiply` m2 =
 
 identity :: Int -> SquareMatrix
 identity n = SquareMatrix [[if row == col then 1 else 0 | col <- [0..n-1]] | row <- [0..n-1]]
+
+invertible :: SquareMatrix -> Bool
+invertible m = determinant m /= 0
+
+inverse :: SquareMatrix -> Either String SquareMatrix
+inverse m
+    | invertible m =
+        let d = determinant m
+            (SquareMatrix a) = m
+            n = length a
+            c = SquareMatrix [[cofactor m row col / d | col <- [0..n-1]] | row <- [0..n-1]]
+        in Right (transpose c)
+    | otherwise = Left "The given matrix is not invertible"
+    
