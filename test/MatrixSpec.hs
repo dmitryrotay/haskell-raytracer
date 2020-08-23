@@ -71,11 +71,7 @@ spec = do
                                           44, 54, 114, 108,
                                           40, 58, 110, 102,
                                           16, 26, 46, 42)
-                    result = m1 `M.multiply` m2
-                    test = (case result of
-                                (Left error) -> expectationFailure error
-                                (Right result') -> result' `shouldBe` expected)
-                in test
+                in m1 `M.multiply` m2 `shouldBe` Right expected
             it "multiplies by tuple returning valid product tuple" $
                 let m = M.square4 (1, 2, 3, 4,
                                    2, 4, 4, 2,
@@ -83,21 +79,14 @@ spec = do
                                    0, 0, 0, 1)
                     t = M.fromTuple4 (1, 2, 3, 1)
                     expected = M.fromTuple4 (18, 24, 33, 1)
-                    result = m `M.multiply` t
-                    test = (case result of
-                                (Left error) -> expectationFailure error
-                                (Right result') -> result' `shouldBe` expected)
-                in test
+                in m `M.multiply` t `shouldBe` Right expected
             it "multiplies by identity matrix returning original matrix" $
                 let m = M.square4 (0, 1, 2, 4,
                                    1, 2, 4, 8,
                                    2, 4, 8, 16,
                                    4, 8, 16, 32)
                     result = m `M.multiply` M.identity 4
-                    test = (case result of
-                                (Left error) -> expectationFailure error
-                                (Right result') -> result' `shouldBe` m)
-                in test
+                in m `M.multiply` M.identity 4 `shouldBe` Right m
             it "fails on mismatch of first matrix rows count and second matrix column count" $
                 let m1 = M.square4 (0, 1, 2, 4,
                                    1, 2, 4, 8,
@@ -156,10 +145,7 @@ spec = do
                                           -0.80827, -1.45677, -0.44361,  0.52068,
                                           -0.07895, -0.22368, -0.05263,  0.19737,
                                           -0.52256, -0.81391, -0.30075,  0.30639)
-                    test = (case M.inverse m of
-                                (Left error) -> expectationFailure error
-                                (Right m') -> m' `shouldBe` expected)  
-                in test
+                in M.inverse m `shouldBe` Right expected
             it "computes inverse matrix correctly 2" $
                 let m = M.square4 ( 8,-5, 9, 2,
                                     7, 5, 6, 1,
@@ -169,10 +155,7 @@ spec = do
                                           -0.07692,  0.12308,  0.02564,  0.03077,
                                            0.35897,  0.35897,  0.43590,  0.92308,
                                           -0.69231, -0.69231,  -0.76923, -1.92308)
-                    test = (case M.inverse m of
-                                (Left error) -> expectationFailure error
-                                (Right m') -> m' `shouldBe` expected)  
-                in test
+                in M.inverse m `shouldBe` Right expected
             it "computes inverse matrix correctly 3" $
                 let m = M.square4 ( 9, 3, 0, 9,
                                    -5,-2,-6,-3,
@@ -182,10 +165,7 @@ spec = do
                                           -0.07778,  0.03333,  0.36667, -0.33333,
                                           -0.02901, -0.14630, -0.10926,  0.12963,
                                            0.17778,  0.06667, -0.26667,  0.33333)
-                    test = (case M.inverse m of
-                                (Left error) -> expectationFailure error
-                                (Right m') -> m' `shouldBe` expected)
-                in test
+                in M.inverse m `shouldBe` Right expected
             it "computes inverse matrix multiplying product by which returns original matrix" $
                 let a = M.square4 ( 3,-9, 7, 3,
                                     3,-8, 2,-9,
@@ -196,7 +176,4 @@ spec = do
                                     7, 0, 5, 4,
                                     6,-2, 0, 5)
                     result = join $ M.multiply <$> a `M.multiply` b <*> M.inverse b
-                    test = (case result of
-                                (Left error) -> expectationFailure error
-                                (Right r) -> r `shouldBe` a)
-                in test
+                in result `shouldBe` Right a
