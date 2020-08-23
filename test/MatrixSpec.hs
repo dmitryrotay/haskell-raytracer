@@ -81,8 +81,8 @@ spec = do
                                    2, 4, 4, 2,
                                    8, 6, 4, 1,
                                    0, 0, 0, 1)
-                    t = M.vector4 (1, 2, 3, 1)
-                    expected = M.vector4 (18, 24, 33, 1)
+                    t = M.fromTuple4 (1, 2, 3, 1)
+                    expected = M.fromTuple4 (18, 24, 33, 1)
                     result = m `M.multiply` t
                     test = (case result of
                                 (Left error) -> expectationFailure error
