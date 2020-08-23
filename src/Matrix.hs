@@ -1,5 +1,6 @@
 module Matrix
-    ( square2
+    ( Matrix
+    , square2
     , square3
     , square4
     , fromTuple4
