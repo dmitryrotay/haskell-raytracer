@@ -47,7 +47,7 @@ spec = do
                     p = M.fromPoint $ S.Point 2 3 4
                     expected = M.fromPoint $ S.Point (-2) 3 4
                 in t `M.multiply` p `shouldBe` Right expected
-        describe "rotation" $ do
+        describe "rotationX" $ do
             it "rotates a point around x axis" $
                 let halfQuarter = T.rotationX (pi / 4)
                     fullQuarter = T.rotationX (pi / 2)
@@ -62,3 +62,21 @@ spec = do
                     expected = M.fromPoint $ S.Point 0 (sqrt 2 / 2) (-sqrt 2 / 2)
                     result = t >>= (`M.multiply` p)
                 in result `shouldBe` Right expected
+        describe "rotationY" $ do
+            it "rotates a point around y axis" $
+                let halfQuarter = T.rotationY (pi / 4)
+                    fullQuarter = T.rotationY (pi / 2)
+                    p = M.fromPoint $ S.Point 0 0 1
+                    expectedHalfQuarter = M.fromPoint $ S.Point (sqrt 2 / 2) 0 (sqrt 2 / 2)
+                    expectedFullQuarter = M.fromPoint $ S.Point 1 0 0
+                in do halfQuarter `M.multiply` p `shouldBe` Right expectedHalfQuarter
+                      fullQuarter `M.multiply` p `shouldBe` Right expectedFullQuarter
+        describe "rotationZ" $ do
+            it "rotates a point around z axis" $
+                let halfQuarter = T.rotationZ (pi / 4)
+                    fullQuarter = T.rotationZ (pi / 2)
+                    p = M.fromPoint $ S.Point 0 1 0
+                    expectedHalfQuarter = M.fromPoint $ S.Point (-sqrt 2 / 2) (sqrt 2 / 2) 0
+                    expectedFullQuarter = M.fromPoint $ S.Point (-1) 0 0
+                in do halfQuarter `M.multiply` p `shouldBe` Right expectedHalfQuarter
+                      fullQuarter `M.multiply` p `shouldBe` Right expectedFullQuarter
