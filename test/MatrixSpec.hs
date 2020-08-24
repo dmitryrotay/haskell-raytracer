@@ -1,10 +1,8 @@
 module MatrixSpec where
 
+import           Control.Monad
 import qualified Matrix as M
-
-import Test.Hspec
-
-import Control.Monad
+import           Test.Hspec
 
 spec :: Spec
 spec = do
