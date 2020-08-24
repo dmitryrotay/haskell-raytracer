@@ -80,3 +80,34 @@ spec = do
                     expectedFullQuarter = M.fromPoint $ S.Point (-1) 0 0
                 in do halfQuarter `M.multiply` p `shouldBe` Right expectedHalfQuarter
                       fullQuarter `M.multiply` p `shouldBe` Right expectedFullQuarter
+        describe "shearing" $ do
+            it "moves x in proportion to y" $
+                let t = T.shearing 1 0 0 0 0 0
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 5 3 4
+                in t `M.multiply` p `shouldBe` Right expected
+            it "moves x in proportion to z" $
+                let t = T.shearing 0 1 0 0 0 0
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 6 3 4
+                in t `M.multiply` p `shouldBe` Right expected
+            it "moves y in proportion to x" $
+                let t = T.shearing 0 0 1 0 0 0
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 2 5 4
+                in t `M.multiply` p `shouldBe` Right expected
+            it "moves y in proportion to z" $
+                let t = T.shearing 0 0 0 1 0 0
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 2 7 4
+                in t `M.multiply` p `shouldBe` Right expected
+            it "moves z in proportion to x" $
+                let t = T.shearing 0 0 0 0 1 0
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 2 3 6
+                in t `M.multiply` p `shouldBe` Right expected
+            it "moves z in proportion to y" $
+                let t = T.shearing 0 0 0 0 0 1
+                    p = M.fromPoint $ S.Point 2 3 4
+                    expected = M.fromPoint $ S.Point 2 3 7
+                in t `M.multiply` p `shouldBe` Right expected

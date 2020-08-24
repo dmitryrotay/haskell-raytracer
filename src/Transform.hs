@@ -4,6 +4,7 @@ module Transform
     , rotationX
     , rotationY
     , rotationZ
+    , shearing
     ) where
 
 import qualified Matrix as M
@@ -37,3 +38,9 @@ rotationZ r = M.square4 (cos r,  -sin r,   0,  0,
                          sin r,   cos r,   0,  0,
                              0,       0,   1,  0,
                              0,       0,   0,  1)
+
+shearing :: Float -> Float -> Float -> Float -> Float -> Float -> M.Matrix
+shearing xy xz yx yz zx zy = M.square4 (1,  xy, xz, 0,
+                                        yx,  1, yz, 0,
+                                        zx, zy,  1, 0,
+                                         0,  0,  0, 1)
