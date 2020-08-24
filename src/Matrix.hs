@@ -11,7 +11,7 @@ module Matrix
     , cofactor
     , determinant
     , submatrix
-    , multiply
+    , (|*|)
     , identity
     , invertible
     , inverse
@@ -103,8 +103,8 @@ fromPoint (S.Point x y z) = Matrix [[x],
 cross :: [Float] -> [Float] -> Float
 cross a1 a2 = sum (zipWith (*) a1 a2)
 
-multiply :: Matrix -> Matrix -> Either String Matrix
-m1 `multiply` m2 = 
+(|*|) :: Matrix -> Matrix -> Either String Matrix
+m1 |*| m2 = 
     let (Matrix rows1) = m1
         (Matrix cols2) = transpose m2
         product

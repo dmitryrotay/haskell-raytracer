@@ -1,6 +1,7 @@
 module MatrixSpec where
 
 import           Control.Monad
+import           Matrix ((|*|))
 import qualified Matrix as M
 import           Test.Hspec
 
@@ -69,7 +70,7 @@ spec = do
                                           44, 54, 114, 108,
                                           40, 58, 110, 102,
                                           16, 26, 46, 42)
-                in m1 `M.multiply` m2 `shouldBe` Right expected
+                in m1 |*| m2 `shouldBe` Right expected
             it "multiplies by tuple returning valid product tuple" $
                 let m = M.square4 (1, 2, 3, 4,
                                    2, 4, 4, 2,
@@ -77,14 +78,14 @@ spec = do
                                    0, 0, 0, 1)
                     t = M.fromTuple4 (1, 2, 3, 1)
                     expected = M.fromTuple4 (18, 24, 33, 1)
-                in m `M.multiply` t `shouldBe` Right expected
+                in m |*| t `shouldBe` Right expected
             it "multiplies by identity matrix returning original matrix" $
                 let m = M.square4 (0, 1, 2, 4,
                                    1, 2, 4, 8,
                                    2, 4, 8, 16,
                                    4, 8, 16, 32)
-                    result = m `M.multiply` M.identity 4
-                in m `M.multiply` M.identity 4 `shouldBe` Right m
+                    result = m |*| M.identity 4
+                in m |*| M.identity 4 `shouldBe` Right m
             it "fails on mismatch of first matrix rows count and second matrix column count" $
                 let m1 = M.square4 (0, 1, 2, 4,
                                    1, 2, 4, 8,
@@ -93,7 +94,7 @@ spec = do
                     m2 = M.square3 (0, 1, 2, 
                                    1, 2, 4,
                                    2, 4, 8) 
-                    result = m1 `M.multiply` m2
+                    result = m1 |*| m2
                     test = (case result of
                                 (Left error) -> pure ()
                                 (Right _) -> expectationFailure "Must fail if matrices rows/columns length don't match")
@@ -117,8 +118,8 @@ spec = do
                                    -8, 5, 8, 6,
                                    -1, 0, 8, 2,
                                    -7, 1, -1, 1)
-                    expected = M.square3 (-6, 1, 6,
-                                          -8, 8, 6,
+                    expected = M.square3 (-6, 1,  6,
+                                          -8, 8,  6,
                                           -7, -1, 1)
                 in M.submatrix m 2 1 `shouldBe` expected
         describe "inverse" $ do
@@ -174,7 +175,7 @@ spec = do
                                     7, 0, 5, 4,
                                     6,-2, 0, 5)
                     result = do
-                        product <- a `M.multiply` b
+                        product <- a |*| b
                         inverseB <- M.inverse b
-                        product `M.multiply` inverseB
+                        product |*| inverseB
                 in result `shouldBe` Right a
