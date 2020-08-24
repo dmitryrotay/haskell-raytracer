@@ -173,5 +173,8 @@ spec = do
                                     3,-1, 7, 0,
                                     7, 0, 5, 4,
                                     6,-2, 0, 5)
-                    result = join $ M.multiply <$> a `M.multiply` b <*> M.inverse b
+                    result = do
+                        product <- a `M.multiply` b
+                        inverseB <- M.inverse b
+                        product `M.multiply` inverseB
                 in result `shouldBe` Right a
