@@ -112,3 +112,18 @@ spec = do
                     p = M.fromPoint $ S.Point 2 3 4
                     expected = M.fromPoint $ S.Point 2 3 7
                 in t |*| p `shouldBe` Right expected
+        describe "combine" $ do
+            it "produces the same result as with applying transformations one by one" $
+                let p = M.fromPoint $ S.Point 1 0 1
+                    a = T.rotationX (pi / 2)
+                    b = T.scaling 5 5 5
+                    c = T.translation 10 5 7
+                    oneByOne = do
+                        ta <- a |*| p
+                        tb <- b |*| ta
+                        c |*| tb
+                    combined = do
+                        t <- T.combine [a, b, c]
+                        t |*| p
+                    in oneByOne `shouldBe` combined
+

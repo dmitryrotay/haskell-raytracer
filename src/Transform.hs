@@ -5,9 +5,14 @@ module Transform
     , rotationY
     , rotationZ
     , shearing
+    , combine
     ) where
 
 import qualified Matrix as M
+import           Matrix ((|*|))
+
+combine :: [M.Matrix] -> Either String M.Matrix
+combine = foldr (\x t -> t >>= (|*| x)) (Right $ M.identity 4)
 
 translation :: Float -> Float -> Float -> M.Matrix
 translation x y z = M.square4 (1, 0, 0, x,
