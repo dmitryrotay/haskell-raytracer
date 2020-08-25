@@ -15,6 +15,7 @@ module Matrix
     , identity
     , invertible
     , inverse
+    , toPoint
     ) where
 
 import Common
@@ -99,6 +100,10 @@ fromPoint (S.Point x y z) = Matrix [[x],
                                     [y],
                                     [z],
                                     [1]]
+
+toPoint :: Matrix -> Either String S.Point
+toPoint (Matrix [[x],[y],[z],[1]]) = Right (S.Point x y z)
+toPoint _ = Left "The matrix doesn't match Point representation"
 
 cross :: [Float] -> [Float] -> Float
 cross a1 a2 = sum (zipWith (*) a1 a2)
