@@ -7,6 +7,7 @@ module Transform
     , shearing
     , combine
     , (|<|)
+    , (|<<|)
     ) where
 
 import qualified Matrix as M
@@ -14,6 +15,9 @@ import           Matrix ((|*|))
 
 (|<|) :: M.Matrix -> M.Matrix -> Either String M.Matrix
 (|<|) = flip (|*|)
+
+(|<<|) :: Either String M.Matrix -> M.Matrix -> Either String M.Matrix
+t |<<| m = t >>= (|<| m)
 
 noop :: M.Matrix
 noop = M.identity 4

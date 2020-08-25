@@ -5,7 +5,7 @@ import           Matrix ((|*|))
 import qualified Matrix as M
 import qualified Space as S
 import           Test.Hspec
-import           Transform ((|<|))
+import           Transform ((|<|), (|<<|))
 import qualified Transform as T
 
 spec :: Spec
@@ -124,7 +124,7 @@ spec = do
                         tb <- ta |<| b
                         tb |<| c
                     combined = do
-                        t <- T.combine [a, b, c]
+                        t <- a |<| b |<<| c
                         p |<| t
                     in oneByOne `shouldBe` combined
 
