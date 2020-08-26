@@ -12,8 +12,8 @@ import           Transform ((|<>|))
 
 drawClockFace :: IO ()
 drawClockFace = do
-    let h = 320
-        w = 480
+    let h = 480
+        w = 640
         canvas = D.canvas w h
         originTransform = T.translation (fromIntegral w / 2) (fromIntegral h / 2) 0
         start = Right (M.fromPoint $ S.Point 0 (-(fromIntegral h / 2) + 50) 0)

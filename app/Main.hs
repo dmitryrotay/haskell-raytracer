@@ -1,6 +1,6 @@
 module Main where
 
-import ClockFace
+import ProjectileTrajectory
 
 main :: IO ()
-main = drawClockFace
+main = drawProjectile
