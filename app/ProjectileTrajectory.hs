@@ -3,29 +3,30 @@ module ProjectileTrajectory
     ) where
 
 import qualified Data.HashMap.Strict as M
-import           Drawing
-import           Drawing.Output
-import           Space
+import qualified Drawing as D
+import qualified Drawing.Output as O
+import qualified Space as S
 
-data Projectile = Projectile { projectilePosition :: Point,  projectileVelocity :: Vector }
-data Environment = Environment Vector Vector
+data Projectile = Projectile { projectilePosition :: S.Point,  projectileVelocity :: S.Vector }
+data Environment = Environment S.Vector S.Vector
 
 tick :: Environment -> Projectile -> Projectile
 tick (Environment gravity wind) (Projectile position velocity) =
-    let position' = position `addVectorP` velocity
-        velocity' = velocity `addVectorV` gravity `addVectorV` wind
+    let position' = position `S.addVectorP` velocity
+        velocity' = velocity `S.addVectorV` gravity `S.addVectorV` wind
     in Projectile position' velocity'
 
 drawProjectile :: IO ()
 drawProjectile = do
-    let start = Point 0 1 0
-        velocity = normalize (Vector 1 1.8 0) `multiplyVector` 11.25
+    let start = S.Point 0 1 0
+        velocity = S.normalize (S.Vector 1 1.8 0) `S.multiplyVector` 11.25
         pStart = Projectile start velocity
-        gravity = Vector 0 (-0.1) 0
-        wind = Vector (-0.01) 0 0
+        gravity = S.Vector 0 (-0.1) 0
+        wind = S.Vector (-0.01) 0 0
         env = Environment gravity wind
-        c = canvas 900 550
-        ps = takeWhile (\p -> (py . projectilePosition $ p) > 0) $ scanl (flip tick) pStart (repeat env)
-        m = M.fromList $ map (\p -> ((round . px . projectilePosition $ p, 550 - (round . py . projectilePosition $ p)), Color 1 0 0)) ps
-        c' = setPixelMap m c
-    putStr . canvasToPpm $ c'
+        c = D.canvas 900 550
+        ps = takeWhile (\p -> (S.pointY . projectilePosition $ p) > 0) $ scanl (flip tick) pStart (repeat env)
+        red = D.Color 1 0 0
+        m = M.fromList $ map (\p -> ((round . S.pointX . projectilePosition $ p, 550 - (round . S.pointY . projectilePosition $ p)), red)) ps
+        c' = D.setPixelMap m c
+    putStr . O.canvasToPpm $ c'

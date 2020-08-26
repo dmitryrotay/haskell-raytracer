@@ -90,16 +90,10 @@ fromTuple4 (x0, x1, x2, x3) = Matrix [[x0],
                                       [x3]]
 
 fromVector :: S.Vector -> Matrix
-fromVector (S.Vector x y z) = Matrix [[x],
-                                      [y],
-                                      [z],
-                                      [0]]
+fromVector (S.Vector x y z) = fromTuple4 (x, y, z, 0)
 
 fromPoint :: S.Point -> Matrix 
-fromPoint (S.Point x y z) = Matrix [[x],
-                                    [y],
-                                    [z],
-                                    [1]]
+fromPoint (S.Point x y z) = fromTuple4 (x, y, z, 1)
 
 toPoint :: Matrix -> Either String S.Point
 toPoint (Matrix [[x],[y],[z],[1]]) = Right (S.Point x y z)
