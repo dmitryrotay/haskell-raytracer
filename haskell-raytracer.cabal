@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 558de51c00f7103545044de95328a3deece465be8b75b526fb9ab24910829db4
+-- hash: 66778964474c24565e828cf8a3cba70f35ac650df02bd5c697e210e7adf9e755
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Drawing
       Drawing.Output
       Matrix
+      RayTracing
       Space
       Transform
   other-modules:

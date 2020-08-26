@@ -2,10 +2,9 @@ module Drawing.Output
     ( canvasToPpm    
     ) where
 
-import Data.List
-
-import Data.List.Split
-import Drawing
+import Data.List (intercalate)
+import Data.List.Split (chunksOf)
+import Drawing (Canvas (..), Color (..))
 
 maxLineLength = 70
 

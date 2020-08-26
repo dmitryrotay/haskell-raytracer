@@ -2,24 +2,23 @@ module ClockFace
     ( drawClockFace
     ) where
 
-import           Data.Either
-import qualified Drawing as D
-import qualified Drawing.Output as O
-import qualified Matrix as M
-import qualified Space as S
-import qualified Transform as T
-import           Transform ((|<>|))
+import Data.Either
+import Drawing (Color (..), canvas, setPixel)
+import Drawing.Output (canvasToPpm)
+import Matrix (fromPoint, toPoint)
+import Space (Point (..), Vector (..))
+import Transform (translation, rotationZ, (|<>|))
 
 drawClockFace :: IO ()
 drawClockFace = do
     let h = 480
         w = 640
-        canvas = D.canvas w h
-        originTransform = T.translation (fromIntegral w / 2) (fromIntegral h / 2) 0
-        start = Right (M.fromPoint $ S.Point 0 (-(fromIntegral h / 2) + 50) 0)
-        hours = start : map (\hour -> start >>= (|<>| T.rotationZ (hour * 2 * pi / 12))) [1..11]
-        correctOriginHours = map (\x -> (x >>= (|<>| originTransform)) >>= M.toPoint) hours
-        points = map (fromRight $ S.Point 0 0 0) correctOriginHours
-        red = D.Color 1 0 0
-        canvas' = foldl (\c (S.Point x y _) -> D.setPixel (round x) (round y) red c) canvas points
-    putStr . O.canvasToPpm $ canvas'
+        outputCanvas = canvas w h
+        originTransform = translation (fromIntegral w / 2) (fromIntegral h / 2) 0
+        start = Right (fromPoint $ Point 0 (-(fromIntegral h / 2) + 50) 0)
+        hours = start : map (\hour -> start >>= (|<>| rotationZ (hour * 2 * pi / 12))) [1..11]
+        correctOriginHours = map (\x -> (x >>= (|<>| originTransform)) >>= toPoint) hours
+        points = map (fromRight $ Point 0 0 0) correctOriginHours
+        red = Color 1 0 0
+        outputCanvas' = foldl (\c (Point x y _) -> setPixel (round x) (round y) red c) outputCanvas points
+    putStr . canvasToPpm $ outputCanvas'

@@ -12,9 +12,9 @@ module Drawing
     , getCoords
     ) where
 
-import           Common
-import qualified Data.HashMap.Strict as M
-
+import           Common ((~==))
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as M (lookup)
 import           Data.Maybe
 
 data Color = Color { red :: Float, green :: Float, blue :: Float } deriving (Show)
@@ -50,7 +50,7 @@ setPixel x y c (Canvas w h ps) =
         ps' = replaceNth n c ps
     in Canvas w h ps'
 
-setPixelMap :: M.HashMap (Int, Int) Color -> Canvas -> Canvas
+setPixelMap :: HashMap (Int, Int) Color -> Canvas -> Canvas
 setPixelMap m (Canvas w h ps) =
     let ps' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m))) (map (getCoords w) [0..]) ps
     in Canvas w h ps'

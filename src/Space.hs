@@ -16,7 +16,7 @@ module Space
     , cross
     ) where
 
-import Common
+import Common ((~==))
 
 class SpaceElement a where
     getX :: a -> Float

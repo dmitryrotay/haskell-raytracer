@@ -18,8 +18,8 @@ module Matrix
     , toPoint
     ) where
 
-import Common
-import qualified Space as S
+import Common ((~==))
+import Space (Point (..), Vector (..))
 
 transposeA :: [[a]] -> [[a]]
 transposeA ([]:_) = []
@@ -89,14 +89,14 @@ fromTuple4 (x0, x1, x2, x3) = Matrix [[x0],
                                       [x2],
                                       [x3]]
 
-fromVector :: S.Vector -> Matrix
-fromVector (S.Vector x y z) = fromTuple4 (x, y, z, 0)
+fromVector :: Vector -> Matrix
+fromVector (Vector x y z) = fromTuple4 (x, y, z, 0)
 
-fromPoint :: S.Point -> Matrix 
-fromPoint (S.Point x y z) = fromTuple4 (x, y, z, 1)
+fromPoint :: Point -> Matrix 
+fromPoint (Point x y z) = fromTuple4 (x, y, z, 1)
 
-toPoint :: Matrix -> Either String S.Point
-toPoint (Matrix [[x],[y],[z],[1]]) = Right (S.Point x y z)
+toPoint :: Matrix -> Either String Point
+toPoint (Matrix [[x],[y],[z],[1]]) = Right (Point x y z)
 toPoint _ = Left "The matrix doesn't match Point representation"
 
 cross :: [Float] -> [Float] -> Float

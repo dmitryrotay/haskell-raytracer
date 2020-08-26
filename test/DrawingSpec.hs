@@ -1,6 +1,18 @@
 module DrawingSpec where
 
 import Drawing
+    ( Color (..)
+    , addColor
+    , subtractColor
+    , multiplyByScalar
+    , multiplyByColor
+    , height
+    , width
+    , pixels
+    , canvas
+    , setPixel
+    , pixelAt
+    )
 
 import Test.Hspec
 
@@ -16,6 +28,7 @@ spec = do
                 Color 0.2 0.3 0.4 `multiplyByScalar` 2 `shouldBe` Color 0.4 0.6 0.8
             it "multiplies two colors producing color with corresponding components multiplied" $
                 Color 1 0.2 0.4 `multiplyByColor` Color 0.9 1 0.1 `shouldBe` Color 0.9 0.2 0.04
+        
         describe "Canvas" $ do
             it "creates canvas with correct initial state" $
                 let c = canvas 10 20
