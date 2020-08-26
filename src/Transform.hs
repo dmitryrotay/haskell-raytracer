@@ -6,24 +6,21 @@ module Transform
     , rotationZ
     , shearing
     , combine
-    , (|<|)
-    , (|<<|)
+    , (|<>|)
     ) where
 
 import qualified Matrix as M
 import           Matrix ((|*|))
 
-(|<|) :: M.Matrix -> M.Matrix -> Either String M.Matrix
-(|<|) = flip (|*|)
-
-(|<<|) :: Either String M.Matrix -> M.Matrix -> Either String M.Matrix
-t |<<| m = t >>= (|<| m)
+-- Apply transformation by swapping arguments and multiplying them
+(|<>|) :: M.Matrix -> M.Matrix -> Either String M.Matrix
+(|<>|) = flip (|*|)
 
 noop :: M.Matrix
 noop = M.identity 4
 
 combine :: [M.Matrix] -> Either String M.Matrix
-combine = foldr (\x t -> t >>= (x |<|)) (Right noop)
+combine = foldr (\m t -> t >>= (m |<>|)) (Right noop)
 
 translation :: Float -> Float -> Float -> M.Matrix
 translation x y z = M.square4 (1, 0, 0, x,

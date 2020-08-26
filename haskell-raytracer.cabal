@@ -4,11 +4,11 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6ce444b5b21bf509adc8f080e5c05bc01e2809548d990f478d636992f8d14a1a
+-- hash: 558de51c00f7103545044de95328a3deece465be8b75b526fb9ab24910829db4
 
 name:           haskell-raytracer
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/DmitryRotayhaskell-raytracer#readme>
+description:    Please see the README on GitHub at <https://github.com/DmitryRotay/haskell-raytracer#readme>
 homepage:       https://github.com/DmitryRotay/haskell-raytracer#readme
 bug-reports:    https://github.com/DmitryRotay/haskell-raytracer/issues
 author:         Dmitry Rotay
