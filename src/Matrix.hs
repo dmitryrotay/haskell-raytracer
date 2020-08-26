@@ -112,12 +112,12 @@ cross a1 a2 = sum (zipWith (*) a1 a2)
 m1 |*| m2 = 
     let (Matrix rows1) = m1
         (Matrix cols2) = transpose m2
-        product
+        matrixProduct
             | length rows1 /= length (head cols2) = Left "m1 height must be equal to m2 width"
             | otherwise =
                 let productArray = [[cross row1 col2 | col2 <- cols2] | row1 <- rows1]
                 in Right (Matrix productArray)
-    in product
+    in matrixProduct
 
 identity :: Int -> Matrix
 identity n = Matrix [[if row == col then 1 else 0 | col <- [0..n-1]] | row <- [0..n-1]]
