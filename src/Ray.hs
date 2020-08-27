@@ -1,4 +1,4 @@
-module RayTracing
+module Ray
     ( Ray (..)
     , position
     ) where

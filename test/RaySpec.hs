@@ -1,12 +1,12 @@
-module RayTracingSpec where
+module RaySpec where
 
-import RayTracing (Ray (..), position)
+import Ray (Ray (..), position)
 import Space (Vector (..), Point (..))
 import Test.Hspec
 
 spec :: Spec
 spec = do
-    describe "RayTracing" $ do
+    describe "Ray" $ do
         describe "Ray" $ do
             it "constructs ray from point and vector" $
                 let p = Point  1 2 3
