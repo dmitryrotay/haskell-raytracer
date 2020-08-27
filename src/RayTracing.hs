@@ -13,5 +13,5 @@ import Space
 data Ray = Ray { origin :: Point, direction :: Vector }
 
 position :: Ray -> Float -> Point
-position (Ray o d) t = o `addVectorP` (d `multiplyVector` t)
+position (Ray origin direction) t = origin `addVectorP` (direction `multiplyVector` t)
 

@@ -1,6 +1,6 @@
 module RayTracingSpec where
 
-import RayTracing (Ray(..), position)
+import RayTracing (Ray (..), position)
 import Space (Vector (..), Point (..))
 import Test.Hspec
 
