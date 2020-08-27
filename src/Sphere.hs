@@ -1,6 +1,7 @@
 module Sphere
     ( Sphere (..)
-    , Intersection (..)
+    , RaySphereIntersection (..)
+    , SphereIntersection (..)
     , intersect
     , sphere
     ) where
@@ -8,15 +9,20 @@ module Sphere
 import Ray (Ray (..))
 import Space (Point (..), subtractPoint, dot)
 
-newtype Sphere = Sphere { id :: Int }
+newtype Sphere = Sphere { sphereId :: Int }
+    deriving (Show, Eq)
 
-data Intersection = Miss | Hit Float Float deriving (Show, Eq)
+data SphereIntersection = SphereIntersection Sphere Float
+    deriving (Show, Eq)
+
+data RaySphereIntersection = Miss | Intersection SphereIntersection SphereIntersection
+    deriving (Show, Eq)
 
 sphere :: Int -> (Sphere, Int)
 sphere newId = (Sphere newId, newId + 1)
 
-intersect :: Sphere -> Ray -> Intersection
-intersect sphere (Ray origin direction) =
+intersect :: Sphere -> Ray -> RaySphereIntersection
+intersect s (Ray origin direction) =
     let sphereToRay = origin `subtractPoint` Point 0 0 0
         a = direction `dot` direction
         b = 2 * (direction `dot` sphereToRay)
@@ -27,5 +33,5 @@ intersect sphere (Ray origin direction) =
             | otherwise =
                 let t1 = (-b - sqrt discriminant) / (2 * a)
                     t2 = (-b + sqrt discriminant) / (2 * a)
-                in Hit (min t1 t2) (max t1 t2)
+                in Intersection (SphereIntersection s (min t1 t2)) (SphereIntersection s (max t1 t2))
     in result   
