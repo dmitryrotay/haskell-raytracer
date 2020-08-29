@@ -16,6 +16,7 @@ module Matrix
     , invertible
     , inverse
     , toPoint
+    , toVector
     ) where
 
 import Common ((~==))
@@ -91,6 +92,10 @@ fromTuple4 (x0, x1, x2, x3) = Matrix [[x0],
 
 fromVector :: Vector -> Matrix
 fromVector (Vector x y z) = fromTuple4 (x, y, z, 0)
+
+toVector :: Matrix -> Either String Vector
+toVector (Matrix [[x],[y],[z],[0]]) = Right (Vector x y z)
+toVector _ = Left "The matrix doesn't match Vector representation"
 
 fromPoint :: Point -> Matrix 
 fromPoint (Point x y z) = fromTuple4 (x, y, z, 1)

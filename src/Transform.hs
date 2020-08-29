@@ -6,20 +6,22 @@ module Transform
     , rotationZ
     , shearing
     , combine
+    , identity
     , (|<>|)
     ) where
 
-import Matrix (Matrix (..), (|*|), identity, square4)
+import           Matrix (Matrix (..), (|*|), square4)
+import qualified Matrix as M (identity)
 
 -- Apply transformation by swapping arguments and multiplying them
 (|<>|) :: Matrix -> Matrix -> Either String Matrix
 (|<>|) = flip (|*|)
 
-noop :: Matrix
-noop = identity 4
+identity :: Matrix
+identity = M.identity 4
 
 combine :: [Matrix] -> Either String Matrix
-combine = foldr (\m t -> t >>= (m |<>|)) (Right noop)
+combine = foldr (\m t -> t >>= (m |<>|)) (Right identity)
 
 translation :: Float -> Float -> Float -> Matrix
 translation x y z = square4 (1, 0, 0, x,
