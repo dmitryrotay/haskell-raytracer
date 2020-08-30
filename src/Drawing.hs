@@ -5,7 +5,7 @@ module Drawing
     , multiplyByScalar
     , multiplyByColor
     , Canvas (..)
-    , canvas
+    , blank
     , setPixel
     , setPixelMap
     , pixelAt
@@ -39,20 +39,21 @@ data Canvas = Canvas { width :: Int, height :: Int, pixels :: [Color] }
 instance Show Canvas where 
     show (Canvas width height _) = "Canvas {width = " ++ show width ++ ", height = " ++ show height ++ "}"
 
-canvas :: Int -> Int -> Canvas
-canvas width height =
+blank :: Int -> Int -> Canvas
+blank width height =
     let pixels = [Color 0 0 0 | _ <- [1..width * height]]
     in Canvas width height pixels
 
-setPixel :: Int -> Int -> Color -> Canvas -> Canvas
-setPixel x y color (Canvas width height pixels) =
+setPixel :: Canvas -> Int -> Int -> Color -> Canvas
+setPixel (Canvas width height pixels) x y color =
     let n = getIndex width x y
         pixels' = replaceNth n color pixels
     in Canvas width height pixels'
 
-setPixelMap :: HashMap (Int, Int) Color -> Canvas -> Canvas
-setPixelMap m (Canvas width height pixels) =
-    let pixels' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m))) (map (getCoords width) [0..]) pixels
+setPixelMap :: Canvas -> HashMap (Int, Int) Color -> Canvas
+setPixelMap (Canvas width height pixels) m =
+    let pixels' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m)))
+                                                   (map (getCoords width) [0..]) pixels
     in Canvas width height pixels'
 
 pixelAt :: Canvas -> Int -> Int -> Color

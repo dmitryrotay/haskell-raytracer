@@ -24,7 +24,7 @@ createSphere newId = (Sphere newId identity, newId + 1)
 intersect :: Sphere -> Ray -> Either String SphereRayIntersection
 intersect s ray =
     do
-        t' <- inverse $ getTransform s
+        t' <- inverse $ getTransform s --possible performance hit
         let sphereToRay = origin `subtractPoint` Point 0 0 0
             (Ray origin direction) = transform ray t'
             a = direction `dot` direction

@@ -1,6 +1,6 @@
 module Main where
 
-import ProjectileTrajectory
+import Silhouette (drawSilhouette)
 
 main :: IO ()
-main = drawProjectile
+main = drawSilhouette

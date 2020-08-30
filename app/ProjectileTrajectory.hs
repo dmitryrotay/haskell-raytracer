@@ -3,7 +3,7 @@ module ProjectileTrajectory
     ) where
 
 import Data.HashMap.Strict (fromList)
-import Drawing (Color (..), canvas, setPixelMap)
+import Drawing (Color (..), blank, setPixelMap)
 import Drawing.Output (canvasToPpm)
 import Space (Point (..), Vector (..), addVectorP, addVectorV, normalize, multiplyVector)
 
@@ -18,15 +18,15 @@ tick (Environment gravity wind) (Projectile position velocity) =
 
 drawProjectile :: IO ()
 drawProjectile = do
-    let start = Point 0 1 0
+    let width = 900
+        height = 300
+        start = Point 0 1 0
         velocity = normalize (Vector 1 1.1 0) `multiplyVector` 10
         pStart = Projectile start velocity
         gravity = Vector 0 (-0.1) 0
         wind = Vector (-0.01) 0 0
         env = Environment gravity wind
-        width = 900
-        height = 300
-        c = canvas 900 300
+        canvas = blank 900 300
         projectileTrajectory = scanl (flip tick) pStart (repeat env)
         insideCanvasPositions =
             takeWhile (\p -> (pointY . position $ p) > 0) projectileTrajectory
@@ -36,5 +36,5 @@ drawProjectile = do
                 canvasY = 300 - (round . pointY . position $ p)
             in ((canvasX, canvasY), red)
         pixelMap = fromList $ map positionToCanvasTuple insideCanvasPositions
-        c' = setPixelMap pixelMap c
-    putStr . canvasToPpm $ c'
+        canvas' = setPixelMap canvas pixelMap
+    putStr . canvasToPpm $ canvas'
