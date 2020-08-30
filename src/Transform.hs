@@ -1,5 +1,9 @@
+{-# LANGUAGE DataKinds              #-}
+{-# LANGUAGE KindSignatures         #-}
+
 module Transform 
-    ( translation
+    ( Transform
+    , translation
     , scaling
     , rotationX
     , rotationY
@@ -10,50 +14,52 @@ module Transform
     , (|<>|)
     ) where
 
-import           Matrix (Matrix (..), (|*|), square4)
+import           Matrix (Matrix (..), SquareMatrix, (|*|), square4)
+import           GHC.TypeNats
 import qualified Matrix as M (identity)
 
--- Apply transformation by swapping arguments and multiplying them
-(|<>|) :: Matrix -> Matrix -> Either String Matrix
+(|<>|) :: Matrix 4 w -> Transform -> Matrix 4 w
 (|<>|) = flip (|*|)
 
-identity :: Matrix
-identity = M.identity 4
+type Transform = SquareMatrix 4
 
-combine :: [Matrix] -> Either String Matrix
-combine = foldr (\m t -> t >>= (m |<>|)) (Right identity)
+identity :: Transform
+identity = M.identity :: Transform
 
-translation :: Float -> Float -> Float -> Matrix
+combine :: [Transform] -> Transform
+combine = foldr (|*|) identity
+
+translation :: Float -> Float -> Float -> SquareMatrix 4
 translation x y z = square4 (1, 0, 0, x,
                              0, 1, 0, y,
                              0, 0, 1, z,
                              0, 0, 0, 1)
 
-scaling :: Float -> Float -> Float -> Matrix
+scaling :: Float -> Float -> Float -> SquareMatrix 4
 scaling x y z = square4 (x, 0, 0, 0,
                          0, y, 0, 0,
                          0, 0, z, 0,
                          0, 0, 0, 1)
 
-rotationX :: Float -> Matrix
+rotationX :: Float -> SquareMatrix 4
 rotationX r = square4 (1,    0,     0,      0,
                        0,    cos r, -sin r, 0,
                        0,    sin r, cos r,  0,
                        0,    0,     0,      1)
 
-rotationY :: Float -> Matrix
+rotationY :: Float -> SquareMatrix 4
 rotationY r = square4 (cos r,    0,  sin r,  0,
                            0,    1,      0,  0,
                        -sin r,   0,  cos r,  0,
                            0,    0,      0,  1)
 
-rotationZ :: Float -> Matrix
+rotationZ :: Float -> SquareMatrix 4
 rotationZ r = square4 (cos r,  -sin r,   0,  0,
                        sin r,   cos r,   0,  0,
                            0,       0,   1,  0,
                            0,       0,   0,  1)
 
-shearing :: Float -> Float -> Float -> Float -> Float -> Float -> Matrix
+shearing :: Float -> Float -> Float -> Float -> Float -> Float -> SquareMatrix 4
 shearing xy xz yx yz zx zy = square4 ( 1,  xy, xz, 0,
                                       yx,   1, yz, 0,
                                       zx,  zy,  1, 0,

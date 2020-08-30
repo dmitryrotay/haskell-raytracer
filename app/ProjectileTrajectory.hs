@@ -24,9 +24,17 @@ drawProjectile = do
         gravity = Vector 0 (-0.1) 0
         wind = Vector (-0.01) 0 0
         env = Environment gravity wind
+        width = 900
+        height = 300
         c = canvas 900 300
-        ps = takeWhile (\p -> (pointY . position $ p) > 0) $ scanl (flip tick) pStart (repeat env)
+        projectileTrajectory = scanl (flip tick) pStart (repeat env)
+        insideCanvasPositions =
+            takeWhile (\p -> (pointY . position $ p) > 0) projectileTrajectory
         red = Color 1 0 0
-        m = fromList $ map (\p -> ((round . pointX . position $ p, 300 - (round . pointY . position $ p)), red)) ps
-        c' = setPixelMap m c
+        positionToCanvasTuple p = 
+            let canvasX = round . pointX . position $ p
+                canvasY = 300 - (round . pointY . position $ p)
+            in ((canvasX, canvasY), red)
+        pixelMap = fromList $ map positionToCanvasTuple insideCanvasPositions
+        c' = setPixelMap pixelMap c
     putStr . canvasToPpm $ c'

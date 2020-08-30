@@ -1,8 +1,12 @@
+{-# LANGUAGE DataKinds #-}
+
 module MatrixSpec where
 
 import Control.Monad
+import Data.Either (fromRight)
 import Matrix
     ( (|*|)
+    , SquareMatrix
     , identity
     , square2
     , square3
@@ -88,7 +92,7 @@ spec = do
                                         44, 54, 114, 108,
                                         40, 58, 110, 102,
                                         16, 26, 46, 42)
-                in m1 |*| m2 `shouldBe` Right expected
+                in m1 |*| m2 `shouldBe` expected
             it "multiplies by tuple returning valid product tuple" $
                 let m = square4 (1, 2, 3, 4,
                                  2, 4, 4, 2,
@@ -96,28 +100,15 @@ spec = do
                                  0, 0, 0, 1)
                     t = fromTuple4 (1, 2, 3, 1)
                     expected = fromTuple4 (18, 24, 33, 1)
-                in m |*| t `shouldBe` Right expected
+                in m |*| t `shouldBe` expected
             it "multiplies by identity matrix returning original matrix" $
                 let m = square4 (0, 1, 2, 4,
                                  1, 2, 4, 8,
                                  2, 4, 8, 16,
                                  4, 8, 16, 32)
-                    result = m |*| identity 4
-                in m |*| identity 4 `shouldBe` Right m
-            it "fails on mismatch of first matrix rows count and second matrix column count" $
-                let m1 = square4 (0, 1, 2, 4,
-                                  1, 2, 4, 8,
-                                  2, 4, 8, 16,
-                                  4, 8, 16, 32)
-                    m2 = square3 (0, 1, 2, 
-                                  1, 2, 4,
-                                  2, 4, 8) 
-                    result = m1 |*| m2
-                    test = (case result of
-                                (Left error) -> pure ()
-                                (Right _) -> expectationFailure "Must fail if matrices rows/columns length don't match")
-                in test
-        
+                    identityMatrix = identity :: SquareMatrix 4
+                in m |*| identityMatrix `shouldBe`  m
+                    
         describe "transpose" $ do
             it "produces matrix with swapped rows and columns" $
                 let m = square4 (0, 9, 3, 0,
@@ -130,7 +121,8 @@ spec = do
                                         0, 8, 3, 8)
                 in transpose m `shouldBe` expected
             it "produces identity matrix from identity matrix" $
-                transpose (identity 4) `shouldBe` identity 4
+                let identityMatrix = identity :: SquareMatrix 4
+                in transpose identityMatrix `shouldBe` identityMatrix
         
         describe "submatrix" $ do
             it "extracts submatrix from 4x4 matrix returning 3x3 matrix with given row and column removed" $
@@ -195,8 +187,7 @@ spec = do
                                   3,-1, 7, 0,
                                   7, 0, 5, 4,
                                   6,-2, 0, 5)
-                    result = do
-                        product <- a |*| b
-                        inverseB <- inverse b
-                        product |*| inverseB
-                in result `shouldBe` Right a
+                    product = a |*| b
+                    inverseB = fromRight (identity :: SquareMatrix 4) (inverse b)
+                    result = product |*| inverseB
+                in result `shouldBe` a
