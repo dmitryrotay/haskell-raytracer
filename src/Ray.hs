@@ -9,9 +9,10 @@ import Space
     , Vector (..)
     , addVectorP
     , multiplyVector
+    , transformPoint
+    , transformVector
     )
 
-import Matrix (Matrix, fromPoint, fromVector, toPoint, toVector)
 import Transform (Transform, translation, scaling, (|<>|))
 
 data Ray = Ray { origin :: Point, direction :: Vector }
@@ -22,10 +23,6 @@ position (Ray origin direction) t = origin `addVectorP` (direction `multiplyVect
 
 transform :: Ray -> Transform -> Ray
 transform (Ray origin direction) transformMatrix =
-    let originMatrix = fromPoint origin
-        directionMatrix = fromVector direction
-        originMatrix' = originMatrix |<>| transformMatrix
-        directionMatrix' = directionMatrix |<>| transformMatrix
-        origin' = toPoint originMatrix'
-        direction' = toVector directionMatrix'
-    in Ray origin' direction'
+    let transformedOrigin = transformPoint origin transformMatrix
+        transformedDirection = transformVector direction transformMatrix
+    in Ray transformedOrigin transformedDirection

@@ -5,14 +5,12 @@
 {-# LANGUAGE TypeOperators          #-}
 
 module Matrix
-    ( Matrix
+    ( SpaceMatrix
     , SquareMatrix
     , square2
     , square3
     , square4
     , fromTuple4
-    , fromVector
-    , fromPoint
     , transpose
     , minor
     , cofactor
@@ -22,21 +20,21 @@ module Matrix
     , identity
     , invertible
     , inverse
-    , toPoint
-    , toVector
+    , toSpaceCoordinates
     ) where
 
 import Common ((~==))
 import Data.Proxy
-import Space (Point (..), Vector (..))
 import GHC.TypeNats
 
 transposeA :: [[a]] -> [[a]]
 transposeA ([]:_) = []
 transposeA x = map head x : transposeA (map tail x)
 
-newtype Matrix (width :: Nat) (height :: Nat) = Matrix [[Float]]
+newtype Matrix (height :: Nat) (width :: Nat) = Matrix [[Float]]
     deriving Show
+
+type SpaceMatrix width = Matrix 4 width
 
 type SquareMatrix n = Matrix n n
 
@@ -107,18 +105,6 @@ fromTuple4 (x0, x1, x2, x3) = Matrix [[x0],
                                       [x2],
                                       [x3]]
 
-fromVector :: Vector -> Matrix 4 1
-fromVector (Vector x y z) = fromTuple4 (x, y, z, 0)
-
-toVector :: Matrix 4 1 -> Vector
-toVector (Matrix [[x],[y],[z],[0]]) = Vector x y z
-
-fromPoint :: Point -> Matrix 4 1
-fromPoint (Point x y z) = fromTuple4 (x, y, z, 1)
-
-toPoint :: Matrix 4 1 -> Point
-toPoint (Matrix [[x],[y],[z],[1]]) = Point x y z
-
 cross :: [Float] -> [Float] -> Float
 cross a1 a2 = sum (zipWith (*) a1 a2)
 
@@ -132,7 +118,7 @@ matrix1 |*| matrix2 =
 identity :: forall n. KnownNat n => SquareMatrix n
 identity =
     let size = natVal (Proxy @n)
-    in Matrix [[if row == col then 1 else 0 | col <- [0..size-1]] | row <- [0..size-1]]
+    in Matrix [[if row == col then 1 else 0 | col <- [0..size - 1]] | row <- [0..size - 1]]
 
 invertible :: Matrix h w -> Bool
 invertible matrix = determinant matrix /= 0
@@ -143,6 +129,9 @@ inverse matrix
         let d = determinant matrix
             (Matrix m) = matrix
             n = length m
-            c = Matrix [[cofactor matrix row col / d | col <- [0..n-1]] | row <- [0..n-1]]
+            c = Matrix [[cofactor matrix row col / d | col <- [0..n - 1]] | row <- [0..n - 1]]
         in Right (transpose c)
     | otherwise = Left "The given matrix is not invertible"
+
+toSpaceCoordinates :: SpaceMatrix 1 -> (Float, Float, Float)
+toSpaceCoordinates (Matrix [[x], [y], [z], [_]]) = (x, y, z)

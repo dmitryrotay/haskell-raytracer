@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds          #-}
+
 module Space
     ( Point (..)    
     , Vector (..)
@@ -14,9 +16,13 @@ module Space
     , normalize
     , dot
     , cross
+    , transformPoint
+    , transformVector
     ) where
 
 import Common ((~==))
+import Matrix (SpaceMatrix, fromTuple4, toSpaceCoordinates)
+import Transform (Transform, (|<>|))
 
 class SpaceElement a where
     getX :: a -> Float
@@ -89,4 +95,24 @@ cross (Vector x1 y1 z1) (Vector x2 y2 z2) =
     let x = y1 * z2 - z1 * y2
         y = z1 * x2 - x1 * z2
         z = x1 * y2 - y1 * x2
+    in Vector x y z
+
+vectorToMatrix :: Vector -> SpaceMatrix 1
+vectorToMatrix (Vector x y z) = fromTuple4 (x, y, z, 0)
+
+pointToMatrix :: Point -> SpaceMatrix 1
+pointToMatrix (Point x y z) = fromTuple4 (x, y, z, 1)
+
+transformPoint :: Point -> Transform -> Point
+transformPoint p t =
+    let matrix = pointToMatrix p
+        transformedMatrix = matrix |<>| t
+        (x, y, z) = toSpaceCoordinates transformedMatrix
+    in Point x y z
+
+transformVector :: Vector -> Transform -> Vector
+transformVector v t =
+    let matrix = vectorToMatrix v
+        transformedMatrix = matrix |<>| t
+        (x, y, z) = toSpaceCoordinates transformedMatrix
     in Vector x y z

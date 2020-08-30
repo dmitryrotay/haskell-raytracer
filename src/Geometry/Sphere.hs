@@ -9,7 +9,7 @@ module Geometry.Sphere
 import Ray (Ray (..), transform)
 import Space (Point (..), subtractPoint, dot)
 import Geometry (Intersection (..))
-import Matrix (Matrix, inverse)
+import Matrix (inverse)
 import Transform (Transform, identity, (|<>|))
 
 data Sphere = Sphere { getSphereId :: Int, getTransform :: Transform }
