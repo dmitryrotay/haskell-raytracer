@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 558de51c00f7103545044de95328a3deece465be8b75b526fb9ab24910829db4
+-- hash: 05fdb24f6f9557bc8ce91e0015aff633f485a66ab151c8627333ad04a3c271a4
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -29,7 +29,10 @@ library
       Common
       Drawing
       Drawing.Output
+      Geometry
+      Geometry.Sphere
       Matrix
+      Ray
       Space
       Transform
   other-modules:
@@ -49,6 +52,7 @@ executable haskell-raytracer-exe
   other-modules:
       ClockFace
       ProjectileTrajectory
+      Silhouette
       Paths_haskell_raytracer
   hs-source-dirs:
       app
@@ -68,7 +72,10 @@ test-suite haskell-raytracer-test
   other-modules:
       Drawing.OutputSpec
       DrawingSpec
+      Geometry.SphereSpec
+      GeometrySpec
       MatrixSpec
+      RaySpec
       SpaceSpec
       TransformSpec
       Paths_haskell_raytracer

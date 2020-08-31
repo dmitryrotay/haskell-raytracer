@@ -1,7 +1,23 @@
 module SpaceSpec where
 
-import Common
+import Common ((~==))
 import Space
+    ( Point (..)
+    , Vector(..)
+    , addVectorP
+    , addVectorV
+    , subtractPoint
+    , subtractVectorP
+    , subtractVectorV
+    , multiplyVector
+    , divideVector
+    , magnitude
+    , normalize
+    , dot
+    , cross
+    , negateP
+    , negateV
+    )
 
 import Test.Hspec
 

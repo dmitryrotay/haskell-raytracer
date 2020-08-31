@@ -1,8 +1,7 @@
 module Drawing.OutputSpec where
 
-import Drawing
-import Drawing.Output
-
+import Drawing (Color (..), canvas, setPixel)
+import Drawing.Output (canvasToPpm)
 import Test.Hspec
 
 spec :: Spec

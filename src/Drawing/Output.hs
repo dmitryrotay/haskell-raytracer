@@ -2,22 +2,24 @@ module Drawing.Output
     ( canvasToPpm    
     ) where
 
-import Data.List
-
-import Data.List.Split
-import Drawing
+import Data.List (intercalate)
+import Data.List.Split (chunksOf)
+import Drawing (Canvas (..), Color (..))
 
 maxLineLength = 70
 
 canvasToPpm :: Canvas -> String
-canvasToPpm c = buildPpmHeader c ++ buildPpmData c
+canvasToPpm canvas = buildPpmHeader canvas ++ buildPpmData canvas
 
 buildPpmHeader :: Canvas -> String
-buildPpmHeader (Canvas w h _) =
-    "P3\n" ++ show w  ++ " " ++ show  h ++ "\n255\n"
+buildPpmHeader (Canvas width height _) =
+    "P3\n" ++ show width  ++ " " ++ show height ++ "\n255\n"
 
 buildPpmData :: Canvas -> String
-buildPpmData (Canvas w _ ps) = intercalate "\n" (map (intercalate "\n" . map unwords . lineChunks . concatMap colorToComponentsTexts) (chunksOf w ps)) ++ "\n"
+buildPpmData (Canvas width _ pixels) =
+    let canvasPixelsRows = chunksOf width pixels
+        maxLineChunks = map (intercalate "\n" . map unwords . lineChunks . concatMap colorToComponentsTexts) canvasPixelsRows
+    in intercalate "\n" maxLineChunks ++ "\n"
 
 lineChunks :: [String] -> [[String]]
 lineChunks [] = []

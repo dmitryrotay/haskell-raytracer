@@ -5,19 +5,19 @@ module Drawing
     , multiplyByScalar
     , multiplyByColor
     , Canvas (..)
-    , canvas
+    , blank
     , setPixel
     , setPixelMap
     , pixelAt
     , getCoords
     ) where
 
-import           Common
-import qualified Data.HashMap.Strict as M
-
+import           Common ((~==))
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as M (lookup)
 import           Data.Maybe
 
-data Color = Color { red :: Float, green :: Float, blue :: Float } deriving (Show)
+data Color = Color { red :: Float, green :: Float, blue :: Float } deriving Show
 
 instance Eq Color where
     Color r1 g1 b1 == Color r2 g2 b2 = (r1 ~== r2) && (g1 ~== g2) && (b1 ~== b2)
@@ -37,37 +37,38 @@ Color r1 g1 b1 `multiplyByColor` Color r2 g2 b2 = Color (r1 * r2) (g1 * g2) (b1 
 data Canvas = Canvas { width :: Int, height :: Int, pixels :: [Color] }
 
 instance Show Canvas where 
-    show (Canvas a b _) = "Canvas {width = " ++ show a ++ ", height = " ++ show b ++ "}"
+    show (Canvas width height _) = "Canvas {width = " ++ show width ++ ", height = " ++ show height ++ "}"
 
-canvas :: Int -> Int -> Canvas
-canvas w h =
-    let pixels = [Color 0 0 0 | _ <- [1..w * h]]
-    in Canvas w h pixels
+blank :: Int -> Int -> Canvas
+blank width height =
+    let pixels = [Color 0 0 0 | _ <- [1..width * height]]
+    in Canvas width height pixels
 
-setPixel :: Int -> Int -> Color -> Canvas -> Canvas
-setPixel x y c (Canvas w h ps) =
-    let n = getIndex w x y
-        ps' = replaceNth n c ps
-    in Canvas w h ps'
+setPixel :: Canvas -> Int -> Int -> Color -> Canvas
+setPixel (Canvas width height pixels) x y color =
+    let n = getIndex width x y
+        pixels' = replaceNth n color pixels
+    in Canvas width height pixels'
 
-setPixelMap :: M.HashMap (Int, Int) Color -> Canvas -> Canvas
-setPixelMap m (Canvas w h ps) =
-    let ps' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m))) (map (getCoords w) [0..]) ps
-    in Canvas w h ps'
+setPixelMap :: Canvas -> HashMap (Int, Int) Color -> Canvas
+setPixelMap (Canvas width height pixels) m =
+    let pixels' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m)))
+                                                   (map (getCoords width) [0..]) pixels
+    in Canvas width height pixels'
 
 pixelAt :: Canvas -> Int -> Int -> Color
-pixelAt (Canvas w h ps) x y =
-    let n = getIndex w x y
-    in ps !! n
+pixelAt (Canvas width height pixels) x y =
+    let n = getIndex width x y
+    in pixels !! n
 
 getIndex :: Int -> Int -> Int -> Int
-getIndex w x y =
-    w * y + x
+getIndex canvasWidth x y =
+    canvasWidth * y + x
 
 getCoords :: Int -> Int -> (Int, Int)
-getCoords w i =
-    let y = i `div` w
-        x = i - w * y
+getCoords canvasWidth arrayIndex =
+    let y = arrayIndex `div` canvasWidth
+        x = arrayIndex - canvasWidth * y
     in (x, y)
 
 replaceNth :: Int -> a -> [a] -> [a]
