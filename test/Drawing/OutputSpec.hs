@@ -24,7 +24,7 @@ spec = do
             it "breaks PPM lines longer than 70 characters" $
                 let color = Color 1 0.8 0.6
                     canvas = foldr (\(x, y) c -> setPixel c x y color) (blank 10 2) [(x, y) | x <- [0..9], y <- [0..1]]
-                in (drop 3 . lines . canvasToPpm $ c) `shouldBe`
+                in (drop 3 . lines . canvasToPpm $ canvas) `shouldBe`
                     ["255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"
                     ,"153 255 204 153 255 204 153 255 204 153 255 204 153"
                     ,"255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"
