@@ -14,7 +14,9 @@ Working through The Ray Tracer Challenge book to get a feel of Haskell.
 
 ### Thoughts
 
-`Space` module feels clunky. I implemented `Point` and `Vector` as data types instead of proposed in the book tuples or lists. As a result, there are too many specialized functions which so far are not used anywhere outside the module's test suite and projectile example. Cannot tell how heavily this module will be used further down the line. It might make sense to implement the primitives as matrices constructed from corresponding functions. *(Edit: The module is already used heavily in the next chapter)*
+`Space` module feels clunky. I implemented `Point` and `Vector` as data types instead of proposed in the book tuples or lists. As a result, there are too many specialized functions which so far are not used anywhere outside the module's test suite and projectile example. Cannot tell how heavily this module will be used further down the line. It might make sense to implement the primitives as matrices constructed from corresponding functions.
+
+*([Edit]: The `Space` module is already used heavily in the next chapter)*
 
 `Canvas` `setPixel` performance is a bit of a concern. Setting a large number of pixels even on a moderately sized canvas one-by-one will be inefficient. In the projectile example I used a `HashMap` of pixels and `map` to set pixels in one pass. In the future it will probably be better to just construct the canvas from a pre-built set of pixels.
 
@@ -38,6 +40,8 @@ Nothing special in the `Transform` module although chaining transformations whic
 ### Thoughts
 
 Among the new modules `Geometry`, `Geometry.Sphere` and `Ray` the first one turned out to be the trickiest. I wanted to make `Intersection a` and instance of `Ord` typeclass and for that I had to add `Eq` constraint to the `Intersection`'s type parameter. Apparently, you cannot do this in a simple data type declaration. The solution that I found [here](https://wiki.haskell.org/Data_declaration_with_constraint) suggests using GADTs for this and so I did.
+
+*[Edit] As it was pointed out to me, I don't need the type parameter constraint here. Moreover, it is generally a bad idea to add such constraints, according to [this explanation](https://www.google.com/url?q=https://stackoverflow.com/a/12770425/394253&sa=D&source=hangouts&ust=1598983884505000&usg=AFQjCNHjctWqcZl4E-UgSEJlA9lu-ETcLQ). In addition to that, I only needed these constraints so that I could use `minimum` instead `minimumBy`. Currently, it makes more sense to use `minimumBy` instead of implementing `Ord`. I don't really have a requirement to always sort intersections by distance while completely ignoring the object. It might come later though.*
 
 When I got to implementing this chapter's practical example, I decided that I want to refactor matrix transformations to avoid working with `Either`. An experienced Haskell developer showed me an example of using `TypeLits` (`TypeNats` for my case) which I could use to check matrices' sizes at compile time instead of runtime. That was the most difficult part.
 
