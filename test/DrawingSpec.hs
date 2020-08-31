@@ -9,7 +9,7 @@ import Drawing
     , height
     , width
     , pixels
-    , canvas
+    , blank
     , setPixel
     , pixelAt
     )
@@ -31,10 +31,9 @@ spec = do
         
         describe "Canvas" $ do
             it "creates canvas with correct initial state" $
-                let c = canvas 10 20
+                let c = blank 10 20
                 in width c == 10 && height c == 20 && length (pixels c) == 200 && all (== Color 0 0 0) (pixels c)
             it "sets pixel on the canvas" $
-                let c = canvas 10 20
-                    red = Color 1 0 0
-                    c' = setPixel 2 3 red c
-                in pixelAt c' 2 3 `shouldBe` red
+                let red = Color 1 0 0
+                    canvas = setPixel (blank 10 20) 2 3 red
+                in pixelAt canvas 2 3 `shouldBe` red
