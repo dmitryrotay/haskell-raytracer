@@ -14,8 +14,8 @@ spec = do
                     v = Vector 4 5 6
                     r = Ray p v
                 in do 
-                    origin r `shouldBe` p
-                    direction r `shouldBe` v
+                    getOrigin r `shouldBe` p
+                    getDirection r `shouldBe` v
         describe "position" $ do
             it "calculates position from ray and distance" $
                 let r = Ray (Point 2 3 4) (Vector 1 0 0)

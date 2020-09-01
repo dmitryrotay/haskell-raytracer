@@ -15,7 +15,7 @@ import Space
 
 import Transform (Transform, translation, scaling, (|<>|))
 
-data Ray = Ray { origin :: Point, direction :: Vector }
+data Ray = Ray { getOrigin :: Point, getDirection :: Vector }
     deriving (Show, Eq)
 
 position :: Ray -> Float -> Point
