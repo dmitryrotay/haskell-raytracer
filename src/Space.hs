@@ -18,6 +18,7 @@ module Space
     , cross
     , transformPoint
     , transformVector
+    , reflectVector
     ) where
 
 import Common ((~==))
@@ -116,3 +117,11 @@ transformVector v t =
         transformedMatrix = matrix |<>| t
         (x, y, z) = toSpaceCoordinates transformedMatrix
     in Vector x y z
+
+reflectVector :: Vector -> Vector -> Vector
+reflectVector vector normalVector =
+    vector `subtractVectorV`
+    ( normalVector `multiplyVector`
+      2 `multiplyVector`
+      (vector `dot` normalVector)
+    )

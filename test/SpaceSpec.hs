@@ -17,6 +17,7 @@ import Space
     , cross
     , negateP
     , negateV
+    , reflectVector
     )
 
 import Test.Hspec
@@ -51,6 +52,14 @@ spec = do
                 Vector 1 (-2) 3 `multiplyVector` 3.5 == Vector 3.5 (-7) 10.5
             it "divides Vector by value producing Vector with coordinates divided by value" $
                 Vector 1 (-2) 3 `divideVector` 2 == Vector 0.5 (-1) 1.5
+            it "calculates dot product of Vector 1 2 3 and Vector 2 3 4 as 20" $
+                dot (Vector 1 2 3) (Vector 2 3 4) == 20
+            it "calculates cross product of Vector 1 2 3 and Vector 2 3 4 as Vector (-1) 2 (-1)" $
+                cross (Vector 1 2 3) (Vector 2 3 4) == Vector (-1) 2 (-1)
+            it "calculates cross product of Vector 2 3 4 and Vector 1 2 3 as Vector 1 (-2) 1" $
+                cross (Vector 2 3 4) (Vector 1 2 3) == Vector 1 (-2) 1
+        
+        describe "magnitude" $ do
             it "calculates magnitude of Vector 1 0 0 as 1" $
                 magnitude (Vector 1 0 0) == 1
             it "calculates magnitude of Vector 0 1 0 as 1" $
@@ -61,6 +70,8 @@ spec = do
                 magnitude (Vector 1 2 3) == sqrt 14
             it "calculates magnitude of Vector (-1) (-2) (-3) as sqrt 14" $
                 magnitude (Vector (-1) (-2) (-3)) == sqrt 14
+
+        describe "normalize" $ do
             it "normalizes Vector 4 0 0 as Vector 1 0 0" $
                 normalize (Vector 4 0 0) == Vector 1 0 0
             it "normalizes Vector 1 2 3 as Vector 0.26726 0.53452 0.80178" $
@@ -68,9 +79,13 @@ spec = do
             it "normalizes Vector 1 2 3 to Vector with magnitude == 1" $
                 let normalized = normalize (Vector 1 2 3)
                 in magnitude normalized ~== 1.0
-            it "calculates dot product of Vector 1 2 3 and Vector 2 3 4 as 20" $
-                dot (Vector 1 2 3) (Vector 2 3 4) == 20
-            it "calculates cross product of Vector 1 2 3 and Vector 2 3 4 as Vector (-1) 2 (-1)" $
-                cross (Vector 1 2 3) (Vector 2 3 4) == Vector (-1) 2 (-1)
-            it "calculates cross product of Vector 2 3 4 and Vector 1 2 3 as Vector 1 (-2) 1" $
-                cross (Vector 2 3 4) (Vector 1 2 3) == Vector 1 (-2) 1
+        
+        describe "reflect" $ do
+            it "reflects a vector approaching at 45°" $
+                let vector = Vector 1 (-1) 0
+                    normalVector = Vector 0 1 0
+                in reflectVector vector normalVector `shouldBe` Vector 1 1 0
+            it "reflects a vector off a slanted surface" $
+                let vector = Vector 0 (-1) 0
+                    normalVector = Vector (sqrt 2 / 2) (sqrt 2 / 2) 0
+                in reflectVector vector normalVector `shouldBe` Vector 1 0 0
