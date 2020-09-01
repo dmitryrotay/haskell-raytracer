@@ -5,6 +5,7 @@ module Geometry.Sphere
     , createSphere
     , setTransform
     , normalAt
+    , setMaterial
     ) where
 
 import Ray (Ray (..), transform)
@@ -19,15 +20,21 @@ import Space
 import Geometry (Intersection (..))
 import Matrix (inverse, transpose)
 import Transform (Transform, identity, (|<>|))
+import Materials (Material (..), defaultMaterial)
 
-data Sphere = Sphere { getSphereId :: Int, getTransform :: Transform }
-    deriving (Show, Eq)
+data Sphere = Sphere
+    { getSphereId :: Int
+    , getTransform :: Transform
+    , getMaterial :: Material
+    } deriving (Show, Eq)
 
 data SphereRayIntersection = Miss | SphereRayIntersection (Intersection Sphere) (Intersection Sphere)
     deriving (Show, Eq)
 
 createSphere :: Int -> (Sphere, Int)
-createSphere newId = (Sphere newId identity, newId + 1)
+createSphere newId =
+    let newSphere = Sphere newId identity defaultMaterial
+    in (newSphere, newId + 1)
 
 intersect :: Sphere -> Ray -> SphereRayIntersection
 intersect sphere ray =
@@ -49,7 +56,7 @@ intersect sphere ray =
         in result   
 
 setTransform :: Sphere -> Transform -> Sphere
-setTransform (Sphere id _) = Sphere id
+setTransform (Sphere id _ material) transform = Sphere id transform material
 
 normalAt :: Sphere -> Point -> Vector
 normalAt sphere point =
@@ -59,3 +66,6 @@ normalAt sphere point =
                       objectNormal
                       (transpose . inverse . getTransform $ sphere)
     in normalize worldNormal
+
+setMaterial :: Sphere -> Material -> Sphere
+setMaterial (Sphere id transform _) = Sphere id transform

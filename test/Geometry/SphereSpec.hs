@@ -1,6 +1,8 @@
 module Geometry.SphereSpec where
 
+import Drawing (Color (..))
 import Geometry (Intersection (..))
+
 import Geometry.Sphere
     ( Sphere (..)
     , SphereRayIntersection (..)
@@ -8,10 +10,11 @@ import Geometry.Sphere
     , intersect
     , setTransform
     , normalAt
+    , setMaterial
     )
 
+import Materials (defaultMaterial, Material (..))
 import Ray (Ray (..))
-
 import Space (Point (..), Vector (..), normalize)
 import Test.Hspec
 import Transform (identity, translation, scaling, rotationZ, (|<>|))
@@ -58,6 +61,9 @@ spec = do
             it "constructs sphere with identity transformation" $
                 let (sphere, _) = createSphere 0
                 in getTransform sphere `shouldBe` identity
+            it "constructs sphere with default material" $
+                let (sphere, _) = createSphere 0
+                in getMaterial sphere `shouldBe` defaultMaterial
         describe "setTransform" $ do
             it "returns sphere object with passed transformation" $
                 let (sphere, _) = createSphere 0
@@ -95,6 +101,13 @@ spec = do
                     transformedSphere = setTransform sphere (rotationZ (pi / 5) |<>| scaling 1 0.5 1)
                     n = normalAt transformedSphere (Point 0 (sqrt 2 / 2) (-sqrt 2 / 2))
                 in n `shouldBe` Vector 0 0.97014 (-0.24254)
+        
+        describe "setMaterial" $ do
+            it "returns sphere with applied material" $
+                let (sphere, _) = createSphere 0
+                    material = Material (Color 1 1 1) 1 1 1 200
+                    sphereWithMaterial = setMaterial sphere material
+                in getMaterial sphereWithMaterial `shouldBe` material
 
 raySphereIntersection :: Float -> Float -> Float -> Float -> Float -> Float -> SphereRayIntersection
 raySphereIntersection originX originY originZ directionX directionY directionZ =
