@@ -5,7 +5,7 @@ module Geometry
 
 import Data.List
 
-data Intersection a = Intersection a Float
+data Intersection a = Intersection { getObject :: a, getDistance :: Float }
     deriving (Show, Eq)
 
 hit :: [Intersection a] -> Maybe (Intersection a)

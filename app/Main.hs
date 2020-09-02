@@ -1,6 +1,6 @@
 module Main where
 
-import Silhouette (drawSilhouette)
+import SphereWithLighting (drawSphere)
 
 main :: IO ()
-main = drawSilhouette
+main = drawSphere
