@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: df22f8e8a5616d8ad8ab3d3ea4ef60f0d19c59a648661fd9e010adea398ae7f3
+-- hash: 5b85d8dd8ccfa6e09cfd3fedc26a56a50d3025b58dbe02a9c5b534a1c28b733e
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
       Ray
       Space
       Transform
+      World
   other-modules:
       Paths_haskell_raytracer
   hs-source-dirs:
@@ -82,12 +83,14 @@ test-suite haskell-raytracer-test
       RaySpec
       SpaceSpec
       TransformSpec
+      WorldSpec
       Paths_haskell_raytracer
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      QuickCheck
+      HUnit
+    , QuickCheck
     , base >=4.7 && <5
     , containers
     , haskell-raytracer

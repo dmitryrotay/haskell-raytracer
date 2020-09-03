@@ -6,6 +6,7 @@ module Geometry.Sphere
     , setTransform
     , normalAt
     , setMaterial
+    , intersectionToList
     ) where
 
 import Ray (Ray (..), transformRay)
@@ -54,6 +55,10 @@ intersect sphere ray =
                     p2 = Intersection sphere (max t1 t2)
                 in SphereRayIntersection p1 p2
         in result   
+
+intersectionToList :: SphereRayIntersection -> [Intersection Sphere]
+intersectionToList Miss = []
+intersectionToList (SphereRayIntersection i1 i2) = [i1, i2]
 
 setTransform :: Sphere -> Transform -> Sphere
 setTransform (Sphere sphereId _ material) transform = Sphere sphereId transform material

@@ -5,4 +5,6 @@ module Lights
 import Drawing (Color (..))
 import Space (Point (..))
 
-data PointLight = PointLight { getPosition :: Point, getIntensity :: Color }
+data PointLight = PointLight
+        { getPosition :: Point
+        , getIntensity :: Color } deriving (Show, Eq)
