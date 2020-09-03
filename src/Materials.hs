@@ -36,18 +36,20 @@ lighting material light position eyeVector normalVector =
 
         (diffuse, specular)
             | lightDotNormal < 0 = (black, black)
-            | otherwise = let diff = effectiveColor
-                                     `multiplyByScalar` getDiffuse material
-                                     `multiplyByScalar` lightDotNormal
-                              spec = let reflectionVector = reflectVector (negateV lightVector) normalVector
-                                         reflectionDotEye = reflectionVector `dot` eyeVector
-                                         result
-                                           | reflectionDotEye <= 0 = black
-                                           | otherwise = let factor = reflectionDotEye ** getShininess material
-                                                         in getIntensity light
-                                                           `multiplyByScalar` getSpecular material
-                                                           `multiplyByScalar` factor
-                                     in result
-                          in (diff, spec)
-
+            | otherwise = 
+                let diff = effectiveColor
+                           `multiplyByScalar` getDiffuse material
+                           `multiplyByScalar` lightDotNormal
+                    spec =
+                        let reflectionVector = reflectVector (negateV lightVector) normalVector
+                            reflectionDotEye = reflectionVector `dot` eyeVector
+                            result
+                              | reflectionDotEye <= 0 = black
+                              | otherwise =
+                                  let factor = reflectionDotEye ** getShininess material
+                                  in getIntensity light
+                                     `multiplyByScalar` getSpecular material
+                                     `multiplyByScalar` factor
+                        in result
+                in (diff, spec)
     in ambient `addColor` diffuse `addColor` specular
