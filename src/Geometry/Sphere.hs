@@ -8,7 +8,7 @@ module Geometry.Sphere
     , setMaterial
     ) where
 
-import Ray (Ray (..), transform)
+import Ray (Ray (..), transformRay)
 import Space 
     ( Point (..)
     , Vector(..)
@@ -19,7 +19,7 @@ import Space
     , transformVector)
 import Geometry (Intersection (..))
 import Matrix (inverse, transpose)
-import Transform (Transform, identity, (|<>|))
+import Transform (Transform, identity)
 import Materials (Material (..), defaultMaterial)
 
 data Sphere = Sphere
@@ -40,11 +40,11 @@ intersect :: Sphere -> Ray -> SphereRayIntersection
 intersect sphere ray =
     let sphereToRay = origin `subtractPoint` Point 0 0 0
         inverseTransform = inverse . getTransform $ sphere --possible performance hit
-        (Ray origin direction) = transform ray inverseTransform
+        (Ray origin direction) = transformRay ray inverseTransform
         a = direction `dot` direction
         b = 2 * (direction `dot` sphereToRay)
         c = sphereToRay `dot` sphereToRay - 1
-        discriminant =  b ^ 2 - 4 * a * c
+        discriminant =  b ** 2 - 4 * a * c
         result
             | discriminant < 0 = Miss
             | otherwise =
@@ -56,7 +56,7 @@ intersect sphere ray =
         in result   
 
 setTransform :: Sphere -> Transform -> Sphere
-setTransform (Sphere id _ material) transform = Sphere id transform material
+setTransform (Sphere sphereId _ material) transform = Sphere sphereId transform material
 
 normalAt :: Sphere -> Point -> Vector
 normalAt sphere point =
@@ -68,4 +68,4 @@ normalAt sphere point =
     in normalize worldNormal
 
 setMaterial :: Sphere -> Material -> Sphere
-setMaterial (Sphere id transform _) = Sphere id transform
+setMaterial (Sphere sphereId transform _) = Sphere sphereId transform

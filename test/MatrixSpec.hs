@@ -26,8 +26,8 @@ spec = do
     describe "Matrix" $ do
         describe "SquareMatrix" $ do
             it "uses float equality comparison" $
-                let m1 = square2 (10.2^2, 5.2^2,
-                                  10.2^2, 5.2^2)
+                let m1 = square2 (10.2 ** 2, 5.2 ** 2,
+                                  10.2 ** 2, 5.2 ** 2)
                     m2 = square2 (104.04, 27.04,
                                   104.04, 27.04)
                 in m1 `shouldBe` m2

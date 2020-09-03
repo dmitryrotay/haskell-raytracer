@@ -24,7 +24,7 @@ module Matrix
     ) where
 
 import Common ((~==))
-import Control.Exception (throw, ArithException (..))
+import Control.Exception (throw, ArithException (..), Exception)
 import Data.Proxy
 import GHC.TypeNats
 
@@ -134,5 +134,9 @@ inverse matrix
         in transpose c
     | otherwise = throw DivideByZero
 
+data InvalidSpaceMatrixException = InvalidSpaceMatrixException deriving Show
+instance Exception InvalidSpaceMatrixException
+
 toSpaceCoordinates :: SpaceMatrix 1 -> (Float, Float, Float)
 toSpaceCoordinates (Matrix [[x], [y], [z], [_]]) = (x, y, z)
+toSpaceCoordinates _ = throw InvalidSpaceMatrixException

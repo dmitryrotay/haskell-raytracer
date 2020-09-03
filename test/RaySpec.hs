@@ -1,6 +1,6 @@
 module RaySpec where
 
-import Ray (Ray (..), position, transform)
+import Ray (Ray (..), position, transformRay)
 import Space (Vector (..), Point (..))
 import Transform (translation, scaling)
 import Test.Hspec
@@ -24,14 +24,14 @@ spec = do
                     position r 1 `shouldBe` Point 3 3 4
                     position r (-1) `shouldBe` Point 1 3 4
                     position r 2.5 `shouldBe` Point 4.5 3 4
-        describe "transform" $ do
+        describe "transformRay" $ do
             it "applies translation correctly" $
                 let ray = Ray (Point 1 2 3) (Vector 0 1 0)
                     m = translation 3 4 5
-                    r' = transform ray m
+                    r' = transformRay ray m
                 in r' `shouldBe` Ray (Point 4 6 8) (Vector 0 1 0)
             it "applies scaling correctly" $
                 let ray = Ray (Point 1 2 3) (Vector 0 1 0)
                     m = scaling 2 3 4
-                    r' = transform ray m
+                    r' = transformRay ray m
                 in r' `shouldBe` Ray (Point 2 6 12) (Vector 0 3 0)

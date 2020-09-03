@@ -81,7 +81,7 @@ divideVector :: Vector -> Float -> Vector
 Vector x y z `divideVector` d = Vector (x / d) (y / d) (z / d)
 
 magnitude :: Vector -> Float
-magnitude (Vector x y z) = sqrt (x^2 + y^2 + z^2)
+magnitude (Vector x y z) = sqrt (x ** 2 + y ** 2 + z ** 2)
 
 normalize :: Vector -> Vector
 normalize (Vector x y z) =
