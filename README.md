@@ -1,6 +1,6 @@
 # The Ray Tracer Challenge With Haskell
 
-Working through The Ray Tracer Challenge book to get a feel of Haskell.
+Writing the first Haskell application by walking through The Ray Tracer Challenge book.
 
 ## Chapters 1-4
 
@@ -22,7 +22,7 @@ Working through The Ray Tracer Challenge book to get a feel of Haskell.
 
 `Matrix` module looks okay-ish. Glanced into the monads world when decided that `multiply` and `inverse` operations must return `Either`. As a result, testing got more interesting as I had to use `do` notation or `>>=` when applying transformations. I do not think what I am doing with them currently is idiomatic, will try to improve it along the way.
 
-Nothing special in the `Transform` module although chaining transformations which can fail was interesting. Same as the above I will most likely revisit it later.
+Nothing special in the `Transform` module although chaining transformations which can fail was interesting. Same as the above, I will most likely revisit it later.
 
 ### Image Samples
 
@@ -34,7 +34,7 @@ Nothing special in the `Transform` module although chaining transformations whic
 
 ### Changes
 
-* Added types for Sphere, Ray and Intersection.
+* Data types for Sphere, Ray and Intersection.
 * Operations to find an intersection and a hit (first intersection) of a ray with a sphere.
 
 ### Thoughts
@@ -47,8 +47,30 @@ When I got to implementing this chapter's practical example, I decided that I wa
 
 I am pretty far from understanding what exactly is happening there but hey, it works! Initially, I have spent quite some time trying to magically pass data constructor parameters to type parameters and wondered why I couldn't make it work. Now, my understanding is that a big chunk of the type-safety with `TypeLits` and the related features is achieved with good reasoning and encapsulation. That is, you "inform" compiler what type you are returning from which function (`TypeOperators` are really cool though). You also have to hide data constructors and get you type's instances from functions with fully described types. If you get any of it wrong, the compiler cannot help you if some arbitrary type instances start flying around.
 
-For the example, instead of doing it the way suggested by the hints I implemented a kind of a brute-force approach. First, applied scale and translation transformations to make the sphere a proper size and put it in the centre of the canvas. Then, cast a ray from each pixel's `x` and `y` coordinates and an appropriate `z` coordinate. The resulting hits draw a silhouette of the given sphere. 
+For the sample, instead of doing it the way suggested by the hints I used a kind of a brute-force approach. First, applied scale and translation transformations to make the sphere a proper size and put it in the centre of the canvas. Then, cast a ray perpendicular to the canvas from each pixel's `x` and `y` coordinates and a suitable `z` coordinate. The resulting hits draw a silhouette of the given sphere. 
 
 ### Image Samples
 
 [Using ray intersections to draw a silhouette of a sphere on the canvas.](/samples/silhouette.png)
+
+## Chapters 5
+
+### Changes
+
+* Sphere normals calculation.
+* Data types for material and point light.
+* Perceived sphere points color computation using material and lighting.
+
+### Thoughts
+
+Overall, nothing too complex in terms of programming this chapter, although the result feels really satisfying. The biggest change was removing more of the `Either`'s from the code. My reasoning is that currently I don't have situations when I really need my code to fail gracefully and follow some other path. If something goes wrong, e.g. trying to invert an uninvertible matrix or create a point not from 4x1 matrix, I just want an exception. I might revisit this later when I have a full picture of the code flow and learn to write proper monadic functions.
+
+Following an advice, added `-Wall` option for the compiler. This lead to improving code by cleaning up quite a few places which compiler marked with warnings.
+
+A `let`-ladder in the `Materials.lighting` function is a little concerning. I don't have a good idea on how to improve it yet.
+
+As expected, I had to rewrite the previous chapter sample's code to properly cast rays from a single view point. While doing it the old way (by casting rays perpendicular to the canvas) produced a fair-looking 3D image, it had some lighting artifacts on the sphere.
+
+### Image Samples
+
+[Using material and lighting to create a first real 3D object.](/samples/sphere-with-lighting.png)
