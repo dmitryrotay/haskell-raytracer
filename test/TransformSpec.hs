@@ -1,13 +1,10 @@
 module TransformSpec where
 
-import Control.Monad
-import Data.Either (fromRight)
-import Matrix ((|*|), inverse)
+import Matrix (inverse)
 import Space (Point (..), Vector (..), transformPoint, transformVector)
 import Test.Hspec
 import Transform
     ( (|<>|)
-    , identity
     , translation
     , scaling
     , rotationX
@@ -30,7 +27,7 @@ spec = do
                 let t = inverse $ translation 5 (-3) 2
                     p = Point (-3) 4 5
                     expected = Point (-8) 7 3
-                    result = p `transformPoint` fromRight identity t
+                    result = p `transformPoint` t
                 in result `shouldBe` expected
             it "does not affect vectors" $
                 let t = translation 5 (-3) 2
@@ -52,7 +49,7 @@ spec = do
                 let t = inverse $ scaling 2 3 4
                     v = Vector (-4) 6 8
                     expected = Vector (-2) 2 2
-                    result = v `transformVector` fromRight identity t
+                    result = v `transformVector` t
                 in result `shouldBe` expected
             it "reflects point if given negative factors" $
                 let t = scaling (-1) 1 1
@@ -73,7 +70,7 @@ spec = do
                 let t = inverse $ rotationX (pi / 4)
                     p = Point 0 1 0
                     expected = Point 0 (sqrt 2 / 2) (-sqrt 2 / 2)
-                    result = p `transformPoint` fromRight identity t
+                    result = p `transformPoint` t
                 in result `shouldBe` expected
         
         describe "rotationY" $ do

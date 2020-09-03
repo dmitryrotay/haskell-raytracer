@@ -7,7 +7,7 @@ import Drawing (Color (..), blank, setPixelMap)
 import Drawing.Output (canvasToPpm)
 import Space (Point (..), Vector (..), addVectorP, addVectorV, normalize, multiplyVector)
 
-data Projectile = Projectile { position :: Point,  velocity :: Vector }
+data Projectile = Projectile { getPosition :: Point, _getVelocity :: Vector }
 data Environment = Environment Vector Vector
 
 tick :: Environment -> Projectile -> Projectile
@@ -26,14 +26,14 @@ drawProjectile = do
         gravity = Vector 0 (-0.1) 0
         wind = Vector (-0.01) 0 0
         env = Environment gravity wind
-        canvas = blank 900 300
+        canvas = blank width height
         projectileTrajectory = scanl (flip tick) pStart (repeat env)
         insideCanvasPositions =
-            takeWhile (\p -> (pointY . position $ p) > 0) projectileTrajectory
+            takeWhile (\p -> (pointY . getPosition $ p) > 0) projectileTrajectory
         red = Color 1 0 0
         positionToCanvasTuple p = 
-            let canvasX = round . pointX . position $ p
-                canvasY = 300 - (round . pointY . position $ p)
+            let canvasX = round . pointX . getPosition $ p
+                canvasY = height - (round . pointY . getPosition $ p)
             in ((canvasX, canvasY), red)
         pixelMap = fromList $ map positionToCanvasTuple insideCanvasPositions
         canvas' = setPixelMap canvas pixelMap

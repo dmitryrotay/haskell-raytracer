@@ -6,6 +6,7 @@ import Data.List (intercalate)
 import Data.List.Split (chunksOf)
 import Drawing (Canvas (..), Color (..))
 
+maxLineLength :: Int
 maxLineLength = 70
 
 canvasToPpm :: Canvas -> String
@@ -28,7 +29,7 @@ lineChunks xs =
     in chunk : lineChunks rest
 
 lineChunk :: [String] -> [String] -> Int -> ([String], [String])
-lineChunk [] chunk len = (chunk, [])
+lineChunk [] chunk _ = (chunk, [])
 lineChunk (x:xs) chunk len =
     let nextLen = len + length x
     in if nextLen > maxLineLength

@@ -2,13 +2,11 @@ module Silhouette
     ( drawSilhouette
     ) where
 
-import Data.Either (fromRight)
 import Data.HashMap.Strict (fromList)
 import Drawing (Color (..), blank, setPixelMap, getCoords)
 import Drawing.Output (canvasToPpm)
-import Geometry (hit)
 import Geometry.Sphere (createSphere, setTransform, intersect, SphereRayIntersection (..))
-import Ray (Ray (..), transform)
+import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Transform (scaling, translation, (|<>|))
 
@@ -22,10 +20,10 @@ drawSilhouette = do
         transformedSphere = setTransform sphere translateAndScale
         isRayHit x y =
             let ray = Ray (Point x y (-300)) (Vector 0 0 1)
-                intersection = fromRight Miss (transformedSphere `intersect` ray)
+                intersection = transformedSphere `intersect` ray
             in case intersection of
                 Miss -> False
-                _ -> True
+                _    -> True
         sphereHitsPixelMap = fromList [((x, y), foreground) |
                                        pixelIndex <- [0..width * height - 1],
                                        let (x, y) = getCoords width pixelIndex,

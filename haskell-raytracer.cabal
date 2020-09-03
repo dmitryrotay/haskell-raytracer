@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 05fdb24f6f9557bc8ce91e0015aff633f485a66ab151c8627333ad04a3c271a4
+-- hash: df22f8e8a5616d8ad8ab3d3ea4ef60f0d19c59a648661fd9e010adea398ae7f3
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -31,6 +31,8 @@ library
       Drawing.Output
       Geometry
       Geometry.Sphere
+      Lights
+      Materials
       Matrix
       Ray
       Space
@@ -53,10 +55,11 @@ executable haskell-raytracer-exe
       ClockFace
       ProjectileTrajectory
       Silhouette
+      SphereWithLighting
       Paths_haskell_raytracer
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.7 && <5
     , containers
@@ -74,6 +77,7 @@ test-suite haskell-raytracer-test
       DrawingSpec
       Geometry.SphereSpec
       GeometrySpec
+      MaterialsSpec
       MatrixSpec
       RaySpec
       SpaceSpec
@@ -81,7 +85,7 @@ test-suite haskell-raytracer-test
       Paths_haskell_raytracer
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       QuickCheck
     , base >=4.7 && <5

@@ -2,11 +2,10 @@ module ClockFace
     ( drawClockFace
     ) where
 
-import Data.Either
 import Drawing (Color (..), blank, setPixel)
 import Drawing.Output (canvasToPpm)
-import Space (Point (..), Vector (..), transformPoint)
-import Transform (translation, rotationZ, (|<>|))
+import Space (Point (..), transformPoint)
+import Transform (translation, rotationZ)
 
 drawClockFace :: IO ()
 drawClockFace = do

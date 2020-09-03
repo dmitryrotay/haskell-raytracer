@@ -17,7 +17,7 @@ import           Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as M (lookup)
 import           Data.Maybe
 
-data Color = Color { red :: Float, green :: Float, blue :: Float } deriving Show
+data Color = Color { getRed :: Float, getGreen :: Float, getBlue :: Float } deriving Show
 
 instance Eq Color where
     Color r1 g1 b1 == Color r2 g2 b2 = (r1 ~== r2) && (g1 ~== g2) && (b1 ~== b2)
@@ -34,7 +34,7 @@ Color r g b `multiplyByScalar` x = Color (r * x) (g * x) (b * x)
 multiplyByColor :: Color -> Color -> Color
 Color r1 g1 b1 `multiplyByColor` Color r2 g2 b2 = Color (r1 * r2) (g1 * g2) (b1 * b2)
 
-data Canvas = Canvas { width :: Int, height :: Int, pixels :: [Color] }
+data Canvas = Canvas { getWidth :: Int, getHeight :: Int, getPixels :: [Color] }
 
 instance Show Canvas where 
     show (Canvas width height _) = "Canvas {width = " ++ show width ++ ", height = " ++ show height ++ "}"
@@ -57,7 +57,7 @@ setPixelMap (Canvas width height pixels) m =
     in Canvas width height pixels'
 
 pixelAt :: Canvas -> Int -> Int -> Color
-pixelAt (Canvas width height pixels) x y =
+pixelAt (Canvas width _ pixels) x y =
     let n = getIndex width x y
     in pixels !! n
 

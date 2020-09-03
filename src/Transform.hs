@@ -16,7 +16,6 @@ module Transform
     ) where
 
 import           Matrix (SpaceMatrix, (|*|), square4)
-import           GHC.TypeNats
 import qualified Matrix as M (identity)
 
 (|<>|) :: SpaceMatrix width -> Transform -> SpaceMatrix width

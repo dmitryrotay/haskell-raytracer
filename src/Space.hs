@@ -18,6 +18,7 @@ module Space
     , cross
     , transformPoint
     , transformVector
+    , reflectVector
     ) where
 
 import Common ((~==))
@@ -80,7 +81,7 @@ divideVector :: Vector -> Float -> Vector
 Vector x y z `divideVector` d = Vector (x / d) (y / d) (z / d)
 
 magnitude :: Vector -> Float
-magnitude (Vector x y z) = sqrt (x^2 + y^2 + z^2)
+magnitude (Vector x y z) = sqrt (x ** 2 + y ** 2 + z ** 2)
 
 normalize :: Vector -> Vector
 normalize (Vector x y z) =
@@ -116,3 +117,11 @@ transformVector v t =
         transformedMatrix = matrix |<>| t
         (x, y, z) = toSpaceCoordinates transformedMatrix
     in Vector x y z
+
+reflectVector :: Vector -> Vector -> Vector
+reflectVector vector normalVector =
+    vector `subtractVectorV`
+    ( normalVector `multiplyVector`
+      2 `multiplyVector`
+      (vector `dot` normalVector)
+    )

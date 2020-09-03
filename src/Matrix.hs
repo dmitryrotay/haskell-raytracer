@@ -24,6 +24,7 @@ module Matrix
     ) where
 
 import Common ((~==))
+import Control.Exception (throw, ArithException (..), Exception)
 import Data.Proxy
 import GHC.TypeNats
 
@@ -123,15 +124,19 @@ identity =
 invertible :: Matrix h w -> Bool
 invertible matrix = determinant matrix /= 0
 
-inverse :: Matrix h w -> Either String (Matrix h w)
+inverse :: Matrix h w -> Matrix h w
 inverse matrix
     | invertible matrix =
         let d = determinant matrix
             (Matrix m) = matrix
             n = length m
             c = Matrix [[cofactor matrix row col / d | col <- [0..n - 1]] | row <- [0..n - 1]]
-        in Right (transpose c)
-    | otherwise = Left "The given matrix is not invertible"
+        in transpose c
+    | otherwise = throw DivideByZero
+
+data InvalidSpaceMatrixException = InvalidSpaceMatrixException deriving Show
+instance Exception InvalidSpaceMatrixException
 
 toSpaceCoordinates :: SpaceMatrix 1 -> (Float, Float, Float)
 toSpaceCoordinates (Matrix [[x], [y], [z], [_]]) = (x, y, z)
+toSpaceCoordinates _ = throw InvalidSpaceMatrixException
