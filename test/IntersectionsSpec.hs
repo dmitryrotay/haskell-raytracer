@@ -1,7 +1,7 @@
-module GeometrySpec where
+module IntersectionsSpec where
 
-import Geometry (Intersection (..), hit)
-import Geometry.Sphere (createSphere)
+import Intersections (Intersection (..), hit)
+import Sphere (createSphere)
 import Test.Hspec
 
 spec :: Spec

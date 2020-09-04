@@ -4,14 +4,12 @@ module World
     , defaultWorld
     , intersectWorld
     ) where
-
 import Data.List (sort)
 import Drawing (Color (..))
-import Geometry (Intersection (..))
-import Geometry.Sphere 
+import Intersections (Intersection (..))
+import Intersections.Sphere(intersect, intersectionToList)
+import Sphere 
     ( Sphere
-    , intersect
-    , intersectionToList
     , createSphere
     , setMaterial
     , setTransform

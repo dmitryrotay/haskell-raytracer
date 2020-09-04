@@ -1,8 +1,8 @@
 module WorldSpec where
 
 import Drawing (Color (..))
-import Geometry.Sphere (Sphere (..))
-import Geometry (Intersection (..))
+import Sphere (Sphere (..))
+import Intersections (Intersection (..))
 import Lights (PointLight (..))
 import Materials (Material (..))
 import Ray (Ray (..))

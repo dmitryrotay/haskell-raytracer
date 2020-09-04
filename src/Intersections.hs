@@ -1,4 +1,4 @@
-module Geometry
+module Intersections
     ( Intersection (..)
     , hit
     ) where
