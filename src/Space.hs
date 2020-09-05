@@ -20,9 +20,9 @@ module Space
     , vectorToMatrix
     , pointToMatrix
     ) where
-
+        
 import Common ((~==))
-import Matrix (SpaceMatrix, fromTuple4, toSpaceCoordinates)
+import Matrix (SpaceMatrix, fromTuple4)
 
 class SpaceElement a where
     getX :: a -> Float

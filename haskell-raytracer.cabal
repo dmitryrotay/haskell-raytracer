@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f72d440c9b6cd9fbde7ba17ed8e4b446024149e90cbae956e2943eb92796b018
+-- hash: 37f87fa6671d2ccaefadf870f1712aaac376bc068265bfee525a8d92728731ba
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      Camera
       Common
       Drawing
       Drawing.Output
@@ -75,6 +76,7 @@ test-suite haskell-raytracer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      CameraSpec
       Drawing.OutputSpec
       DrawingSpec
       Intersections.SphereSpec
