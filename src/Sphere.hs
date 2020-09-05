@@ -8,8 +8,8 @@ module Sphere
 
 import Materials (Material (..), defaultMaterial)
 import Matrix (transpose, inverse)
-import Space (Point (..), Vector (..), subtractPoint, normalize, transformPoint, transformVector)
-import Transform (Transform, identity)
+import Space (Point (..), Vector (..), subtractPoint, normalize)
+import Transform (Transform, identity, transformPoint, transformVector)
 
 data Sphere = Sphere
     { getSphereId :: Int

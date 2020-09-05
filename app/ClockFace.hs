@@ -4,8 +4,8 @@ module ClockFace
 
 import Drawing (Color (..), blank, setPixel)
 import Drawing.Output (canvasToPpm)
-import Space (Point (..), transformPoint)
-import Transform (translation, rotationZ)
+import Space (Point (..))
+import Transform (translation, rotationZ, transformPoint)
 
 drawClockFace :: IO ()
 drawClockFace = do

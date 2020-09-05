@@ -9,11 +9,9 @@ import Space
     , Vector (..)
     , addVectorP
     , multiplyVector
-    , transformPoint
-    , transformVector
     )
 
-import Transform (Transform)
+import Transform (Transform, transformPoint, transformVector)
 
 data Ray = Ray { getOrigin :: Point, getDirection :: Vector }
     deriving (Show, Eq)
