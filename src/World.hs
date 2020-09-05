@@ -3,19 +3,27 @@ module World
     , createWorld
     , defaultWorld
     , intersectWorld
+    , setLight
+    , shadeHit
+    , colorAt
     ) where
 import Data.List (sort)
 import Drawing (Color (..))
-import Intersections (Intersection (..))
-import Intersections.Sphere(intersect, intersectionToList)
+import Intersections (Intersection (..), hit)
+import Intersections.Sphere
+    ( Computations (..)
+    , intersect
+    , intersectionToList
+    , prepareComputations
+    )
 import Sphere 
-    ( Sphere
+    ( Sphere (..)
     , createSphere
     , setMaterial
     , setTransform
     )
 import Lights (PointLight (..))
-import Materials (Material (..))
+import Materials (Material (..), lighting)
 import Ray (Ray (..))
 import Space (Point (..))
 import Transform (scaling)
@@ -40,3 +48,28 @@ defaultWorld =
 intersectWorld :: World -> Ray -> [Intersection Sphere]
 intersectWorld (World objects _) ray =
     sort $ concat [intersectionToList (object `intersect` ray) | object <- objects]
+
+setLight :: World -> PointLight -> World
+setLight (World objects _) light = World objects (Just light)
+
+shadeHit :: World -> Computations -> Color
+shadeHit (World _ (Just light)) comps = lighting
+                         (getMaterial $ getCompObject comps)
+                         light
+                         (getCompPoint comps)
+                         (getCompEyeVector comps)
+                         (getCompNormalVector comps)
+shadeHit _ _ = Color 0 0 0
+
+colorAt :: World -> Ray -> Color
+colorAt (World objects (Just light)) ray =
+    let world = World objects (Just light)
+        xs = intersectWorld world ray
+        objectHit = hit xs
+        color = case objectHit of
+                  Nothing -> Color 0 0 0
+                  Just intersection ->
+                    let comps = prepareComputations intersection ray
+                    in shadeHit world comps
+    in color
+colorAt _ _ = Color 0 0 0

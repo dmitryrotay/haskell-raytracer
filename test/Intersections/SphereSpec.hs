@@ -1,7 +1,12 @@
 module Intersections.SphereSpec where
 
 import Intersections (Intersection (..))
-import Intersections.Sphere (SphereRayIntersection (..), intersect)
+import Intersections.Sphere 
+    ( SphereRayIntersection (..)
+    , Computations (..)
+    , intersect
+    , prepareComputations
+    )
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Sphere (createSphere, setTransform)
@@ -46,6 +51,32 @@ spec = do
                     t1 = Intersection sphere' 3.0
                     t2 = Intersection sphere' 7.0
                 in intersect sphere' r `shouldBe` SphereRayIntersection t1 t2
+            
+        describe "prepareComputations" $ do
+            it "computes outside hit" $
+                let ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
+                    (sphere, _) = createSphere 0
+                    i = Intersection sphere 4
+                    comps = prepareComputations i ray
+                in comps  `shouldBe` Computations
+                                        sphere
+                                        (getDistance i)
+                                        (Point 0 0 (-1))
+                                        (Vector 0 0 (-1))
+                                        (Vector 0 0 (-1))
+                                        False
+            it "computes inside hit" $
+                let ray = Ray (Point 0 0 0) (Vector 0 0 1)
+                    (sphere, _) = createSphere 0
+                    i = Intersection sphere 1
+                    comps = prepareComputations i ray
+                in comps  `shouldBe` Computations
+                                        sphere
+                                        (getDistance i)
+                                        (Point 0 0 1)
+                                        (Vector 0 0 (-1))
+                                        (Vector 0 0 (-1))
+                                        True
 
 raySphereIntersection :: Float -> Float -> Float -> Float -> Float -> Float -> SphereRayIntersection
 raySphereIntersection originX originY originZ directionX directionY directionZ =

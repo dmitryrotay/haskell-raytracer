@@ -53,5 +53,3 @@ tests:
     - haskell-raytracer
     - hspec
     - hspec-discover
-    - HUnit
-    - QuickCheck

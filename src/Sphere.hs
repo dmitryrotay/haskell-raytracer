@@ -35,4 +35,4 @@ normalAt sphere point =
     in normalize worldNormal
 
 setMaterial :: Sphere -> Material -> Sphere
-setMaterial (Sphere sphereId transform _) = Sphere sphereId transform
+setMaterial sphere material = sphere { getMaterial = material }

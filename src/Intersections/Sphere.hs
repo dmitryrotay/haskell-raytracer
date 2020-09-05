@@ -1,20 +1,34 @@
 module Intersections.Sphere
     ( SphereRayIntersection (..)
+    , Computations (..)
     , intersect
     , intersectionToList
+    , prepareComputations
     ) where
         
 import Intersections (Intersection (..))
 import Matrix (inverse)
-import Ray (Ray (..), transformRay)
+import Ray (Ray (..), transformRay, position)
 import Space 
     ( Point (..)
+    , Vector (..)
     , subtractPoint
-    , dot)
-import Sphere (Sphere (..))
+    , dot
+    , negateV
+    )
+import Sphere (Sphere (..), normalAt)
 
 data SphereRayIntersection = Miss | SphereRayIntersection (Intersection Sphere) (Intersection Sphere)
     deriving (Show, Eq)
+
+data Computations = Computations
+    { getCompObject :: Sphere        
+    , getCompDistance :: Float
+    , getCompPoint :: Point
+    , getCompEyeVector :: Vector
+    , getCompNormalVector :: Vector
+    , getIsInside :: Bool
+    } deriving (Show, Eq)
 
 intersect :: Sphere -> Ray -> SphereRayIntersection
 intersect sphere ray =
@@ -38,3 +52,14 @@ intersect sphere ray =
 intersectionToList :: SphereRayIntersection -> [Intersection Sphere]
 intersectionToList Miss = []
 intersectionToList (SphereRayIntersection i1 i2) = [i1, i2]
+
+prepareComputations :: Intersection Sphere -> Ray -> Computations
+prepareComputations (Intersection sphere distance) ray =
+    let point = position ray distance
+        normalVector = normalAt sphere point
+        eyeVector = negateV (getDirection ray)
+        isInside = dot normalVector eyeVector < 0
+        normalVector'
+            | isInside = negateV normalVector
+            | otherwise = normalVector
+    in Computations sphere distance point eyeVector normalVector' isInside

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b9317a0286a7c43d251849c2744b5eaa2b14c2ccf16cb4bb4edb4be20e4e593b
+-- hash: f72d440c9b6cd9fbde7ba17ed8e4b446024149e90cbae956e2943eb92796b018
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -91,9 +91,7 @@ test-suite haskell-raytracer-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      HUnit
-    , QuickCheck
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , containers
     , haskell-raytracer
     , hspec
