@@ -1,6 +1,6 @@
 module Main where
 
-import SphereWithLighting (drawSphere)
+import CameraWorldRender (renderWorld)
 
 main :: IO ()
-main = drawSphere
+main = renderWorld

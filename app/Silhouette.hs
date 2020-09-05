@@ -3,7 +3,7 @@ module Silhouette
     ) where
 
 import Data.HashMap.Strict (fromList)
-import Drawing (Color (..), blank, setPixelMap, getCoords)
+import Drawing (Color (..), blankCanvas, setPixelMap, getCoords)
 import Drawing.Output (canvasToPpm)
 import Sphere (createSphere, setTransform)
 import Intersections.Sphere (intersect, SphereRayIntersection (..))
@@ -30,6 +30,6 @@ drawSilhouette = do
                                        let (x, y) = getCoords width pixelIndex,
                                        isRayHit (fromIntegral x) (fromIntegral y)
                                       ]
-        canvas = blank width height
+        canvas = blankCanvas width height
         canvas' = setPixelMap canvas sphereHitsPixelMap
     putStr . canvasToPpm $ canvas'

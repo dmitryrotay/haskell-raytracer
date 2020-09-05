@@ -3,7 +3,7 @@ module ProjectileTrajectory
     ) where
 
 import Data.HashMap.Strict (fromList)
-import Drawing (Color (..), blank, setPixelMap)
+import Drawing (Color (..), blankCanvas, setPixelMap)
 import Drawing.Output (canvasToPpm)
 import Space (Point (..), Vector (..), addVectorP, addVectorV, normalize, multiplyVector)
 
@@ -26,7 +26,7 @@ drawProjectile = do
         gravity = Vector 0 (-0.1) 0
         wind = Vector (-0.01) 0 0
         env = Environment gravity wind
-        canvas = blank width height
+        canvas = blankCanvas width height
         projectileTrajectory = scanl (flip tick) pStart (repeat env)
         insideCanvasPositions =
             takeWhile (\p -> (pointY . getPosition $ p) > 0) projectileTrajectory

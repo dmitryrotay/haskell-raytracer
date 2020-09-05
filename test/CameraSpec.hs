@@ -1,10 +1,12 @@
 module CameraSpec where
 
-import Camera (Camera (..), createCamera, rayForPixel)
+import Camera (Camera (..), createCamera, rayForPixel, render)
+import Drawing (Color (..), pixelAt)
 import Test.Hspec
-import Transform (identity, rotationY, translation, (|<>|))
+import Transform (identity, rotationY, translation, viewTransform, (|<>|))
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
+import World (defaultWorld)
 
 spec :: Spec
 spec =
@@ -48,5 +50,12 @@ spec =
                     getOrigin ray `shouldBe` Point 0 2 (-5)
                     getDirection ray `shouldBe` Vector (sqrt 2 / 2) 0 (-sqrt 2 / 2)
             
-                
-    
+        describe "render" $
+            it "renders a world with a camera" $
+                let world = defaultWorld
+                    from = Point 0 0 (-5)
+                    to = Point 0 0 0
+                    up = Vector 0 1 0
+                    camera = (createCamera 11 11 (pi / 2)) { getTransform = viewTransform from to up }
+                    image = render camera world
+                in pixelAt image 5 5 `shouldBe` Color 0.38066 0.47583 0.2855
