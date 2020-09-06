@@ -53,7 +53,7 @@ For the sample, instead of doing it the way suggested by the hints I used a kind
 
 [Using ray intersections to draw a silhouette of a sphere on the canvas.](/samples/silhouette.png)
 
-## Chapters 5
+## Chapters 6
 
 ### Changes
 
@@ -74,3 +74,24 @@ As expected, I had to rewrite the previous chapter sample's code to properly cas
 ### Image Samples
 
 [Using material and lighting to create a first real 3D object.](/samples/sphere-with-lighting.png)
+
+## Chapters 7
+
+### Changes
+
+* World data type holding objects and a single light.
+* Ray intersection with World.
+* Camera data type and view transform.
+* Render function combining Camera, World and view transform to produce an image.
+
+### Thoughts
+
+Pretty straightforward implementation overall. The biggest change was probably doing some refactoring to move around and rename modules holding intersection data types and logic.
+
+Finally figured out the record update syntax sucha as `record' = record { getValue = newValue }`, for some reason I have failed to discover it earlier. Anyway, started to get rid of some of the `setValue` functions that I started adding previously.
+
+All the ray intersection functions and `World` still work with the single type of object - `Sphere`. Cannot tell which way the book will turn this so leaving generalization for later.
+
+### Image Samples
+
+[Render of a world with 3 spheres and walls using a camera with a view transform.](/samples/camera-world-render.png)
