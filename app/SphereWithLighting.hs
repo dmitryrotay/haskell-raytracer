@@ -3,21 +3,15 @@ module SphereWithLighting
     ) where
 
 import Data.HashMap.Strict (fromList)
-import Drawing (Color (..), blank, setPixelMap, getCoords)
+import Drawing (Color (..), blankCanvas, setPixelMap, getCoords)
 import Drawing.Output (canvasToPpm)
-import Geometry (Intersection (..), hit)
-import Geometry.Sphere
-    ( Sphere (..)
-    , createSphere
-    , intersect
-    , SphereRayIntersection (..)
-    , setMaterial
-    , normalAt
-    )
+import Intersections (Intersection (..), hit)
+import Intersections.Sphere (SphereRayIntersection (..), intersect)
 import Lights (PointLight (..))
 import Materials (Material (..), lighting)
 import Ray (Ray (..), position)
 import Space (Point (..), negateV, subtractPoint, normalize)
+import Sphere (Sphere (..), createSphere, setMaterial, normalAt)
 
 width :: Int
 width = 640
@@ -78,6 +72,6 @@ drawSphere = do
                                              (isRayHit, color) = castRay x y
                                        , isRayHit
                                       ]
-        canvas = blank width height
+        canvas = blankCanvas width height
         canvas' = setPixelMap canvas sphereHitsPixelMap
     putStr . canvasToPpm $ canvas'

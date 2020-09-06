@@ -1,7 +1,7 @@
 module TransformSpec where
 
-import Matrix (inverse)
-import Space (Point (..), Vector (..), transformPoint, transformVector)
+import Matrix (inverse, square4)
+import Space (Point (..), Vector (..))
 import Test.Hspec
 import Transform
     ( (|<>|)
@@ -12,6 +12,10 @@ import Transform
     , rotationZ
     , shearing
     , combine
+    , identity
+    , viewTransform
+    , transformPoint
+    , transformVector
     )
 
 spec :: Spec
@@ -124,6 +128,7 @@ spec = do
                     p = Point 2 3 4
                     expected = Point 2 3 7
                 in p `transformPoint` t `shouldBe` expected
+        
         describe "combine" $ do
             it "produces the same result as with applying transformations one by one" $
                 let p = Point 1 0 1
@@ -133,3 +138,30 @@ spec = do
                     oneByOne = p `transformPoint` (c |<>| b |<>| a)
                     combined = p `transformPoint` combine [a, b, c]
                 in combined `shouldBe` oneByOne
+
+        describe "viewTransform" $ do
+            it "produces identity transformation from default parameters" $
+                let from = Point 0 0 0
+                    to = Point 0 0 (-1)
+                    up = Vector 0 1 0
+                in viewTransform from to up `shouldBe` identity
+            it "produces transformation matrix looking in positive z direction" $
+                let from = Point 0 0 0
+                    to = Point 0 0 1
+                    up = Vector 0 1 0
+                in viewTransform from to up `shouldBe` scaling (-1) 1 (-1)
+            it "moves the world and not the eye" $
+                let from = Point 0 0 8
+                    to = Point 0 0 0
+                    up = Vector 0 1 0
+                in viewTransform from to up `shouldBe` translation 0 0 (-8)
+            it "computes an arbitrary transformation" $
+                let from = Point 1 3 2
+                    to = Point 4 (-2) 8
+                    up = Vector 1 1 0
+                    expected = square4 ( -0.50709, 0.50709,  0.67612, -2.36643,
+                                          0.76772, 0.60609,  0.12122, -2.82843,
+                                         -0.35857, 0.59761, -0.71714,  0.00000,
+                                          0.00000, 0.00000,  0.00000,  1.00000
+                                       )
+                in viewTransform from to up `shouldBe` expected

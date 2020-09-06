@@ -5,7 +5,7 @@ module Drawing
     , multiplyByScalar
     , multiplyByColor
     , Canvas (..)
-    , blank
+    , blankCanvas
     , setPixel
     , setPixelMap
     , pixelAt
@@ -39,8 +39,8 @@ data Canvas = Canvas { getWidth :: Int, getHeight :: Int, getPixels :: [Color] }
 instance Show Canvas where 
     show (Canvas width height _) = "Canvas {width = " ++ show width ++ ", height = " ++ show height ++ "}"
 
-blank :: Int -> Int -> Canvas
-blank width height =
+blankCanvas :: Int -> Int -> Canvas
+blankCanvas width height =
     let pixels = [Color 0 0 0 | _ <- [1..width * height]]
     in Canvas width height pixels
 

@@ -16,14 +16,13 @@ module Space
     , normalize
     , dot
     , cross
-    , transformPoint
-    , transformVector
     , reflectVector
+    , vectorToMatrix
+    , pointToMatrix
     ) where
-
+        
 import Common ((~==))
-import Matrix (SpaceMatrix, fromTuple4, toSpaceCoordinates)
-import Transform (Transform, (|<>|))
+import Matrix (SpaceMatrix, fromTuple4)
 
 class SpaceElement a where
     getX :: a -> Float
@@ -103,20 +102,6 @@ vectorToMatrix (Vector x y z) = fromTuple4 (x, y, z, 0)
 
 pointToMatrix :: Point -> SpaceMatrix 1
 pointToMatrix (Point x y z) = fromTuple4 (x, y, z, 1)
-
-transformPoint :: Point -> Transform -> Point
-transformPoint p t =
-    let matrix = pointToMatrix p
-        transformedMatrix = matrix |<>| t
-        (x, y, z) = toSpaceCoordinates transformedMatrix
-    in Point x y z
-
-transformVector :: Vector -> Transform -> Vector
-transformVector v t =
-    let matrix = vectorToMatrix v
-        transformedMatrix = matrix |<>| t
-        (x, y, z) = toSpaceCoordinates transformedMatrix
-    in Vector x y z
 
 reflectVector :: Vector -> Vector -> Vector
 reflectVector vector normalVector =

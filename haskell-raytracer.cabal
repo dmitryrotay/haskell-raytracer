@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: df22f8e8a5616d8ad8ab3d3ea4ef60f0d19c59a648661fd9e010adea398ae7f3
+-- hash: 34b1b34466fc00d0e04047a726ab84c9f1f5b205b264cbca59370174fdb5adce
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -26,17 +26,20 @@ source-repository head
 
 library
   exposed-modules:
+      Camera
       Common
       Drawing
       Drawing.Output
-      Geometry
-      Geometry.Sphere
+      Intersections
+      Intersections.Sphere
       Lights
       Materials
       Matrix
       Ray
       Space
+      Sphere
       Transform
+      World
   other-modules:
       Paths_haskell_raytracer
   hs-source-dirs:
@@ -52,6 +55,7 @@ library
 executable haskell-raytracer-exe
   main-is: Main.hs
   other-modules:
+      CameraWorldRender
       ClockFace
       ProjectileTrajectory
       Silhouette
@@ -73,22 +77,24 @@ test-suite haskell-raytracer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      CameraSpec
       Drawing.OutputSpec
       DrawingSpec
-      Geometry.SphereSpec
-      GeometrySpec
+      Intersections.SphereSpec
+      IntersectionsSpec
       MaterialsSpec
       MatrixSpec
       RaySpec
       SpaceSpec
+      SphereSpec
       TransformSpec
+      WorldSpec
       Paths_haskell_raytracer
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
-      QuickCheck
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , containers
     , haskell-raytracer
     , hspec

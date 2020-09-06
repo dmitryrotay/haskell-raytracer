@@ -7,7 +7,7 @@ import Drawing
     , multiplyByScalar
     , multiplyByColor
     , Canvas (..)
-    , blank
+    , blankCanvas
     , setPixel
     , pixelAt
     )
@@ -29,12 +29,12 @@ spec = do
         
         describe "Canvas" $ do
             it "creates canvas with correct initial state" $
-                let canvas = blank 10 20
+                let canvas = blankCanvas 10 20
                 in do getWidth canvas `shouldBe` 10
                       getHeight canvas `shouldBe` 20
                       length (getPixels canvas) `shouldBe` 200
                       all (== Color 0 0 0) (getPixels canvas) `shouldBe` True
             it "sets pixel on the canvas" $
                 let red = Color 1 0 0
-                    canvas = setPixel (blank 10 20) 2 3 red
+                    canvas = setPixel (blankCanvas 10 20) 2 3 red
                 in pixelAt canvas 2 3 `shouldBe` red
