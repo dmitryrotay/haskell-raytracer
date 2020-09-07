@@ -1,15 +1,15 @@
 module WorldSpec where
 
 import Drawing (Color (..))
-import Sphere (Sphere (..))
 import Intersections (Intersection (..))
 import Intersections.Sphere (prepareComputations)
 import Lights (PointLight (..))
 import Materials (Material (..))
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
+import Sphere (Sphere (..), createSphere)
 import Test.Hspec
-import Transform (scaling)
+import Transform (scaling, translation)
 import World
     ( World (..)
     , createWorld
@@ -108,4 +108,14 @@ spec = do
                 let world = defaultWorld
                     point = Point (-2) 2 (-2)
                 in isShadowed world point `shouldBe` False
-                    
+        
+        describe "shadeHit" $ do
+            it "computes color when given an intersection in shadow" $
+                let (sphere1, id1) = createSphere 0
+                    (sphere2, _) = createSphere id1
+                    sphere2' = sphere2 { getTransform = translation 0 0 10 }
+                    world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
+                    ray = Ray (Point 0 0 5) (Vector 0 0 1)
+                    i = Intersection sphere2' 4 
+                    comps = prepareComputations i ray
+                in shadeHit world comps `shouldBe` Color 0.1 0.1 0.1

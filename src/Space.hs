@@ -32,12 +32,12 @@ class SpaceElement a where
 eq :: (SpaceElement a) => a -> a -> Bool
 e1 `eq` e2 = (getX e1 ~== getX e2) && (getY e1 ~== getY e2) && (getZ e1 ~== getZ e2)
 
-data Point = Point { pointX :: Float, pointY :: Float, pointZ :: Float } deriving (Show)
+data Point = Point { getPointX :: Float, getPointY :: Float, getPointZ :: Float } deriving (Show)
 
 instance SpaceElement Point where
-    getX = pointX
-    getY = pointY
-    getZ = pointZ
+    getX = getPointX
+    getY = getPointY
+    getZ = getPointZ
 
 instance Eq Point where
     (==) = eq

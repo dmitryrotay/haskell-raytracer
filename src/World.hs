@@ -53,16 +53,6 @@ intersectWorld (World objects _) ray =
 setLight :: World -> PointLight -> World
 setLight (World objects _) light = World objects (Just light)
 
-shadeHit :: World -> Computations -> Color
-shadeHit (World _ (Just light)) comps = lighting
-                         (getMaterial $ getCompObject comps)
-                         light
-                         (getCompPoint comps)
-                         (getCompEyeVector comps)
-                         (getCompNormalVector comps)
-                         False
-shadeHit _ _ = Color 0 0 0
-
 colorAt :: World -> Ray -> Color
 colorAt (World objects (Just light)) ray =
     let world = World objects (Just light)
@@ -75,6 +65,20 @@ colorAt (World objects (Just light)) ray =
                     in shadeHit world comps
     in color
 colorAt _ _ = Color 0 0 0
+
+shadeHit :: World -> Computations -> Color
+shadeHit world comps =
+    case world of
+        (World _ (Just light)) ->
+            let shadowed = isShadowed world (getCompOverPoint comps)
+            in lighting
+                    (getMaterial $ getCompObject comps)
+                    light
+                    (getCompOverPoint comps)
+                    (getCompEyeVector comps)
+                    (getCompNormalVector comps)
+                    shadowed
+        _ -> Color 0 0 0
 
 isShadowed :: World -> Point -> Bool
 isShadowed world point =

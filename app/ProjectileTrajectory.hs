@@ -29,11 +29,11 @@ drawProjectile = do
         canvas = blankCanvas width height
         projectileTrajectory = scanl (flip tick) pStart (repeat env)
         insideCanvasPositions =
-            takeWhile (\p -> (pointY . getPosition $ p) > 0) projectileTrajectory
+            takeWhile (\p -> (getPointY . getPosition $ p) > 0) projectileTrajectory
         red = Color 1 0 0
         positionToCanvasTuple p = 
-            let canvasX = round . pointX . getPosition $ p
-                canvasY = height - (round . pointY . getPosition $ p)
+            let canvasX = round . getPointX . getPosition $ p
+                canvasY = height - (round . getPointY . getPosition $ p)
             in ((canvasX, canvasY), red)
         pixelMap = fromList $ map positionToCanvasTuple insideCanvasPositions
         canvas' = setPixelMap canvas pixelMap

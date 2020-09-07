@@ -1,5 +1,6 @@
 module Intersections.SphereSpec where
 
+import Common (epsilon)
 import Intersections (Intersection (..))
 import Intersections.Sphere 
     ( SphereRayIntersection (..)
@@ -9,8 +10,8 @@ import Intersections.Sphere
     )
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
-import Sphere (createSphere, setTransform)
-import Transform (scaling)
+import Sphere (Sphere (..), createSphere, setTransform)
+import Transform (scaling, translation)
 import Test.Hspec
 
 spec :: Spec
@@ -58,25 +59,36 @@ spec = do
                     (sphere, _) = createSphere 0
                     i = Intersection sphere 4
                     comps = prepareComputations i ray
-                in comps  `shouldBe` Computations
-                                        sphere
-                                        (getDistance i)
-                                        (Point 0 0 (-1))
-                                        (Vector 0 0 (-1))
-                                        (Vector 0 0 (-1))
-                                        False
+                in do
+                    getCompObject comps `shouldBe` sphere
+                    getCompDistance comps `shouldBe` getDistance i
+                    getCompPoint comps `shouldBe` Point 0 0 (-1)
+                    getCompEyeVector comps `shouldBe` Vector 0 0 (-1)
+                    getCompNormalVector comps `shouldBe` Vector 0 0 (-1)
+                    getIsInside comps `shouldBe` False
+                                        
             it "computes inside hit" $
                 let ray = Ray (Point 0 0 0) (Vector 0 0 1)
                     (sphere, _) = createSphere 0
                     i = Intersection sphere 1
                     comps = prepareComputations i ray
-                in comps  `shouldBe` Computations
-                                        sphere
-                                        (getDistance i)
-                                        (Point 0 0 1)
-                                        (Vector 0 0 (-1))
-                                        (Vector 0 0 (-1))
-                                        True
+                in do
+                    getCompObject comps `shouldBe` sphere
+                    getCompDistance comps `shouldBe` getDistance i
+                    getCompPoint comps `shouldBe` Point 0 0 1
+                    getCompEyeVector comps `shouldBe` Vector 0 0 (-1)
+                    getCompNormalVector comps `shouldBe` Vector 0 0 (-1)
+                    getIsInside comps `shouldBe` True
+
+            it "offsets the point of the hit" $
+                let ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
+                    (sphere, _) = createSphere 0
+                    sphere' = sphere { getTransform = translation 0 0 1}
+                    i = Intersection sphere' 5
+                    comps = prepareComputations i ray
+                in do
+                    getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
+                    getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
 
 raySphereIntersection :: Float -> Float -> Float -> Float -> Float -> Float -> SphereRayIntersection
 raySphereIntersection originX originY originZ directionX directionY directionZ =
