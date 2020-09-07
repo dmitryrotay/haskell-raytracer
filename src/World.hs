@@ -6,6 +6,7 @@ module World
     , setLight
     , shadeHit
     , colorAt
+    , isShadowed
     ) where
 import Data.List (sort)
 import Drawing (Color (..))
@@ -25,7 +26,7 @@ import Sphere
 import Lights (PointLight (..))
 import Materials (Material (..), lighting)
 import Ray (Ray (..))
-import Space (Point (..))
+import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)
 
 data World = World
@@ -59,6 +60,7 @@ shadeHit (World _ (Just light)) comps = lighting
                          (getCompPoint comps)
                          (getCompEyeVector comps)
                          (getCompNormalVector comps)
+                         False
 shadeHit _ _ = Color 0 0 0
 
 colorAt :: World -> Ray -> Color
@@ -73,3 +75,18 @@ colorAt (World objects (Just light)) ray =
                     in shadeHit world comps
     in color
 colorAt _ _ = Color 0 0 0
+
+isShadowed :: World -> Point -> Bool
+isShadowed world point =
+    case world of
+        (World _ Nothing) -> True
+        (World _ (Just light)) ->
+            let vector = getPosition light `subtractPoint` point
+                distance = magnitude vector
+                direction = normalize vector
+                ray = Ray point direction
+                intersections = intersectWorld world ray
+                h = hit intersections
+            in case h of
+                Nothing -> False
+                Just (Intersection _ t) -> t < distance

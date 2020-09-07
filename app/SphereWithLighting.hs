@@ -63,7 +63,7 @@ drawSphere = do
                                     let point = position ray t
                                         normal = normalAt s point
                                         eye = negateV (getDirection ray)
-                                    in lighting (getMaterial s) light point eye normal
+                                    in lighting (getMaterial s) light point eye normal False
             in (isRayHit, color)
                    
         sphereHitsPixelMap = fromList [((x, y), color) |

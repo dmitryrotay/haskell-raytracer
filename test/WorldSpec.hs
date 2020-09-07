@@ -18,6 +18,7 @@ import World
     , shadeHit
     , setLight
     , colorAt
+    , isShadowed
     )
 
 spec :: Spec
@@ -89,4 +90,22 @@ spec = do
                     world' = world { getObjects = [inner', outer'] }
                     ray = Ray (Point 0 0 0.75) (Vector 0 0 (-1))
                 in colorAt world' ray `shouldBe` getColor (getMaterial inner')
+        
+        describe "isShadowed" $ do
+            it "returns False when nothing is collinear with point and light" $
+                let world = defaultWorld
+                    point = Point 0 10 0
+                in isShadowed world point `shouldBe` False
+            it "returns True when an object is between the point and the light" $
+                let world = defaultWorld
+                    point = Point 10 (-10) 10
+                in isShadowed world point `shouldBe` True
+            it  "returns False when an object is behind the light" $
+                let world = defaultWorld
+                    point = Point (-20) 20 (-20)
+                in isShadowed world point `shouldBe` False
+            it  "returns False when an object is behind the point" $
+                let world = defaultWorld
+                    point = Point (-2) 2 (-2)
+                in isShadowed world point `shouldBe` False
                     
