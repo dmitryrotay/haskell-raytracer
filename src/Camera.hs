@@ -5,6 +5,8 @@ module Camera
     , render
     ) where
 
+import Control.Parallel.Strategies
+import Data.List.Split (chunksOf)
 import Data.HashMap.Strict (fromList)
 import Drawing (Canvas, blankCanvas, setPixelMap)
 import Matrix (inverse)
@@ -45,17 +47,22 @@ rayForPixel camera px py =
         direction = normalize (pixel `subtractPoint` origin)
     in Ray origin direction
 
+chunkSize :: Int
+chunkSize = 50000
+
 render :: Camera -> World -> Canvas
 render camera world =
     let hSize = getHsize camera
         vSize = getVsize camera
         image = blankCanvas hSize vSize
+        
         pixelList = [((x, y), color)
                       | x <- [0..hSize - 1]
                       , y <- [0..vSize - 1]
                       , let ray = rayForPixel camera x y
                             color = colorAt world ray
                      ]
+
         pixelMap = fromList pixelList
         image' = setPixelMap image pixelMap
     in image'

@@ -49,9 +49,9 @@ submatrix :: Matrix h w -> Int -> Int -> Matrix (h - 1) (w - 1)
 submatrix (Matrix m) removeRow removeCol = 
     let rows = zip [0..] [zip [0..] row | row <- m]
     in Matrix [
-        [col | (colIndex, col) <- row, colIndex /= removeCol]
-         | (rowIndex, row) <- rows, rowIndex /= removeRow
-        ]
+                [col | (colIndex, col) <- row, colIndex /= removeCol]
+                | (rowIndex, row) <- rows, rowIndex /= removeRow
+              ]
 
 determinant :: Matrix h w -> Double
 determinant (Matrix []) = 1
