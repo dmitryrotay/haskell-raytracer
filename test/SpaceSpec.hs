@@ -26,11 +26,11 @@ spec :: Spec
 spec = do
     describe "Space" $ do
         describe "Point" $ do
-            it "compares using float equality" $
+            it "compares using floating point equality" $
                 Point (10.2 ** 2) (5.2 ** 2) (2.2 ** 2) `shouldBe` Point 104.04 27.04 4.84
         
         describe "Vector" $ do
-            it "compares using float equality" $
+            it "compares using floating point equality" $
                 Vector (10.2 ** 2) (5.2 ** 2) (2.2 ** 2) `shouldBe` Vector 104.04 27.04 4.84
 
         describe "Operations" $ do

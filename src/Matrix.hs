@@ -32,7 +32,7 @@ transposeA :: [[a]] -> [[a]]
 transposeA ([]:_) = []
 transposeA x = map head x : transposeA (map tail x)
 
-newtype Matrix (height :: Nat) (width :: Nat) = Matrix [[Float]]
+newtype Matrix (height :: Nat) (width :: Nat) = Matrix [[Double]]
     deriving Show
 
 type SpaceMatrix width = Matrix 4 width
@@ -53,31 +53,31 @@ submatrix (Matrix m) removeRow removeCol =
          | (rowIndex, row) <- rows, rowIndex /= removeRow
         ]
 
-determinant :: Matrix h w -> Float
+determinant :: Matrix h w -> Double
 determinant (Matrix []) = 1
 determinant matrix =
     let (Matrix m) = matrix
     in sum (zipWith (\i x -> x * cofactor matrix 0 i) [0..] (head m))
 
-minor :: Matrix h w -> Int -> Int -> Float
+minor :: Matrix h w -> Int -> Int -> Double
 minor matrix row col = determinant (submatrix matrix row col)
 
-cofactor :: Matrix h w -> Int -> Int -> Float
+cofactor :: Matrix h w -> Int -> Int -> Double
 cofactor matrix row col = 
     let sign = if odd (row + col) then -1 else 1
     in sign * minor matrix row col
 
-type SquareTuple2 = (Float, Float,
-                     Float, Float)
+type SquareTuple2 = (Double, Double,
+                     Double, Double)
 
 square2 :: SquareTuple2 -> SquareMatrix 2
 square2 (m00, m01,
          m10, m11) = Matrix [[m00, m01],
                              [m10, m11]]
 
-type SquareTuple3 = (Float, Float, Float,
-                     Float, Float, Float,
-                     Float, Float, Float)
+type SquareTuple3 = (Double, Double, Double,
+                     Double, Double, Double,
+                     Double, Double, Double)
 
 square3 :: SquareTuple3 -> SquareMatrix 3
 square3 (m00, m01, m02,
@@ -86,10 +86,10 @@ square3 (m00, m01, m02,
                                   [m10, m11, m12],
                                   [m20, m21, m22]]
 
-type SquareTuple4 = (Float, Float, Float, Float,
-                     Float, Float, Float, Float,
-                     Float, Float, Float, Float,
-                     Float, Float, Float, Float)
+type SquareTuple4 = (Double, Double, Double, Double,
+                     Double, Double, Double, Double,
+                     Double, Double, Double, Double,
+                     Double, Double, Double, Double)
 
 square4 :: SquareTuple4 -> SquareMatrix 4
 square4 (m00, m01, m02, m03,
@@ -100,13 +100,13 @@ square4 (m00, m01, m02, m03,
                                        [m20, m21, m22, m23],
                                        [m30, m31, m32, m33]]
 
-fromTuple4 :: (Float, Float, Float, Float) -> Matrix 4 1
+fromTuple4 :: (Double, Double, Double, Double) -> Matrix 4 1
 fromTuple4 (x0, x1, x2, x3) = Matrix [[x0],
                                       [x1],
                                       [x2],
                                       [x3]]
 
-cross :: [Float] -> [Float] -> Float
+cross :: [Double] -> [Double] -> Double
 cross a1 a2 = sum (zipWith (*) a1 a2)
 
 (|*|) :: Matrix h1 w1 -> Matrix w1 h2 -> Matrix h1 h2
@@ -137,6 +137,6 @@ inverse matrix
 data InvalidSpaceMatrixException = InvalidSpaceMatrixException deriving Show
 instance Exception InvalidSpaceMatrixException
 
-toSpaceCoordinates :: SpaceMatrix 1 -> (Float, Float, Float)
+toSpaceCoordinates :: SpaceMatrix 1 -> (Double, Double, Double)
 toSpaceCoordinates (Matrix [[x], [y], [z], [_]]) = (x, y, z)
 toSpaceCoordinates _ = throw InvalidSpaceMatrixException

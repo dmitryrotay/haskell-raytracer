@@ -29,7 +29,7 @@ spec = do
             let eyeVector = Vector 0 (-sqrt 2 / 2) (-sqrt 2 / 2)
                 light = PointLight (Point 0 10 (-10)) (Color 1 1 1)
                 result = lighting material light position eyeVector normalVector False
-            in result `shouldBe` Color 1.63638 1.63638 1.63638
+            in result `shouldBe` Color 1.6364 1.6364 1.6364
         it "computes color with the light behind the surface" $
             let eyeVector = Vector 0 0 (-1)
                 light = PointLight (Point 0 0 10) (Color 1 1 1)

@@ -3,8 +3,8 @@ module Common
     , epsilon
     ) where
 
-epsilon :: Float
+epsilon :: Double
 epsilon = 1e-5
 
-(~==) :: Float -> Float -> Bool
+(~==) :: Double -> Double -> Bool
 x ~== y = abs (x - y) < epsilon

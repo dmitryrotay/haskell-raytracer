@@ -26,7 +26,7 @@ data SphereRayIntersection = Miss | SphereRayIntersection (Intersection Sphere) 
 
 data Computations = Computations
     { getCompObject :: Sphere        
-    , getCompDistance :: Float
+    , getCompDistance :: Double
     , getCompPoint :: Point
     , getCompOverPoint :: Point
     , getCompEyeVector :: Vector

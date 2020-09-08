@@ -90,7 +90,7 @@ spec = do
                     getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
                     getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
 
-raySphereIntersection :: Float -> Float -> Float -> Float -> Float -> Float -> SphereRayIntersection
+raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> SphereRayIntersection
 raySphereIntersection originX originY originZ directionX directionY directionZ =
     let
         origin = Point originX originY originZ

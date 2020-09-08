@@ -16,14 +16,14 @@ import World (World, colorAt)
 data Camera = Camera
     { getHsize :: Int
     , getVsize :: Int
-    , getFov :: Float
+    , getFov :: Double
     , getCameraTransform :: Transform
-    , getHalfWidth :: Float
-    , getHalfHeight :: Float
-    , getPixelSize :: Float
+    , getHalfWidth :: Double
+    , getHalfHeight :: Double
+    , getPixelSize :: Double
     }
 
-createCamera :: Int -> Int -> Float -> Camera
+createCamera :: Int -> Int -> Double -> Camera
 createCamera hsize vsize fov =
     let halfView = tan (fov / 2.0)
         aspect = fromIntegral hsize / fromIntegral vsize

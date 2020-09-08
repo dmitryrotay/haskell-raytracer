@@ -10,10 +10,10 @@ import Space (Point, Vector, subtractPoint, dot, reflectVector, negateV, normali
 
 data Material = Material
     { getColor :: Color
-    , getAmbient :: Float
-    , getDiffuse :: Float
-    , getSpecular :: Float
-    , getShininess :: Float
+    , getAmbient :: Double
+    , getDiffuse :: Double
+    , getSpecular :: Double
+    , getShininess :: Double
     } deriving (Show, Eq)
 
 defaultMaterial :: Material

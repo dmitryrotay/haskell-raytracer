@@ -1,5 +1,6 @@
 module CameraSpec where
 
+import Common ((~==))
 import Camera (Camera (..), createCamera, rayForPixel, render)
 import Drawing (Color (..), pixelAt)
 import Test.Hspec
@@ -24,10 +25,10 @@ spec =
                     getCameraTransform camera `shouldBe` identity
             it "computes pixel size for a horizontal canvas" $ 
                 let camera = createCamera 200 125 (pi / 2)
-                in getPixelSize camera `shouldBe` 0.01
+                in getPixelSize camera `shouldSatisfy` (~== 0.01)
             it "computes pixel size for a vertical canvas" $ 
                 let camera = createCamera 125 200 (pi / 2)
-                in getPixelSize camera `shouldBe` 0.01
+                in getPixelSize camera `shouldSatisfy` (~== 0.01)
         
         describe "rayForPixel" $ do
             it "constructs a ray throught the center of the canvas" $
