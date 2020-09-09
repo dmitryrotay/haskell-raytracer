@@ -79,7 +79,7 @@ renderWorld = do
         objects = [floor', leftWall', rightWall', leftSphere', middleSphere', rightSphere']
         world = World objects (Just light)
         cameraTransform = viewTransform (Point 0 1.5 (-5)) (Point 0 1 0) (Vector 0 1 0)
-        camera = (createCamera 320 240 (pi / 3)) { getCameraTransform = cameraTransform }
+        camera = (createCamera 640 480 (pi / 3)) { getCameraTransform = cameraTransform }
         image = render camera world
     
     handle <- openFile "camera-world-render.ppm" WriteMode
