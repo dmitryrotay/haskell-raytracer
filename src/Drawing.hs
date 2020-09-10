@@ -17,7 +17,7 @@ import           Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as M (lookup)
 import           Data.Maybe
 
-data Color = Color { getRed :: Float, getGreen :: Float, getBlue :: Float } deriving Show
+data Color = Color { getRed :: Double, getGreen :: Double, getBlue :: Double } deriving Show
 
 instance Eq Color where
     Color r1 g1 b1 == Color r2 g2 b2 = (r1 ~== r2) && (g1 ~== g2) && (b1 ~== b2)
@@ -28,7 +28,7 @@ Color r1 g1 b1 `addColor` Color r2 g2 b2 = Color (r1 + r2) (g1 + g2) (b1 + b2)
 subtractColor :: Color -> Color -> Color
 Color r1 g1 b1 `subtractColor` Color r2 g2 b2 = Color (r1 - r2) (g1 - g2) (b1 - b2)
 
-multiplyByScalar :: Color -> Float -> Color
+multiplyByScalar :: Color -> Double -> Color
 Color r g b `multiplyByScalar` x = Color (r * x) (g * x) (b * x)
 
 multiplyByColor :: Color -> Color -> Color

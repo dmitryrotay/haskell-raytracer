@@ -5,7 +5,7 @@ module Intersections
 
 import Data.List
 
-data Intersection a = Intersection { getObject :: a, getDistance :: Float }
+data Intersection a = Intersection { getObject :: a, getDistance :: Double }
     deriving (Show, Eq)
 
 instance (Eq a) => Ord (Intersection a) where

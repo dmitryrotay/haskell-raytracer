@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 34b1b34466fc00d0e04047a726ab84c9f1f5b205b264cbca59370174fdb5adce
+-- hash: fd613751752db3b30edcfd892578a7a25bc3dc040396710c54a023df915c4ea9
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -47,6 +47,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , parallel
     , split
     , text
     , unordered-containers
@@ -63,11 +64,12 @@ executable haskell-raytracer-exe
       Paths_haskell_raytracer
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -threaded -rtsopts -Wall
   build-depends:
       base >=4.7 && <5
     , containers
     , haskell-raytracer
+    , parallel
     , split
     , text
     , unordered-containers
@@ -92,13 +94,14 @@ test-suite haskell-raytracer-test
       Paths_haskell_raytracer
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -threaded -rtsopts -Wall
   build-depends:
       base >=4.7 && <5
     , containers
     , haskell-raytracer
     , hspec
     , hspec-discover
+    , parallel
     , split
     , text
     , unordered-containers

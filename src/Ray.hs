@@ -16,7 +16,7 @@ import Transform (Transform, transformPoint, transformVector)
 data Ray = Ray { getOrigin :: Point, getDirection :: Vector }
     deriving (Show, Eq)
 
-position :: Ray -> Float -> Point
+position :: Ray -> Double -> Point
 position (Ray origin direction) t = origin `addVectorP` (direction `multiplyVector` t)
 
 transformRay :: Ray -> Transform -> Ray

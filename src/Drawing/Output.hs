@@ -43,8 +43,8 @@ colorToComponentsTexts :: Color -> [String]
 colorToComponentsTexts (Color r g b) =
     map componentText [r, g, b]
 
-componentText :: Float -> String
+componentText :: Double -> String
 componentText = show . componentValue
 
-componentValue :: Float -> Int
+componentValue :: Double -> Int
 componentValue c = round . min 255 . max 0 $ c * 255

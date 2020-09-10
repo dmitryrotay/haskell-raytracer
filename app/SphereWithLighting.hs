@@ -19,19 +19,19 @@ width = 640
 height :: Int
 height = 480
 
-canvasWidth :: Float
+canvasWidth :: Double
 canvasWidth = 4.8
 
-canvasHeight :: Float
+canvasHeight :: Double
 canvasHeight = 3.6
 
-canvasOffset :: Float
+canvasOffset :: Double
 canvasOffset = 2
 
-eyeOffset :: Float
+eyeOffset :: Double
 eyeOffset = 5
 
-toObject :: (Int, Int) -> (Float, Float)
+toObject :: (Int, Int) -> (Double, Double)
 toObject (worldX, worldY) =
     let objectX = canvasWidth / fromIntegral width * fromIntegral worldX - (canvasWidth / 2)
         objectY = canvasHeight / fromIntegral height * fromIntegral worldY - (canvasHeight / 2)
@@ -63,7 +63,7 @@ drawSphere = do
                                     let point = position ray t
                                         normal = normalAt s point
                                         eye = negateV (getDirection ray)
-                                    in lighting (getMaterial s) light point eye normal
+                                    in lighting (getMaterial s) light point eye normal False
             in (isRayHit, color)
                    
         sphereHitsPixelMap = fromList [((x, y), color) |

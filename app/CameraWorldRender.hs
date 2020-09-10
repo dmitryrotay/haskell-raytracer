@@ -7,9 +7,10 @@ import Drawing (Color (..))
 import Drawing.Output (canvasToPpm)
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
-import Transform (scaling, translation, rotationX, rotationY, viewTransform, combine, (|<>|))
 import Space (Point (..), Vector (..))
 import Sphere (Sphere (..), createSphere)
+import System.IO
+import Transform (scaling, translation, rotationX, rotationY, viewTransform, combine, (|<>|))
 import World (World (..))
 
 renderWorld :: IO ()
@@ -81,4 +82,6 @@ renderWorld = do
         camera = (createCamera 640 480 (pi / 3)) { getCameraTransform = cameraTransform }
         image = render camera world
     
-    putStr . canvasToPpm $ image
+    handle <- openFile "camera-world-render.ppm" WriteMode
+    hPutStr handle (canvasToPpm  image)
+    hClose handle

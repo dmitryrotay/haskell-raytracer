@@ -10,12 +10,7 @@ import Matrix
     , square3
     , square4
     , fromTuple4
-    , determinant
-    , submatrix
-    , minor
-    , cofactor
     , transpose
-    , invertible
     , inverse
     )
 
@@ -25,57 +20,13 @@ spec :: Spec
 spec = do
     describe "Matrix" $ do
         describe "SquareMatrix" $ do
-            it "uses float equality comparison" $
+            it "uses floating point equality comparison" $
                 let m1 = square2 (10.2 ** 2, 5.2 ** 2,
                                   10.2 ** 2, 5.2 ** 2)
                     m2 = square2 (104.04, 27.04,
                                   104.04, 27.04)
                 in m1 `shouldBe` m2
-        describe "determinant" $ do
-            it "computes for 2x2 matrix correctly" $
-                let m = square2 ( 1, 5,
-                                 -3, 2)
-                in determinant m `shouldBe` 17
-            it "computes for 3x3 matrix correctly" $
-                let m = square3 ( 1, 2, 6,
-                                 -5, 8, -4,
-                                  2, 6, 4)
-                in determinant m `shouldBe` -196
-            it "computes for 4x4 matrix correctly" $
-                let m = square4 (-2, -8, 3, 5,
-                                 -3, 1, 7, 3,
-                                  1, 2, -9, 6,
-                                 -6, 7, 7, -9)
-                in determinant m `shouldBe` -4071
-        
-        describe "submatrix" $ do
-            it "extracts submatrix from 3x3 matrix returning 2x2 matrix with given row and column removed" $
-                let m = square3 ( 1, 5, 0,
-                                 -3, 2, 7,
-                                  0, 6, -3)
-                    expected = square2 (-3, 2,
-                                         0, 6)
-                in submatrix m 0 2 `shouldBe` expected
-        
-        describe "minor" $ do
-            it "computes for element of 3x3 matrix as determinant with row and column of the element" $
-                let m = square3 (3, 5, 0,
-                                 2, -1, -7,
-                                 6, -1, 5)
-                in minor m 1 0 `shouldBe` determinant (submatrix m 1 0)
-        
-        describe "cofactor" $ do
-            it "computes for 0 0 for 3x3 matrix as value of 'minor'" $
-                let m = square3 (3, 5, 0,
-                                 2, -1, -7,
-                                 6, -1, 5)
-                in cofactor m 0 0 `shouldBe` minor m 0 0
-            it "computes for 1 0 as minor as negated value of 'minor'" $
-                let m = square3 (3, 5, 0,
-                                 2, -1, -7,
-                                 6, -1, 5)
-                in cofactor m 1 0 `shouldBe` negate (minor m 1 0)
-        
+       
         describe "multiply" $ do
             it "multiplies two matrices returning valid product matrix" $
                 let m1 = square4 (1, 2, 3, 4,
@@ -121,31 +72,8 @@ spec = do
             it "produces identity matrix from identity matrix" $
                 let identityMatrix = identity :: SquareMatrix 4
                 in transpose identityMatrix `shouldBe` identityMatrix
-        
-        describe "submatrix" $ do
-            it "extracts submatrix from 4x4 matrix returning 3x3 matrix with given row and column removed" $
-                let m = square4 (-6, 1, 1, 6,
-                                 -8, 5, 8, 6,
-                                 -1, 0, 8, 2,
-                                 -7, 1, -1, 1)
-                    expected = square3 (-6, 1,  6,
-                                        -8, 8,  6,
-                                        -7, -1, 1)
-                in submatrix m 2 1 `shouldBe` expected
-        
+               
         describe "inverse" $ do
-            it "determines if matrix is invertible" $
-                let m = square4 (6, 4, 4, 4,
-                                 5, 5, 7, 6,
-                                 4,-9, 3,-7,
-                                 9, 1, 7,-6)
-                in m `shouldSatisfy` invertible
-            it "determines if matrix is not invertible" $
-                let m = square4 (-4, 2,-2,-3,
-                                  9, 6, 2, 6,
-                                  0,-5, 1,-5,
-                                  0, 0, 0, 0)
-                in m `shouldNotSatisfy` invertible
             it "computes inverse matrix correctly 1" $
                 let m = square4 (-5, 2, 6,-8,
                                   1,-5, 1, 8,

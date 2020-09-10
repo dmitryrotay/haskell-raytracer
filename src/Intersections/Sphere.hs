@@ -5,7 +5,8 @@ module Intersections.Sphere
     , intersectionToList
     , prepareComputations
     ) where
-        
+
+import Common (epsilon)
 import Intersections (Intersection (..))
 import Matrix (inverse)
 import Ray (Ray (..), transformRay, position)
@@ -15,6 +16,8 @@ import Space
     , subtractPoint
     , dot
     , negateV
+    , addVectorP
+    , multiplyVector
     )
 import Sphere (Sphere (..), normalAt)
 
@@ -23,8 +26,9 @@ data SphereRayIntersection = Miss | SphereRayIntersection (Intersection Sphere) 
 
 data Computations = Computations
     { getCompObject :: Sphere        
-    , getCompDistance :: Float
+    , getCompDistance :: Double
     , getCompPoint :: Point
+    , getCompOverPoint :: Point
     , getCompEyeVector :: Vector
     , getCompNormalVector :: Vector
     , getIsInside :: Bool
@@ -62,4 +66,5 @@ prepareComputations (Intersection sphere distance) ray =
         normalVector'
             | isInside = negateV normalVector
             | otherwise = normalVector
-    in Computations sphere distance point eyeVector normalVector' isInside
+        overPoint = point `addVectorP` (normalVector' `multiplyVector` epsilon)
+    in Computations sphere distance point overPoint eyeVector normalVector' isInside

@@ -41,37 +41,37 @@ identity = M.identity :: Transform
 combine :: [Transform] -> Transform
 combine = foldr (|*|) identity
 
-translation :: Float -> Float -> Float -> Transform
+translation :: Double -> Double -> Double -> Transform
 translation x y z = square4 (1, 0, 0, x,
                              0, 1, 0, y,
                              0, 0, 1, z,
                              0, 0, 0, 1)
 
-scaling :: Float -> Float -> Float -> Transform
+scaling :: Double -> Double -> Double -> Transform
 scaling x y z = square4 (x, 0, 0, 0,
                          0, y, 0, 0,
                          0, 0, z, 0,
                          0, 0, 0, 1)
 
-rotationX :: Float -> Transform
+rotationX :: Double -> Transform
 rotationX r = square4 (1,    0,     0,      0,
                        0,    cos r, -sin r, 0,
                        0,    sin r, cos r,  0,
                        0,    0,     0,      1)
 
-rotationY :: Float -> Transform
+rotationY :: Double -> Transform
 rotationY r = square4 (cos r,    0,  sin r,  0,
                            0,    1,      0,  0,
                        -sin r,   0,  cos r,  0,
                            0,    0,      0,  1)
 
-rotationZ :: Float -> Transform
+rotationZ :: Double -> Transform
 rotationZ r = square4 (cos r,  -sin r,   0,  0,
                        sin r,   cos r,   0,  0,
                            0,       0,   1,  0,
                            0,       0,   0,  1)
 
-shearing :: Float -> Float -> Float -> Float -> Float -> Float -> Transform
+shearing :: Double -> Double -> Double -> Double -> Double -> Double -> Transform
 shearing xy xz yx yz zx zy = square4 ( 1,  xy, xz, 0,
                                       yx,   1, yz, 0,
                                       zx,  zy,  1, 0,
