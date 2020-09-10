@@ -1,13 +1,19 @@
 module WorldSpec where
 
 import Drawing (Color (..))
-import Intersections (Intersection (..))
-import Intersections.Sphere (prepareComputations)
 import Lights (PointLight (..))
 import Materials (Material (..))
 import Ray (Ray (..))
+import Shapes
+    ( Intersection (..)
+    , createSphere
+    , getMaterial
+    , getTransform
+    , prepareComputations
+    , setMaterial
+    , setTransform
+    )
 import Space (Point (..), Vector (..))
-import Sphere (Sphere (..), createSphere)
 import Test.Hspec
 import Transform (scaling, translation)
 import World
@@ -28,7 +34,7 @@ spec = do
             it "returns empty world" $
                 let world = createWorld
                 in do
-                    getObjects world `shouldBe` []
+                    getShapes world `shouldSatisfy` null
                     getLight world `shouldBe` Nothing
         
         describe "defaultWorld" $ do
@@ -57,7 +63,7 @@ spec = do
             it "shades an intersection from the outside" $
                 let world = defaultWorld
                     ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
-                    shape = head (getObjects world)
+                    shape = head (getShapes world)
                     i = Intersection shape 4
                     comps = prepareComputations i ray
                 in shadeHit world comps `shouldBe` Color 0.38066 0.47583 0.2855
@@ -67,7 +73,7 @@ spec = do
                     light = PointLight (Point 0 0.25 0) (Color 1 1 1)
                     world' = setLight world light
                     ray = Ray (Point 0 0 0) (Vector 0 0 1)
-                    shape = getObjects world !! 1
+                    shape = getShapes world !! 1
                     i = Intersection shape 0.5
                     comps = prepareComputations i ray
                 in shadeHit world' comps `shouldBe` Color 0.90498 0.90498 0.90498
@@ -83,11 +89,11 @@ spec = do
                 in colorAt world ray `shouldBe` Color 0.38066 0.47583 0.2855
             it "correctly computes color with an intersection behind the ray" $
                 let world = defaultWorld
-                    outer = head (getObjects world)
-                    outer' = outer { getMaterial = (getMaterial outer) { getAmbient = 1 } }
-                    inner = getObjects world !! 1
-                    inner' = inner { getMaterial = (getMaterial inner) { getAmbient = 1 } }
-                    world' = world { getObjects = [inner', outer'] }
+                    outer = head (getShapes world)
+                    outer' = setMaterial outer (getMaterial outer) { getAmbient = 1 }
+                    inner = getShapes world !! 1
+                    inner' = setMaterial inner (getMaterial inner) { getAmbient = 1 }
+                    world' = world { getShapes = [inner', outer'] }
                     ray = Ray (Point 0 0 0.75) (Vector 0 0 (-1))
                 in colorAt world' ray `shouldBe` getColor (getMaterial inner')
         
@@ -113,7 +119,7 @@ spec = do
             it "computes color when given an intersection in shadow" $
                 let (sphere1, id1) = createSphere 0
                     (sphere2, _) = createSphere id1
-                    sphere2' = sphere2 { getTransform = translation 0 0 10 }
+                    sphere2' = setTransform sphere2 (translation 0 0 10)
                     world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
                     ray = Ray (Point 0 0 5) (Vector 0 0 1)
                     i = Intersection sphere2' 4 

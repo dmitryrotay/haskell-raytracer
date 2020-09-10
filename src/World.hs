@@ -10,16 +10,16 @@ module World
     ) where
 import Data.List (sort)
 import Drawing (Color (..))
-import Intersections (Intersection (..), hit)
-import Intersections.Sphere
-    ( Computations (..)
-    , intersect
-    , intersectionToList
-    , prepareComputations
-    )
-import Sphere 
-    ( Sphere (..)
+import Shapes
+    ( Shape (..)
+    , Intersection (..)
+    , Computations (..)
     , createSphere
+    , getMaterial
+    , getTransform
+    , hit
+    , intersect
+    , prepareComputations
     , setMaterial
     , setTransform
     )
@@ -30,7 +30,7 @@ import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)
 
 data World = World
-    { getObjects :: [Sphere]
+    { getShapes :: [Shape]
     , getLight :: Maybe PointLight
     } deriving (Show, Eq)
 
@@ -42,20 +42,20 @@ defaultWorld =
     let (sphere1, nextId) = createSphere 0
         sphere1' = setMaterial sphere1 (Material (Color 0.8 1.0 0.6) 0.1 0.7 0.2 200.0)
         (sphere2, _) = createSphere nextId
-        sphere2' = setTransform sphere2 (scaling 0.5 0.5 0.5)
+        sphere2' = setTransform sphere2  (scaling 0.5 0.5 0.5)
         light = PointLight (Point (-10) 10 (-10)) (Color 1 1 1)
     in World [sphere1', sphere2'] (Just light)
 
-intersectWorld :: World -> Ray -> [Intersection Sphere]
-intersectWorld (World objects _) ray =
-    sort $ concat [intersectionToList (object `intersect` ray) | object <- objects]
+intersectWorld :: World -> Ray -> [Intersection]
+intersectWorld (World shapes _) ray =
+    sort $ concat [shape `intersect` ray | shape <- shapes]
 
 setLight :: World -> PointLight -> World
-setLight (World objects _) light = World objects (Just light)
+setLight (World shapes _) light = World shapes (Just light)
 
 colorAt :: World -> Ray -> Color
-colorAt (World objects (Just light)) ray =
-    let world = World objects (Just light)
+colorAt (World shapes (Just light)) ray =
+    let world = World shapes (Just light)
         xs = intersectWorld world ray
         objectHit = hit xs
         color = case objectHit of
@@ -72,7 +72,7 @@ shadeHit world comps =
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
             in lighting
-                    (getMaterial $ getCompObject comps)
+                    (getMaterial $ getCompShape comps)
                     light
                     (getCompOverPoint comps)
                     (getCompEyeVector comps)

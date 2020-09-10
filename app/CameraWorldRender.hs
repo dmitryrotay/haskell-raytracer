@@ -7,8 +7,8 @@ import Drawing (Color (..))
 import Drawing.Output (canvasToPpm)
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
+import Shapes (createSphere, setMaterial, setTransform)
 import Space (Point (..), Vector (..))
-import Sphere (Sphere (..), createSphere)
 import System.IO
 import Transform (scaling, translation, rotationX, rotationY, viewTransform, combine, (|<>|))
 import World (World (..))
@@ -19,7 +19,7 @@ renderWorld = do
         
         floorTransform = scaling 10 0.01 10
         (fl, fId) = createSphere 0
-        floor' = fl { getTransform = floorTransform, getMaterial = wallMaterial }
+        floor' = flip setMaterial wallMaterial . flip setTransform floorTransform $ fl
         
         leftWallTransform = combine 
                             [ translation 0 0 5
@@ -28,7 +28,7 @@ renderWorld = do
                             , scaling 10 0.01 10
                             ]
         (leftWall, lwId) = createSphere fId
-        leftWall' = leftWall  { getTransform = leftWallTransform, getMaterial = wallMaterial }
+        leftWall' = flip setMaterial wallMaterial . flip setTransform leftWallTransform $ leftWall
         
         rightWallTransform = combine 
                             [ translation 0 0 5
@@ -37,7 +37,7 @@ renderWorld = do
                             , scaling 10 0.01 10 
                             ]
         (rightWall, rwId) = createSphere lwId
-        rightWall' = rightWall { getTransform = rightWallTransform, getMaterial = wallMaterial }
+        rightWall' = flip setMaterial wallMaterial . flip setTransform rightWallTransform $ rightWall
         
         middleSphereTransform = translation (-0.2) 1 0.5
         middleSphereMaterial = defaultMaterial
@@ -46,10 +46,8 @@ renderWorld = do
                                 , getSpecular = 0.3
                                 }
         (middleSphere, mId) = createSphere rwId
-        middleSphere' = middleSphere
-                            { getTransform = middleSphereTransform
-                            , getMaterial = middleSphereMaterial
-                            }
+
+        middleSphere' = flip setMaterial middleSphereMaterial . flip setTransform middleSphereTransform $ middleSphere
                                 
         rightSphereTransform = scaling 0.5 0.5 0.5 |<>| translation 1.5 0.5 (-0.5)
         rightSphereMaterial = defaultMaterial
@@ -58,10 +56,7 @@ renderWorld = do
                                 , getSpecular = 0.3
                                 }
         (rightSphere, rId) = createSphere mId
-        rightSphere' = rightSphere
-                                { getTransform = rightSphereTransform
-                                , getMaterial = rightSphereMaterial
-                                }
+        rightSphere' = flip setMaterial rightSphereMaterial . flip setTransform rightSphereTransform $ rightSphere
 
         leftSphereTransform = scaling 0.33 0.33 0.33 |<>| translation (-1.5) 0.33 (-0.75)
         leftSphereMaterial = defaultMaterial
@@ -70,10 +65,7 @@ renderWorld = do
                                 , getSpecular = 0.3
                                 }
         (leftSphere, _) = createSphere rId
-        leftSphere' = leftSphere
-                            { getTransform = leftSphereTransform
-                            , getMaterial = leftSphereMaterial
-                            }
+        leftSphere' = flip setMaterial leftSphereMaterial . flip setTransform leftSphereTransform $ leftSphere
 
         light = PointLight (Point 10 10 (-10)) (Color 1 1 1)
         objects = [floor', leftWall', rightWall', leftSphere', middleSphere', rightSphere']
