@@ -15,7 +15,7 @@ module Shapes
     ) where
 
 import Common (epsilon)
-import Data.List (minimumBy)
+import Data.Function (on)
 import Materials (Material, defaultMaterial)
 import Matrix (inverse, transpose)
 import Ray (Ray (..), position, transformRay)
@@ -45,7 +45,7 @@ data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
     deriving (Show, Eq)
 
 instance Ord Intersection where
-    compare i1 i2 = compare (getDistance i1) (getDistance i2)
+    compare = compare `on` getDistance
    
 data Computations = Computations
     { getCompShape :: Shape
@@ -83,7 +83,7 @@ localNormalAt (Shape Plane _ _ _ _) _ = Vector 0 1 0
 
 intersect :: Shape -> Ray -> [Intersection]
 intersect shape ray =
-    let localRay = transformRay ray (getShapeInverseTransform shape)
+    let localRay = transformRay ray $ getShapeInverseTransform shape
     in localIntersect shape localRay
 
 localIntersect :: Shape -> Ray -> [Intersection]
@@ -125,17 +125,15 @@ prepareComputations (Intersection shape distance) ray =
         normalVector'
             | isInside = negateV normalVector
             | otherwise = normalVector
-        overPoint = point `addVectorP` (normalVector' `multiplyVector` epsilon)
+        overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
     in Computations shape distance point overPoint eyeVector normalVector' isInside
 
 hit :: [Intersection] -> Maybe Intersection
 hit xs = 
-    let positiveIntersections = filter (\(Intersection _ t) -> t >= 0) xs
+    let positiveIntersections = filter ((>=0) . getDistance) xs
     in case positiveIntersections of
         [] -> Nothing
-        _ -> Just $ minimumBy
-                    (\(Intersection _ t1) (Intersection _ t2) -> compare t1 t2)
-                    positiveIntersections
+        _ -> Just $ minimum positiveIntersections
 
 setTransform :: Shape -> Transform -> Shape
 setTransform (Shape shapeType shapeId _ _ m) newTransform =

@@ -9,7 +9,6 @@ import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
 import Shapes (createSphere, createPlane, setMaterial, setTransform)
 import Space (Point (..), Vector (..))
-import System.IO
 import Transform (scaling, translation, rotationX, rotationZ, viewTransform, (|<>|), combine)
 import World (World (..))
 
@@ -83,6 +82,5 @@ renderWorld = do
         camera = (createCamera 640 480 (pi / 3)) { getCameraTransform = cameraTransform }
         image = render camera world
     
-    handle <- openFile "world-render-with-planes.ppm" WriteMode
-    hPutStr handle (canvasToPpm image)
-    hClose handle
+    writeFile "world-render-with-planes.ppm" (canvasToPpm image)
+    

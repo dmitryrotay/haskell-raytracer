@@ -17,7 +17,7 @@ data Ray = Ray { getOrigin :: Point, getDirection :: Vector }
     deriving (Show, Eq)
 
 position :: Ray -> Double -> Point
-position (Ray origin direction) t = origin `addVectorP` (direction `multiplyVector` t)
+position (Ray origin direction) = addVectorP origin . multiplyVector direction
 
 transformRay :: Ray -> Transform -> Ray
 transformRay (Ray origin direction) transformMatrix =

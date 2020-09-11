@@ -14,8 +14,7 @@ module Drawing
 
 import           Common ((~==))
 import           Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as M (lookup)
-import           Data.Maybe
+import qualified Data.HashMap.Strict as M (lookupDefault)
 
 data Color = Color { getRed :: Double, getGreen :: Double, getBlue :: Double } deriving Show
 
@@ -51,9 +50,9 @@ setPixel (Canvas width height pixels) x y color =
     in Canvas width height pixels'
 
 setPixelMap :: Canvas -> HashMap (Int, Int) Color -> Canvas
-setPixelMap (Canvas width height pixels) m =
-    let pixels' = zipWith (curry (\( (x, y), p) -> fromMaybe p (M.lookup (x, y) m)))
-                                                   (map (getCoords width) [0..]) pixels
+setPixelMap (Canvas width height pixels) pixelsMap =
+    let pixelsWithCords = zip (map (getCoords width) [0..]) pixels
+        pixels' = map (\((x, y), color) -> M.lookupDefault color (x, y) pixelsMap) pixelsWithCords
     in Canvas width height pixels'
 
 pixelAt :: Canvas -> Int -> Int -> Color
