@@ -1,6 +1,6 @@
 module Main where
 
-import CameraWorldRender (renderWorld)
+import WorldRenderWithPlanes (renderWorld)
 
 main :: IO ()
 main = renderWorld

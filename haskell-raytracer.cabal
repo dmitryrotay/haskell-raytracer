@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fd613751752db3b30edcfd892578a7a25bc3dc040396710c54a023df915c4ea9
+-- hash: e803a2769e8ff33c24d4a68d7f5ec6e0a7c14281b30917e12472449494fa060b
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -30,14 +30,12 @@ library
       Common
       Drawing
       Drawing.Output
-      Intersections
-      Intersections.Sphere
       Lights
       Materials
       Matrix
       Ray
+      Shapes
       Space
-      Sphere
       Transform
       World
   other-modules:
@@ -60,7 +58,7 @@ executable haskell-raytracer-exe
       ClockFace
       ProjectileTrajectory
       Silhouette
-      SphereWithLighting
+      WorldRenderWithPlanes
       Paths_haskell_raytracer
   hs-source-dirs:
       app
@@ -82,13 +80,11 @@ test-suite haskell-raytracer-test
       CameraSpec
       Drawing.OutputSpec
       DrawingSpec
-      Intersections.SphereSpec
-      IntersectionsSpec
       MaterialsSpec
       MatrixSpec
       RaySpec
+      ShapesSpec
       SpaceSpec
-      SphereSpec
       TransformSpec
       WorldSpec
       Paths_haskell_raytracer

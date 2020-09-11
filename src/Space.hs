@@ -42,12 +42,12 @@ instance SpaceElement Point where
 instance Eq Point where
     (==) = eq
 
-data Vector = Vector { vectorX :: Double, vectorY :: Double, vectorZ :: Double } deriving (Show)
+data Vector = Vector { getVectorX :: Double, getVectorY :: Double, getVectorZ :: Double } deriving (Show)
 
 instance SpaceElement Vector where
-    getX = vectorX
-    getY = vectorY
-    getZ = vectorZ
+    getX = getVectorX
+    getY = getVectorY
+    getZ = getVectorZ
 
 instance Eq Vector where
     (==) = eq
