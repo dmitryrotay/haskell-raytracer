@@ -3,9 +3,7 @@ module Shapes
     , Computations (..)
     , Intersection (..)
     , createSphere
-    , createPlane
-    , getMaterial
-    , getTransform
+    , createPlane    
     , intersect
     , localIntersect
     , normalAt
@@ -37,9 +35,10 @@ data ShapeType = Sphere | Plane deriving (Show, Eq)
 
 data Shape = Shape
             { getShapeType :: ShapeType
-            , getSphereId :: Int
-            , getSphereTransform :: Transform
-            , getSphereMaterial :: Material
+            , getShapeId :: Int
+            , getShapeTransform :: Transform
+            , getShapeInverseTransform :: Transform
+            , getShapeMaterial :: Material
             } deriving (Show, Eq)
 
 data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
@@ -66,32 +65,31 @@ createPlane = createShape Plane
 
 createShape :: ShapeType -> Int -> (Shape, Int)
 createShape shapeType newId =
-    let newShape = Shape shapeType newId identity defaultMaterial
+    let newShape = Shape shapeType newId identity identity defaultMaterial
     in (newShape, newId + 1)
 
 normalAt :: Shape -> Point -> Vector
 normalAt shape point =
-    let shapePoint = transformPoint point (inverse (getTransform shape))
+    let shapePoint = transformPoint point (getShapeInverseTransform shape)
         shapeNormal = localNormalAt shape shapePoint
         worldNormal = transformVector
                       shapeNormal
-                      (transpose . inverse . getTransform $ shape)
+                      (transpose . getShapeInverseTransform $ shape)
     in normalize worldNormal
 
 localNormalAt :: Shape -> Point -> Vector
-localNormalAt (Shape Sphere _ _ _) point = point `subtractPoint` Point 0 0 0
-localNormalAt (Shape Plane _ _ _) _ = Vector 0 1 0
+localNormalAt (Shape Sphere _ _ _ _) point = point `subtractPoint` Point 0 0 0
+localNormalAt (Shape Plane _ _ _ _) _ = Vector 0 1 0
 
 intersect :: Shape -> Ray -> [Intersection]
 intersect shape ray =
-    let inverseTransform = inverse . getTransform $ shape
-        shapeRay = transformRay ray inverseTransform
-    in localIntersect shape shapeRay
+    let localRay = transformRay ray (getShapeInverseTransform shape)
+    in localIntersect shape localRay
 
 localIntersect :: Shape -> Ray -> [Intersection]
 
-localIntersect (Shape Sphere sphereId t m) (Ray origin direction) =
-    let sphere = Shape Sphere sphereId t m
+localIntersect (Shape Sphere sphereId t it m) (Ray origin direction) =
+    let sphere = Shape Sphere sphereId t it m
         sphereToRay = origin `subtractPoint` Point 0 0 0
         a = direction `dot` direction
         b = 2 * (direction `dot` sphereToRay)
@@ -107,10 +105,10 @@ localIntersect (Shape Sphere sphereId t m) (Ray origin direction) =
                 in [p1, p2]
     in result
 
-localIntersect (Shape Plane sphereId t m) (Ray origin direction) =
+localIntersect (Shape Plane sphereId t it m) (Ray origin direction) =
     intersection
     where
-        plane = Shape Plane sphereId t m
+        plane = Shape Plane sphereId t it m
         directionY = getVectorY direction
         intersection
             | abs directionY < epsilon = []
@@ -139,14 +137,9 @@ hit xs =
                     (\(Intersection _ t1) (Intersection _ t2) -> compare t1 t2)
                     positiveIntersections
 
-getTransform :: Shape -> Transform
-getTransform (Shape _ _ shapeTransform _) = shapeTransform
-
 setTransform :: Shape -> Transform -> Shape
-setTransform (Shape shapeType shapeId _ m) newTransform = Shape shapeType shapeId newTransform m
-
-getMaterial :: Shape -> Material
-getMaterial (Shape _ _ _ shapeMaterial) = shapeMaterial
+setTransform (Shape shapeType shapeId _ _ m) newTransform =
+    Shape shapeType shapeId newTransform (inverse newTransform) m
 
 setMaterial :: Shape -> Material -> Shape
-setMaterial (Shape shapeType shapeId t _) = Shape shapeType shapeId t
+setMaterial (Shape shapeType shapeId t it _) = Shape shapeType shapeId t it

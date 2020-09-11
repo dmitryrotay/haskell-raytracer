@@ -18,7 +18,6 @@ import Shapes
     , Intersection (..)
     , Computations (..)
     , createSphere
-    , getMaterial
     , hit
     , intersect
     , prepareComputations
@@ -71,7 +70,7 @@ shadeHit world comps =
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
             in lighting
-                    (getMaterial $ getCompShape comps)
+                    (getShapeMaterial $ getCompShape comps)
                     light
                     (getCompOverPoint comps)
                     (getCompEyeVector comps)

@@ -9,8 +9,6 @@ import Shapes
     , Computations (..)
     , createSphere
     , createPlane
-    , getMaterial
-    , getTransform
     , hit
     , localIntersect
     , intersect
@@ -29,17 +27,17 @@ spec = do
             describe "createSphere" $ do
                 it "constructs sphere with identity transformation" $
                     let (sphere, _) = createSphere 0
-                    in getTransform sphere `shouldBe` identity
+                    in getShapeTransform sphere `shouldBe` identity
                 it "constructs sphere with default material" $
                     let (sphere, _) = createSphere 0
-                    in getMaterial sphere `shouldBe` defaultMaterial
+                    in getShapeMaterial sphere `shouldBe` defaultMaterial
             
             describe "setTransform" $ do
                 it "returns sphere object with passed transformation" $
                     let (sphere, _) = createSphere 0
                         t = translation 2 3 4
                         sphere' = setTransform sphere t
-                    in getTransform sphere' `shouldBe` t
+                    in getShapeTransform sphere' `shouldBe` t
 
             describe "normalAt" $ do
                 it "computes the normal on a sphere at a point on the x axis" $
