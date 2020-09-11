@@ -7,6 +7,7 @@ import Space (Point (..), Vector (..), normalize)
 import Shapes
     ( Intersection (..)
     , Computations (..)
+    , Shape (..)
     , createSphere
     , createPlane
     , hit

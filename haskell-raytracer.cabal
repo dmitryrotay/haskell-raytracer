@@ -45,9 +45,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
-    , parallel
     , split
-    , text
     , unordered-containers
   default-language: Haskell2010
 
@@ -67,9 +65,7 @@ executable haskell-raytracer-exe
       base >=4.7 && <5
     , containers
     , haskell-raytracer
-    , parallel
     , split
-    , text
     , unordered-containers
   default-language: Haskell2010
 
@@ -96,9 +92,8 @@ test-suite haskell-raytracer-test
     , containers
     , haskell-raytracer
     , hspec
-    , hspec-discover
-    , parallel
     , split
-    , text
     , unordered-containers
+  build-tool-depends:
+      hspec-discover:hspec-discover
   default-language: Haskell2010
