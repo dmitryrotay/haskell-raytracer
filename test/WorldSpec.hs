@@ -6,9 +6,8 @@ import Materials (Material (..))
 import Ray (Ray (..))
 import Shapes
     ( Intersection (..)
+    , Shape (..)
     , createSphere
-    , getMaterial
-    , getTransform
     , prepareComputations
     , setMaterial
     , setTransform
@@ -42,8 +41,8 @@ spec = do
                 case defaultWorld of
                     World [s1, s2] l ->
                         do
-                            getColor (getMaterial s1) `shouldBe` Color 0.8 1.0 0.6
-                            getTransform s2 `shouldBe` scaling  0.5 0.5 0.5
+                            getColor (getShapeMaterial s1) `shouldBe` Color 0.8 1.0 0.6
+                            getShapeTransform s2 `shouldBe` scaling  0.5 0.5 0.5
                             l `shouldBe` Just (PointLight (Point (-10) 10 (-10)) (Color 1 1 1))
                     _ -> expectationFailure "World must contain two spheres and a light"
         
@@ -90,12 +89,12 @@ spec = do
             it "correctly computes color with an intersection behind the ray" $
                 let world = defaultWorld
                     outer = head (getShapes world)
-                    outer' = setMaterial outer (getMaterial outer) { getAmbient = 1 }
+                    outer' = setMaterial outer (getShapeMaterial outer) { getAmbient = 1 }
                     inner = getShapes world !! 1
-                    inner' = setMaterial inner (getMaterial inner) { getAmbient = 1 }
+                    inner' = setMaterial inner (getShapeMaterial inner) { getAmbient = 1 }
                     world' = world { getShapes = [inner', outer'] }
                     ray = Ray (Point 0 0 0.75) (Vector 0 0 (-1))
-                in colorAt world' ray `shouldBe` getColor (getMaterial inner')
+                in colorAt world' ray `shouldBe` getColor (getShapeMaterial inner')
         
         describe "isShadowed" $ do
             it "returns False when nothing is collinear with point and light" $
