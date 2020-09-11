@@ -92,7 +92,8 @@ test-suite haskell-raytracer-test
     , containers
     , haskell-raytracer
     , hspec
-    , hspec-discover
     , split
     , unordered-containers
+  build-tool-depends:
+      hspec-discover:hspec-discover
   default-language: Haskell2010
