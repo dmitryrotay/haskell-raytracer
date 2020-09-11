@@ -10,22 +10,21 @@ module World
     ) where
 import Data.List (sort)
 import Drawing (Color (..))
+import Lights (PointLight (..))
+import Materials (Material (..), lighting)
+import Ray (Ray (..))
 import Shapes
     ( Shape (..)
     , Intersection (..)
     , Computations (..)
     , createSphere
     , getMaterial
-    , getTransform
     , hit
     , intersect
     , prepareComputations
     , setMaterial
     , setTransform
     )
-import Lights (PointLight (..))
-import Materials (Material (..), lighting)
-import Ray (Ray (..))
 import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)
 

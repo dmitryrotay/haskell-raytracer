@@ -3,10 +3,13 @@ module Shapes
     , Computations (..)
     , Intersection (..)
     , createSphere
+    , createPlane
     , getMaterial
     , getTransform
     , intersect
+    , localIntersect
     , normalAt
+    , localNormalAt
     , prepareComputations
     , hit
     , setMaterial
@@ -20,7 +23,7 @@ import Matrix (inverse, transpose)
 import Ray (Ray (..), position, transformRay)
 import Space
     ( Point (..)
-    , Vector
+    , Vector (..)
     , multiplyVector
     , addVectorP
     , negateV
@@ -30,7 +33,7 @@ import Space
     )
 import Transform (Transform, identity, transformPoint, transformVector)
 
-data ShapeType = Sphere deriving (Show, Eq)
+data ShapeType = Sphere | Plane deriving (Show, Eq)
 
 data Shape = Shape
             { getShapeType :: ShapeType
@@ -44,10 +47,7 @@ data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
 
 instance Ord Intersection where
     compare i1 i2 = compare (getDistance i1) (getDistance i2)
-
-data SphereRayIntersection = Miss | SphereRayIntersection Intersection Intersection
-    deriving (Show, Eq)
-    
+   
 data Computations = Computations
     { getCompShape :: Shape
     , getCompDistance :: Double
@@ -59,30 +59,38 @@ data Computations = Computations
     } deriving (Show, Eq)
 
 createSphere :: Int -> (Shape, Int)
-createSphere newId =
-    let newSphere = Shape Sphere newId identity defaultMaterial
-    in (newSphere, newId + 1)
+createSphere = createShape Sphere
+
+createPlane :: Int -> (Shape, Int)
+createPlane = createShape Plane
+
+createShape :: ShapeType -> Int -> (Shape, Int)
+createShape shapeType newId =
+    let newShape = Shape shapeType newId identity defaultMaterial
+    in (newShape, newId + 1)
 
 normalAt :: Shape -> Point -> Vector
 normalAt shape point =
     let shapePoint = transformPoint point (inverse (getTransform shape))
-        shapeNormal = shapeNormalAt shape shapePoint
+        shapeNormal = localNormalAt shape shapePoint
         worldNormal = transformVector
                       shapeNormal
                       (transpose . inverse . getTransform $ shape)
     in normalize worldNormal
 
-shapeNormalAt :: Shape -> Point -> Vector
-shapeNormalAt (Shape Sphere _ _ _) point = point `subtractPoint` Point 0 0 0
+localNormalAt :: Shape -> Point -> Vector
+localNormalAt (Shape Sphere _ _ _) point = point `subtractPoint` Point 0 0 0
+localNormalAt (Shape Plane _ _ _) _ = Vector 0 1 0
 
 intersect :: Shape -> Ray -> [Intersection]
 intersect shape ray =
     let inverseTransform = inverse . getTransform $ shape
         shapeRay = transformRay ray inverseTransform
-    in shapeIntersection shape shapeRay
+    in localIntersect shape shapeRay
 
-shapeIntersection :: Shape -> Ray -> [Intersection]
-shapeIntersection (Shape Sphere sphereId t m) (Ray origin direction) =
+localIntersect :: Shape -> Ray -> [Intersection]
+
+localIntersect (Shape Sphere sphereId t m) (Ray origin direction) =
     let sphere = Shape Sphere sphereId t m
         sphereToRay = origin `subtractPoint` Point 0 0 0
         a = direction `dot` direction
@@ -90,18 +98,25 @@ shapeIntersection (Shape Sphere sphereId t m) (Ray origin direction) =
         c = sphereToRay `dot` sphereToRay - 1
         discriminant =  b ** 2 - 4 * a * c
         result
-            | discriminant < 0 = Miss
+            | discriminant < 0 = []
             | otherwise =
                 let t1 = (-b - sqrt discriminant) / (2 * a)
                     t2 = (-b + sqrt discriminant) / (2 * a)
                     p1 = Intersection sphere (min t1 t2)
                     p2 = Intersection sphere (max t1 t2)
-                in SphereRayIntersection p1 p2 
-    in sphereIntersectionToList result
+                in [p1, p2]
+    in result
 
-sphereIntersectionToList :: SphereRayIntersection -> [Intersection]
-sphereIntersectionToList Miss = []
-sphereIntersectionToList (SphereRayIntersection i1 i2) = [i1, i2]
+localIntersect (Shape Plane sphereId t m) (Ray origin direction) =
+    intersection
+    where
+        plane = Shape Plane sphereId t m
+        directionY = getVectorY direction
+        intersection
+            | abs directionY < epsilon = []
+            | otherwise =
+                let distance = -getPointY origin / directionY
+                in [Intersection plane distance]
 
 prepareComputations :: Intersection -> Ray -> Computations
 prepareComputations (Intersection shape distance) ray =

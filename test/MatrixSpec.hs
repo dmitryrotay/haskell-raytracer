@@ -7,7 +7,6 @@ import Matrix
     , SquareMatrix
     , identity
     , square2
-    , square3
     , square4
     , fromTuple4
     , transpose
