@@ -122,3 +122,18 @@ The important point here is that the performance problem I encountered should al
 ### Image Samples
 
 [Using a point-in-shadow detection and shadowed point color calculation to render the same scene.](/samples/render-with-shadows.png)
+
+## Chapter 9
+
+### Changes
+
+* Introduction of a general `Shape` data type in place of `Sphere` and refactoring of existing functionality.
+* Implementation of the `Plane` shape type.
+
+### Thoughts
+
+Finally! Now there is a basic abstraction for shapes that we render. It's hard for me to tell what would be the best approach here. After doing some reading I stopped on implementing shapes as a simple AGT with `ShapeType` as a first data constructor parameter. This way I can use functions to construct shapes with required type, and pattern match against this parameter when I need to distinguish between shapes. The only downside is that I had to merge together three modules because of circular dependencies that I was getting. I will see how I can improve it along the way.
+
+### Image Samples
+
+[Using planes to render a hexagonal room around the three spheres.](/samples/hexagonal-room.png)
