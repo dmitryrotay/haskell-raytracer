@@ -2,6 +2,8 @@
 
 Writing the first Haskell application by walking through The Ray Tracer Challenge book.
 
+[![Build](../../workflows/Build/badge.svg)](../../actions?query=workflow%3ABuild+branch%3Amaster)
+
 ## Chapters 1-4
 
 ### Changes
