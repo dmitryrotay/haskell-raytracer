@@ -134,7 +134,7 @@ The important point here is that the performance problem I encountered should al
 
 ### Thoughts
 
-Finally! Now there is a basic abstraction for shapes that we render. It's hard for me to tell what would be the best approach here. After doing some reading I stopped on implementing shapes as a simple AGT with `ShapeType` as a first data constructor parameter. This way I can use functions to construct shapes with required type, and pattern match against this parameter when I need to distinguish between shapes. The only downside is that I had to merge together three modules because of circular dependencies that I was getting. I will see how I can improve it along the way.
+Finally! Now there is a basic abstraction for shapes that we render. It's hard for me to tell what would be the best approach here. After doing some reading I stopped on implementing shapes as a simple ADT with `ShapeType` as a first data constructor parameter. This way I can use functions to construct shapes with required type, and pattern match against this parameter when I need to distinguish between shapes. The only downside is that I had to merge together three modules because of circular dependencies that I was getting. I will see how I can improve it along the way.
 
 ### Image Samples
 
