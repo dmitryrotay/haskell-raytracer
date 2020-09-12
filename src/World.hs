@@ -8,6 +8,7 @@ module World
     , colorAt
     , isShadowed
     ) where
+
 import Data.List (sort)
 import Drawing (Color (..))
 import Lights (PointLight (..))
@@ -45,8 +46,7 @@ defaultWorld =
     in World [sphere1', sphere2'] (Just light)
 
 intersectWorld :: World -> Ray -> [Intersection]
-intersectWorld (World shapes _) ray =
-    sort $ concat [shape `intersect` ray | shape <- shapes]
+intersectWorld (World shapes _) ray = sort $ flip intersect ray =<< shapes
 
 setLight :: World -> PointLight -> World
 setLight (World shapes _) light = World shapes (Just light)

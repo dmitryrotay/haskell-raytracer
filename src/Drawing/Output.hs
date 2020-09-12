@@ -19,8 +19,8 @@ buildPpmHeader (Canvas width height _) =
 buildPpmData :: Canvas -> String
 buildPpmData (Canvas width _ pixels) =
     let canvasPixelsRows = chunksOf width pixels
-        maxLineChunks = map (intercalate "\n" . map unwords . lineChunks . concatMap colorToComponentsTexts) canvasPixelsRows
-    in intercalate "\n" maxLineChunks ++ "\n"
+        maxLineChunks = intercalate "\n" . map unwords . lineChunks . concatMap colorToComponentsTexts <$> canvasPixelsRows
+    in unlines maxLineChunks
 
 lineChunks :: [String] -> [[String]]
 lineChunks [] = []
