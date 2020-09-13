@@ -33,6 +33,7 @@ library
       Lights
       Materials
       Matrix
+      Patterns
       Ray
       Shapes
       Space
@@ -78,6 +79,7 @@ test-suite haskell-raytracer-test
       DrawingSpec
       MaterialsSpec
       MatrixSpec
+      PatternsSpec
       RaySpec
       ShapesSpec
       SpaceSpec
@@ -94,6 +96,7 @@ test-suite haskell-raytracer-test
     , hspec
     , split
     , unordered-containers
+    , QuickCheck
   build-tool-depends:
       hspec-discover:hspec-discover
   default-language: Haskell2010

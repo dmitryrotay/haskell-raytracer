@@ -2,7 +2,8 @@ module MaterialsSpec where
 
 import Drawing (Color (..))
 import Lights (PointLight (..))
-import Materials (Material, defaultMaterial, lighting)
+import Materials (Material (..), defaultMaterial, lighting)
+import Patterns (createStripePattern)
 import Space (Vector (..), Point (..))
 import Test.Hspec
 
@@ -41,6 +42,14 @@ spec = do
                 inShadow = True
                 result = lighting material light position eyeVector normalVector inShadow
             in result `shouldBe` Color 0.1 0.1 0.1
+        it "computes color with a pattern applied" $
+            let patt = createStripePattern (Color 1 1 1) (Color 0 0 0)
+                material' = material { getAmbient = 1, getDiffuse = 0, getSpecular = 0, getPattern = Just patt }
+                eyeVector = Vector 0 0 (-1)
+                light = PointLight (Point 0 0 (-10)) (Color 1 1 1)
+            in do
+                lighting material' light (Point 0.9 0 0) eyeVector normalVector False `shouldBe` Color 1 1 1
+                lighting material' light (Point 1.1 0 0) eyeVector normalVector False `shouldBe` Color 0 0 0
 
 commonParameters :: (Material, Point, Vector)
 commonParameters = (defaultMaterial, Point 0 0 0, Vector 0 0 (-1))

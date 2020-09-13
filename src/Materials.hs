@@ -6,6 +6,7 @@ module Materials
 
 import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
 import Lights (PointLight (..))
+import Patterns (Pattern, getPatternColorAt)
 import Space (Point, Vector, subtractPoint, dot, reflectVector, negateV, normalize)
 
 data Material = Material
@@ -14,7 +15,8 @@ data Material = Material
     , getDiffuse :: Double
     , getSpecular :: Double
     , getShininess :: Double
-    } deriving (Show, Eq)
+    , getPattern :: Maybe Pattern
+    } deriving (Eq, Show)
 
 defaultMaterial :: Material
 defaultMaterial =
@@ -23,11 +25,15 @@ defaultMaterial =
         diffuse = 0.9
         specular = 0.9
         shininess = 200.0
-    in Material color ambient diffuse specular shininess
+        patt = Nothing
+    in Material color ambient diffuse specular shininess patt
 
 lighting :: Material -> PointLight -> Point -> Vector -> Vector -> Bool -> Color
 lighting material light position eyeVector normalVector inShadow =
-    let effectiveColor = getColor material `multiplyByColor` getIntensity light
+    let color = case getPattern material of
+            Nothing -> getColor material
+            Just patt -> getPatternColorAt patt position
+        effectiveColor = color `multiplyByColor` getIntensity light
         ambient = effectiveColor `multiplyByScalar` getAmbient material
         
         resultColor
