@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module ShapesSpec where
 
 import Common (epsilon)
@@ -5,7 +7,7 @@ import Data.Fixed (mod')
 import Drawing (Color (..))
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
-import Patterns (Pattern (..), setPatternTransform, createStripePattern)
+import Patterns (Pattern (..), setPatternTransform, createGradientPattern, createStripePattern)
 import Ray (Ray (..))
 import Shapes
     ( Intersection (..)
@@ -216,15 +218,22 @@ spec = do
                     getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
         
         describe "Pattern Color" $ do
-            let patt = createStripePattern white black
+            let stripe = createStripePattern white black
             
             describe "getPatternColorAt" $ do
-                it "returns constant value if changing Y coordinate" $ property $
-                    \y -> patt `getPatternColorAt` Point 0 y 0 `shouldBe` white
-                it "returns constant value if changing Z coordinate" $ property $
-                    \z -> patt `getPatternColorAt` Point 0 0 z `shouldBe` white
-                it "returns alternating value if changing X coordinate" $ property $
-                    \x -> patt `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
+                describe "for stipe pattern" $ do
+                    it "returns constant value if changing Y coordinate" $ property $
+                        \y -> stripe `getPatternColorAt` Point 0 y 0 `shouldBe` white
+                    it "returns constant value if changing Z coordinate" $ property $
+                        \z -> stripe `getPatternColorAt` Point 0 0 z `shouldBe` white
+                    it "returns alternating value if changing X coordinate" $ property $
+                        \x -> stripe `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
+                
+                describe "for gradient pattern" $ do
+                    let gradient = createGradientPattern black white
+                    it "returns color linearly interpolated between the gradient's colors by X coordinate" $ property $
+                        \x -> let fraction = snd @Int . properFraction $ x
+                              in gradient `getPatternColorAt` Point x 0 0 `shouldBe` Color fraction fraction fraction
             
             describe "getPatternColorAtObject" $ do
                 it "respects object transformation" $ property $
@@ -235,7 +244,7 @@ spec = do
                                 object' = setTransform object (scaling s s s)
                                 point = Point x 0 0
                                 transformedPoint = transformPoint point (getShapeInverseTransform object')
-                            return $ getPatternColorForObjectAt patt object' point
+                            return $ getPatternColorForObjectAt stripe object' point
                                     `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
                     in check
                 it "respects pattern transformation" $ property $
@@ -244,7 +253,7 @@ spec = do
                             x <- arbitrary
                             let (object, _) = createSphere 0
                                 point = Point x 0 0
-                                patt' = setPatternTransform patt (scaling s s s)
+                                patt' = setPatternTransform stripe (scaling s s s)
                                 transformedPoint = transformPoint point (getPatternInverseTransform patt')
                             return $ getPatternColorForObjectAt patt' object point
                                     `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
@@ -257,7 +266,7 @@ spec = do
                             let (object, _) = createSphere 0
                                 point = Point x 0 0
                                 object' = setTransform object (scaling s s s)
-                                patt' = setPatternTransform patt (translation t 0 0)
+                                patt' = setPatternTransform stripe (translation t 0 0)
                                 transformedPoint = transformPoint point (getShapeInverseTransform object' |<>| getPatternInverseTransform patt')
                             return $ getPatternColorForObjectAt patt' object' point
                                     `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black

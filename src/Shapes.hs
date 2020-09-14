@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Shapes
     ( Shape (..)
     , Computations (..)
@@ -20,7 +22,7 @@ module Shapes
 import Common (epsilon)
 import Data.Fixed (mod')
 import Data.Function (on)
-import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
+import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar, subtractColor)
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
 import Matrix (inverse, transpose)
@@ -187,6 +189,10 @@ lighting material light point eyeVector normalVector inShadow =
     in resultColor
 
 getPatternColorAt :: Pattern -> Point -> Color
+getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x _ _) =
+    let shift = secondColor `subtractColor` firstColor
+        fraction = snd @Int . properFraction $ x
+    in firstColor `addColor` (shift `multiplyByScalar` fraction)
 getPatternColorAt (Pattern (StripeRules firstColor secondColor) _ _) (Point x _ _)
     | x `mod'` 2 < 1 = firstColor
     | otherwise = secondColor

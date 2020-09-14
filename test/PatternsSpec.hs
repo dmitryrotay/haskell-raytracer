@@ -13,5 +13,5 @@ spec = do
         
         describe "createStripePattern" $ do
             it "creates a stripe pattern" $ do
-                (getFirstColor . getPatternRules) patt `shouldBe` white
-                (getSecondColor . getPatternRules) patt `shouldBe` black  
+                (getStripeFirstColor . getPatternRules) patt `shouldBe` white
+                (getStripeSecondColor . getPatternRules) patt `shouldBe` black  
