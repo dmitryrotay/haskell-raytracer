@@ -24,7 +24,7 @@ import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
 import Matrix (inverse, transpose)
-import Patterns (Pattern (..))
+import Patterns (Pattern (..), PatternRules (..))
 import Ray (Ray (..), position, transformRay)
 import Space
     ( Point (..)
@@ -187,7 +187,7 @@ lighting material light point eyeVector normalVector inShadow =
     in resultColor
 
 getPatternColorAt :: Pattern -> Point -> Color
-getPatternColorAt (StripePattern firstColor secondColor _ _) (Point x _ _)
+getPatternColorAt (Pattern (StripeRules firstColor secondColor) _ _) (Point x _ _)
     | x `mod'` 2 < 1 = firstColor
     | otherwise = secondColor
 

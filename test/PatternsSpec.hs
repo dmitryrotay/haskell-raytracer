@@ -1,7 +1,7 @@
 module PatternsSpec where
 
 import Drawing (Color (..))
-import Patterns (Pattern (..), createStripePattern)
+import Patterns (Pattern (..), PatternRules (..), createStripePattern)
 import Test.Hspec
 
 spec :: Spec
@@ -13,5 +13,5 @@ spec = do
         
         describe "createStripePattern" $ do
             it "creates a stripe pattern" $ do
-                getFirstColor patt `shouldBe` white
-                getSecondColor patt `shouldBe` black  
+                (getFirstColor . getPatternRules) patt `shouldBe` white
+                (getSecondColor . getPatternRules) patt `shouldBe` black  
