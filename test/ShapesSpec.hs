@@ -1,9 +1,12 @@
 module ShapesSpec where
 
 import Common (epsilon)
-import Materials (defaultMaterial)
+import Data.Fixed (mod')
+import Drawing (Color (..))
+import Lights (PointLight (..))
+import Materials (Material (..), defaultMaterial)
+import Patterns (Pattern (..), setPatternTransform, createStripePattern)
 import Ray (Ray (..))
-import Space (Point (..), Vector (..), normalize)
 import Shapes
     ( Intersection (..)
     , Computations (..)
@@ -17,13 +20,21 @@ import Shapes
     , localNormalAt
     , normalAt
     , prepareComputations
+    , lighting
+    , getPatternColorAt
+    , getPatternColorForObjectAt
     )
+import Space (Point (..), Vector (..), normalize)
 import Test.Hspec
-import Transform (identity, translation, scaling, rotationZ, (|<>|))
+import Test.QuickCheck
+import Transform (identity, translation, scaling, rotationZ, (|<>|), transformPoint)
 
 spec :: Spec
 spec = do
     describe "Shapes" $ do
+        let black = Color 0 0 0
+            white = Color 1 1 1
+
         describe "Sphere" $ do
             describe "createSphere" $ do
                 it "constructs sphere with identity transformation" $
@@ -203,6 +214,99 @@ spec = do
                 in do
                     getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
                     getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
+        
+        describe "Pattern Color" $ do
+            let patt = createStripePattern white black
+            
+            describe "getPatternColorAt" $ do
+                it "returns constant value if changing Y coordinate" $ property $
+                    \y -> patt `getPatternColorAt` Point 0 y 0 `shouldBe` white
+                it "returns constant value if changing Z coordinate" $ property $
+                    \z -> patt `getPatternColorAt` Point 0 0 z `shouldBe` white
+                it "returns alternating value if changing X coordinate" $ property $
+                    \x -> patt `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
+            
+            describe "getPatternColorAtObject" $ do
+                it "respects object transformation" $ property $
+                    let check = do
+                            s <- choose (epsilon, 100.0)
+                            x <- arbitrary
+                            let (object, _) = createSphere 0
+                                object' = setTransform object (scaling s s s)
+                                point = Point x 0 0
+                                transformedPoint = transformPoint point (getShapeInverseTransform object')
+                            return $ getPatternColorForObjectAt patt object' point
+                                    `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
+                    in check
+                it "respects pattern transformation" $ property $
+                    let check = do
+                            s <- choose (epsilon, 100.0)
+                            x <- arbitrary
+                            let (object, _) = createSphere 0
+                                point = Point x 0 0
+                                patt' = setPatternTransform patt (scaling s s s)
+                                transformedPoint = transformPoint point (getPatternInverseTransform patt')
+                            return $ getPatternColorForObjectAt patt' object point
+                                    `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
+                    in check
+                it "respects both object and pattern transformations" $ property $
+                    let check = do
+                            s <- choose (epsilon, 9999)
+                            t <- choose (epsilon, 9999)
+                            x <- arbitrary
+                            let (object, _) = createSphere 0
+                                point = Point x 0 0
+                                object' = setTransform object (scaling s s s)
+                                patt' = setPatternTransform patt (translation t 0 0)
+                                transformedPoint = transformPoint point (getShapeInverseTransform object' |<>| getPatternInverseTransform patt')
+                            return $ getPatternColorForObjectAt patt' object' point
+                                    `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
+                    in check
+        
+        describe "lighting" $ do
+            let (material, position, normalVector) = lightingCommonParameters
+            it "computes color when eye between the light and surface" $
+                let eyeVector = Vector 0 0 (-1)
+                    light = PointLight (Point 0 0 (-10)) (Color 1 1 1)
+                    result = lighting material light position eyeVector normalVector False
+                in result `shouldBe` Color 1.9 1.9 1.9
+            it "computes color when eye between the light and surface, eye offset 45°" $
+                let eyeVector = Vector 0 (sqrt 2 / 2) (sqrt 2 / 2)
+                    light = PointLight (Point 0 0 (-10)) (Color 1 1 1)
+                    result = lighting material light position eyeVector normalVector False
+                in result `shouldBe` Color 1.0 1.0 1.0
+            it "computes color with eye opposite surface, light offset 45°" $
+                let eyeVector = Vector 0 0 (-1)
+                    light = PointLight (Point 0 10 (-10)) (Color 1 1 1)
+                    result = lighting material light position eyeVector normalVector False
+                in result `shouldBe` Color 0.7364 0.7364 0.7364
+            it "computes color with eye in the path of the reflection vector" $
+                let eyeVector = Vector 0 (-sqrt 2 / 2) (-sqrt 2 / 2)
+                    light = PointLight (Point 0 10 (-10)) (Color 1 1 1)
+                    result = lighting material light position eyeVector normalVector False
+                in result `shouldBe` Color 1.6364 1.6364 1.6364
+            it "computes color with the light behind the surface" $
+                let eyeVector = Vector 0 0 (-1)
+                    light = PointLight (Point 0 0 10) (Color 1 1 1)
+                    result = lighting material light position eyeVector normalVector False
+                in result `shouldBe` Color 0.1 0.1 0.1
+            it "computes color for the surface in the shadow" $
+                let eyeVector = Vector 0 0 (-1)
+                    light = PointLight (Point 0 0 (-10)) (Color 1 1 1)
+                    inShadow = True
+                    result = lighting material light position eyeVector normalVector inShadow
+                in result `shouldBe` Color 0.1 0.1 0.1
+            it "computes color with a pattern applied" $
+                let patt = createStripePattern (Color 1 1 1) (Color 0 0 0)
+                    material' = material { getAmbient = 1, getDiffuse = 0, getSpecular = 0, getPattern = Just patt }
+                    eyeVector = Vector 0 0 (-1)
+                    light = PointLight (Point 0 0 (-10)) (Color 1 1 1)
+                in property $
+                    \x -> lighting material' light (Point x 0 0) eyeVector normalVector False
+                          `shouldBe` if x `mod'` 2 < 1 then white else black
+
+lightingCommonParameters :: (Material, Point, Vector)
+lightingCommonParameters = (defaultMaterial, Point 0 0 0, Vector 0 0 (-1))
 
 raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> [Intersection]
 raySphereIntersection originX originY originZ directionX directionY directionZ =

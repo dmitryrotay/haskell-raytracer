@@ -12,12 +12,19 @@ module Shapes
     , hit
     , setMaterial
     , setTransform
+    , lighting
+    , getPatternColorAt
+    , getPatternColorForObjectAt
     ) where
 
 import Common (epsilon)
+import Data.Fixed (mod')
 import Data.Function (on)
-import Materials (Material, defaultMaterial)
+import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
+import Lights (PointLight (..))
+import Materials (Material (..), defaultMaterial)
 import Matrix (inverse, transpose)
+import Patterns (Pattern (..))
 import Ray (Ray (..), position, transformRay)
 import Space
     ( Point (..)
@@ -28,6 +35,7 @@ import Space
     , dot
     , normalize
     , subtractPoint
+    , reflectVector
     )
 import Transform (Transform, identity, transformPoint, transformVector)
 
@@ -141,3 +149,50 @@ setTransform (Shape shapeType shapeId _ _ m) newTransform =
 
 setMaterial :: Shape -> Material -> Shape
 setMaterial (Shape shapeType shapeId t it _) = Shape shapeType shapeId t it
+
+lighting :: Material -> PointLight -> Point -> Vector -> Vector -> Bool -> Color
+lighting material light point eyeVector normalVector inShadow =
+    let color = case getPattern material of
+            Nothing -> getColor material
+            Just patt -> getPatternColorAt patt point
+        effectiveColor = color `multiplyByColor` getIntensity light
+        ambient = effectiveColor `multiplyByScalar` getAmbient material
+        
+        resultColor
+            | inShadow = ambient
+            | otherwise =
+                let lightVector = normalize (getPosition light `subtractPoint` point)
+                    lightDotNormal = lightVector `dot` normalVector
+                    black = Color 0 0 0    
+                    (diffuse, specular)
+                        | lightDotNormal < 0 = (black, black)
+                        | otherwise = 
+                            let diff = effectiveColor
+                                    `multiplyByScalar` getDiffuse material
+                                    `multiplyByScalar` lightDotNormal
+                                spec =
+                                    let reflectionVector = reflectVector (negateV lightVector) normalVector
+                                        reflectionDotEye = reflectionVector `dot` eyeVector
+                                        result
+                                            | reflectionDotEye <= 0 = black
+                                            | otherwise =
+                                                let factor = reflectionDotEye ** getShininess material
+                                                in getIntensity light
+                                                    `multiplyByScalar` getSpecular material
+                                                    `multiplyByScalar` factor
+                                    in result
+                            in (diff, spec)
+                    in ambient `addColor` diffuse `addColor` specular
+
+    in resultColor
+
+getPatternColorAt :: Pattern -> Point -> Color
+getPatternColorAt (StripePattern firstColor secondColor _ _) (Point x _ _)
+    | x `mod'` 2 < 1 = firstColor
+    | otherwise = secondColor
+
+getPatternColorForObjectAt :: Pattern -> Shape -> Point -> Color
+getPatternColorForObjectAt patt object point =
+    let objectPoint = transformPoint point (getShapeInverseTransform object)
+        patternPoint = transformPoint objectPoint (getPatternInverseTransform patt)
+    in getPatternColorAt patt patternPoint

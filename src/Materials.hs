@@ -1,13 +1,10 @@
 module Materials
     ( Material (..)
     , defaultMaterial
-    , lighting
     ) where
 
-import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
-import Lights (PointLight (..))
-import Patterns (Pattern, getPatternColorAt)
-import Space (Point, Vector, subtractPoint, dot, reflectVector, negateV, normalize)
+import Drawing (Color (..))
+import Patterns (Pattern)
 
 data Material = Material
     { getColor :: Color
@@ -27,39 +24,3 @@ defaultMaterial =
         shininess = 200.0
         patt = Nothing
     in Material color ambient diffuse specular shininess patt
-
-lighting :: Material -> PointLight -> Point -> Vector -> Vector -> Bool -> Color
-lighting material light position eyeVector normalVector inShadow =
-    let color = case getPattern material of
-            Nothing -> getColor material
-            Just patt -> getPatternColorAt patt position
-        effectiveColor = color `multiplyByColor` getIntensity light
-        ambient = effectiveColor `multiplyByScalar` getAmbient material
-        
-        resultColor
-            | inShadow = ambient
-            | otherwise =
-                let lightVector = normalize (getPosition light `subtractPoint` position)
-                    lightDotNormal = lightVector `dot` normalVector
-                    black = Color 0 0 0    
-                    (diffuse, specular)
-                        | lightDotNormal < 0 = (black, black)
-                        | otherwise = 
-                            let diff = effectiveColor
-                                    `multiplyByScalar` getDiffuse material
-                                    `multiplyByScalar` lightDotNormal
-                                spec =
-                                    let reflectionVector = reflectVector (negateV lightVector) normalVector
-                                        reflectionDotEye = reflectionVector `dot` eyeVector
-                                        result
-                                            | reflectionDotEye <= 0 = black
-                                            | otherwise =
-                                                let factor = reflectionDotEye ** getShininess material
-                                                in getIntensity light
-                                                    `multiplyByScalar` getSpecular material
-                                                    `multiplyByScalar` factor
-                                    in result
-                            in (diff, spec)
-                    in ambient `addColor` diffuse `addColor` specular
-
-    in resultColor

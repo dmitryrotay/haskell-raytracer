@@ -12,7 +12,7 @@ module World
 import Data.List (sort)
 import Drawing (Color (..))
 import Lights (PointLight (..))
-import Materials (Material (..), lighting)
+import Materials (Material (..))
 import Ray (Ray (..))
 import Shapes
     ( Shape (..)
@@ -23,7 +23,7 @@ import Shapes
     , intersect
     , prepareComputations
     , setMaterial
-    , setTransform
+    , setTransform, lighting
     )
 import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)

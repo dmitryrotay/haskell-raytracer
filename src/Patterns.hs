@@ -1,19 +1,23 @@
 module Patterns
     ( Pattern (..)
     , createStripePattern
-    , getPatternColorAt
+    , setPatternTransform
     ) where
 
-import Data.Fixed (mod')
 import Drawing (Color (..))
-import Space (Point (..))
+import Matrix (inverse)
+import Transform (Transform, identity)
 
-data Pattern = StripePattern { getFirstColor :: Color, getSecondColor :: Color } deriving (Eq, Show)
+data Pattern = StripePattern
+    { getFirstColor :: Color
+    , getSecondColor :: Color
+    , getPatternTransform :: Transform
+    , getPatternInverseTransform :: Transform
+    } deriving (Eq, Show)
 
 createStripePattern :: Color -> Color -> Pattern
-createStripePattern = StripePattern
+createStripePattern firstColor secondColor = StripePattern firstColor secondColor identity identity
 
-getPatternColorAt :: Pattern -> Point -> Color
-getPatternColorAt (StripePattern firstColor secondColor) (Point x _ _)
-    | x `mod'` 2 < 1 = firstColor
-    | otherwise = secondColor
+setPatternTransform :: Pattern -> Transform -> Pattern
+setPatternTransform (StripePattern firstColor secondColor _ _) transform
+    = StripePattern firstColor secondColor transform (inverse transform)
