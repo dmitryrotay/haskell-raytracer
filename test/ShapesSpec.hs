@@ -7,7 +7,13 @@ import Data.Fixed (mod')
 import Drawing (Color (..))
 import Lights (PointLight (..))
 import Materials (Material (..), defaultMaterial)
-import Patterns (Pattern (..), setPatternTransform, createGradientPattern, createStripePattern)
+import Patterns
+    ( Pattern (..)
+    , setPatternTransform
+    , createGradientPattern
+    , createRingPattern
+    , createStripePattern
+    )
 import Ray (Ray (..))
 import Shapes
     ( Intersection (..)
@@ -221,19 +227,26 @@ spec = do
             let stripe = createStripePattern white black
             
             describe "getPatternColorAt" $ do
-                describe "for stipe pattern" $ do
-                    it "returns constant value if changing Y coordinate" $ property $
-                        \y -> stripe `getPatternColorAt` Point 0 y 0 `shouldBe` white
-                    it "returns constant value if changing Z coordinate" $ property $
-                        \z -> stripe `getPatternColorAt` Point 0 0 z `shouldBe` white
-                    it "returns alternating value if changing X coordinate" $ property $
+                describe "for stripe pattern" $ do
+                    it "returns constant value if changing Y and Z coordinates" $ property $
+                        \y z -> stripe `getPatternColorAt` Point 0 y z `shouldBe` white
+                    it "returns alternating values if changing X coordinate" $ property $
                         \x -> stripe `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
                 
                 describe "for gradient pattern" $ do
                     let gradient = createGradientPattern black white
+                    it "returns constant value if changing Z and Y coordinates" $ property $
+                        \y z -> gradient `getPatternColorAt` Point 0 y z `shouldBe` black
                     it "returns color linearly interpolated between the gradient's colors by X coordinate" $ property $
                         \x -> let fraction = snd @Int . properFraction $ x
                               in gradient `getPatternColorAt` Point x 0 0 `shouldBe` Color fraction fraction fraction
+                
+                describe "for ring pattern" $ do
+                    let ring = createRingPattern white black
+                    it "returns constant value if changing Z coordinate" $ property $
+                        \z -> ring `getPatternColorAt` Point 0 0 z `shouldBe` white
+                    it "returns alternating values if changing X and Y coordinates" $ property $
+                        \x y -> ring `getPatternColorAt` Point x y 0 `shouldBe` if sqrt (x ** 2 + y ** 2) `mod'` 2 < 1 then white else black
             
             describe "getPatternColorAtObject" $ do
                 it "respects object transformation" $ property $

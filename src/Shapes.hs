@@ -193,6 +193,9 @@ getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x 
     let shift = secondColor `subtractColor` firstColor
         fraction = snd @Int . properFraction $ x
     in firstColor `addColor` (shift `multiplyByScalar` fraction)
+getPatternColorAt (Pattern (RingRules firstColor secondColor) _ _) (Point x y _)
+    | sqrt (x ** 2 + y ** 2) `mod'` 2 < 1 = firstColor
+    | otherwise = secondColor
 getPatternColorAt (Pattern (StripeRules firstColor secondColor) _ _) (Point x _ _)
     | x `mod'` 2 < 1 = firstColor
     | otherwise = secondColor

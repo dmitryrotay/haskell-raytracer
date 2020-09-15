@@ -2,6 +2,7 @@ module Patterns
     ( Pattern (..)
     , PatternRules (..)
     , createGradientPattern
+    , createRingPattern
     , createStripePattern
     , setPatternTransform
     ) where
@@ -19,6 +20,10 @@ data PatternRules =
         { getGradientFirstColor :: Color
         , getGradientSecondColor :: Color
         }
+    | RingRules
+        { getRingFirstColor :: Color
+        , getRingSecondColor :: Color
+        }
     deriving (Eq, Show)
 
 data Pattern = Pattern
@@ -29,6 +34,9 @@ data Pattern = Pattern
 
 createGradientPattern :: Color -> Color -> Pattern
 createGradientPattern firstColor secondColor = Pattern (GradientRules firstColor secondColor) identity identity
+
+createRingPattern :: Color -> Color -> Pattern
+createRingPattern firstColor secondColor = Pattern (RingRules firstColor secondColor) identity identity
 
 createStripePattern :: Color -> Color -> Pattern
 createStripePattern firstColor secondColor = Pattern (StripeRules firstColor secondColor) identity identity
