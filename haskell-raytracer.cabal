@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e803a2769e8ff33c24d4a68d7f5ec6e0a7c14281b30917e12472449494fa060b
+-- hash: fb1c2f7363f3868778350e20a9a1b253ca9a2c191196ff9fd01bd5b41e36b728
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -31,11 +31,13 @@ library
       Drawing
       Drawing.Output
       Lights
-      Materials
       Matrix
-      Patterns
+      Objects
+      Objects.Intersections
+      Objects.Materials
+      Objects.Patterns
+      Objects.Shapes
       Ray
-      Shapes
       Space
       Transform
       World
@@ -77,11 +79,13 @@ test-suite haskell-raytracer-test
       CameraSpec
       Drawing.OutputSpec
       DrawingSpec
-      MaterialsSpec
       MatrixSpec
-      PatternsSpec
+      Objects.IntersectionsSpec
+      Objects.MaterialsSpec
+      Objects.PatternsSpec
+      Objects.ShapesSpec
+      ObjectsSpec
       RaySpec
-      ShapesSpec
       SpaceSpec
       TransformSpec
       WorldSpec
@@ -89,14 +93,14 @@ test-suite haskell-raytracer-test
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -Wall
+  build-tool-depends:
+      hspec-discover:hspec-discover
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , containers
     , haskell-raytracer
     , hspec
     , split
     , unordered-containers
-    , QuickCheck
-  build-tool-depends:
-      hspec-discover:hspec-discover
   default-language: Haskell2010

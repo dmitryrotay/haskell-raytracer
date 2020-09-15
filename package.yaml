@@ -20,11 +20,9 @@ description:         Please see the README on GitHub at <https://github.com/Dmit
 
 dependencies:
 - base >= 4.7 && < 5
-- text
 - containers
 - unordered-containers
 - split
-- parallel
 
 library:
   source-dirs: src
@@ -51,4 +49,6 @@ tests:
     dependencies:
     - haskell-raytracer
     - hspec
+    - QuickCheck
+    build-tools:
     - hspec-discover

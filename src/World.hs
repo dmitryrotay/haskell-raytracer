@@ -12,19 +12,17 @@ module World
 import Data.List (sort)
 import Drawing (Color (..))
 import Lights (PointLight (..))
-import Materials (Material (..))
-import Ray (Ray (..))
-import Shapes
-    ( Shape (..)
-    , Intersection (..)
+import Objects (computeObjectPerceivedColor)
+import Objects.Intersections
+    ( Intersection (..)
     , Computations (..)
-    , createSphere
     , hit
     , intersect
     , prepareComputations
-    , setMaterial
-    , setTransform, lighting
     )
+import Objects.Materials (Material (..))
+import Objects.Shapes (Shape (..), createSphere, setMaterial, setTransform)
+import Ray (Ray (..))
 import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)
 
@@ -60,17 +58,18 @@ colorAt (World shapes (Just light)) ray =
                   Nothing -> Color 0 0 0
                   Just intersection ->
                     let comps = prepareComputations intersection ray
-                    in shadeHit world comps
+                    in shadeHit world (getShape intersection) comps
     in color
 colorAt _ _ = Color 0 0 0
 
-shadeHit :: World -> Computations -> Color
-shadeHit world comps =
+shadeHit :: World -> Shape -> Computations -> Color
+shadeHit world object comps =
     case world of
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
-            in lighting
+            in computeObjectPerceivedColor
                     (getShapeMaterial $ getCompShape comps)
+                    object
                     light
                     (getCompOverPoint comps)
                     (getCompEyeVector comps)

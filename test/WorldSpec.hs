@@ -2,16 +2,10 @@ module WorldSpec where
 
 import Drawing (Color (..))
 import Lights (PointLight (..))
-import Materials (Material (..))
+import Objects.Intersections (Intersection (..), prepareComputations)
+import Objects.Shapes (Shape (..), createSphere, setMaterial, setTransform)
+import Objects.Materials (Material (..))
 import Ray (Ray (..))
-import Shapes
-    ( Intersection (..)
-    , Shape (..)
-    , createSphere
-    , prepareComputations
-    , setMaterial
-    , setTransform
-    )
 import Space (Point (..), Vector (..))
 import Test.Hspec
 import Transform (scaling, translation)
@@ -65,7 +59,7 @@ spec = do
                     shape = head (getShapes world)
                     i = Intersection shape 4
                     comps = prepareComputations i ray
-                in shadeHit world comps `shouldBe` Color 0.38066 0.47583 0.2855
+                in shadeHit world shape comps `shouldBe` Color 0.38066 0.47583 0.2855
             
             it "shades an intersection from the inside" $
                 let world = defaultWorld
@@ -75,7 +69,7 @@ spec = do
                     shape = getShapes world !! 1
                     i = Intersection shape 0.5
                     comps = prepareComputations i ray
-                in shadeHit world' comps `shouldBe` Color 0.90498 0.90498 0.90498
+                in shadeHit world' shape comps `shouldBe` Color 0.90498 0.90498 0.90498
 
         describe "colorAt" $ do
             it "returns black color when ray misses" $
@@ -123,4 +117,4 @@ spec = do
                     ray = Ray (Point 0 0 5) (Vector 0 0 1)
                     i = Intersection sphere2' 4 
                     comps = prepareComputations i ray
-                in shadeHit world comps `shouldBe` Color 0.1 0.1 0.1
+                in shadeHit world sphere2' comps `shouldBe` Color 0.1 0.1 0.1

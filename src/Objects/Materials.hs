@@ -1,10 +1,10 @@
-module Materials
+module Objects.Materials
     ( Material (..)
     , defaultMaterial
     ) where
 
 import Drawing (Color (..))
-import Patterns (Pattern)
+import Objects.Patterns (Pattern)
 
 data Material = Material
     { getColor :: Color
