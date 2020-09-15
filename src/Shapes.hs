@@ -189,6 +189,9 @@ lighting material light point eyeVector normalVector inShadow =
     in resultColor
 
 getPatternColorAt :: Pattern -> Point -> Color
+getPatternColorAt (Pattern (Checker3dRules firstColor secondColor) _ _) (Point x y z)
+    | (floor x + floor y + floor z :: Int) `mod'` 2 == 0 = firstColor
+    | otherwise = secondColor
 getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x _ _) =
     let shift = secondColor `subtractColor` firstColor
         fraction = snd @Int . properFraction $ x

@@ -1,6 +1,7 @@
 module Patterns
     ( Pattern (..)
     , PatternRules (..)
+    , createChecker3dPattern
     , createGradientPattern
     , createRingPattern
     , createStripePattern
@@ -12,9 +13,9 @@ import Matrix (inverse)
 import Transform (Transform, identity)
 
 data PatternRules =
-      StripeRules
-        { getStripeFirstColor :: Color
-        , getStripeSecondColor :: Color
+      Checker3dRules
+        { getRingFirstColor :: Color
+        , getRingSecondColor :: Color
         }
     | GradientRules
         { getGradientFirstColor :: Color
@@ -24,6 +25,10 @@ data PatternRules =
         { getRingFirstColor :: Color
         , getRingSecondColor :: Color
         }
+    | StripeRules
+        { getStripeFirstColor :: Color
+        , getStripeSecondColor :: Color
+        }
     deriving (Eq, Show)
 
 data Pattern = Pattern
@@ -31,6 +36,9 @@ data Pattern = Pattern
     , getPatternTransform :: Transform
     , getPatternInverseTransform :: Transform
     } deriving (Eq, Show)
+
+createChecker3dPattern :: Color -> Color -> Pattern
+createChecker3dPattern firstColor secondColor = Pattern (Checker3dRules firstColor secondColor) identity identity
 
 createGradientPattern :: Color -> Color -> Pattern
 createGradientPattern firstColor secondColor = Pattern (GradientRules firstColor secondColor) identity identity

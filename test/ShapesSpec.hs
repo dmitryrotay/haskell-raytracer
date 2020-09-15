@@ -10,6 +10,7 @@ import Materials (Material (..), defaultMaterial)
 import Patterns
     ( Pattern (..)
     , setPatternTransform
+    , createChecker3dPattern
     , createGradientPattern
     , createRingPattern
     , createStripePattern
@@ -245,8 +246,24 @@ spec = do
                     let ring = createRingPattern white black
                     it "returns constant value if changing Z coordinate" $ property $
                         \z -> ring `getPatternColorAt` Point 0 0 z `shouldBe` white
+                    it "returns alternating values if changing X coordinate" $ property $
+                        \x -> ring `getPatternColorAt` Point x 0 0 `shouldBe` if sqrt (x ** 2) `mod'` 2 < 1 then white else black
+                    it "returns alternating values if changing Y coordinate" $ property $
+                        \y -> ring `getPatternColorAt` Point 0 y 0 `shouldBe` if sqrt (y ** 2) `mod'` 2 < 1 then white else black
                     it "returns alternating values if changing X and Y coordinates" $ property $
                         \x y -> ring `getPatternColorAt` Point x y 0 `shouldBe` if sqrt (x ** 2 + y ** 2) `mod'` 2 < 1 then white else black
+                
+                describe "for checker 3D pattern" $ do
+                    let checker3d = createChecker3dPattern white black
+                    it "returns alternating values if changing X coordinate" $ property $
+                        \x -> checker3d `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
+                    it "returns alternating values if changing Y coordinate" $ property $
+                        \y -> checker3d `getPatternColorAt` Point 0 y 0 `shouldBe` if y `mod'` 2 < 1 then white else black
+                    it "returns alternating values if changing Z coordinate" $ property $
+                        \z -> checker3d `getPatternColorAt` Point 0 0 z `shouldBe` if z `mod'` 2 < 1 then white else black
+                    it "returns alternating values if changing all coordinates" $ property $
+                        \x y z -> checker3d `getPatternColorAt` Point x y z
+                                  `shouldBe` if (floor x + floor y + floor z :: Int) `mod'` 2 == 0 then white else black
             
             describe "getPatternColorAtObject" $ do
                 it "respects object transformation" $ property $
