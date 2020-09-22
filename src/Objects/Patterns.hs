@@ -1,12 +1,16 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Objects.Patterns
-    ( Pattern (..)
+    ( Fill (..)
+    , Pattern (..)
     , PatternRules (..)
+    , createCheckerPattern
     , createChecker3dPattern
+    , createCombinedRingPattern
     , createGradientPattern
     , createRingPattern
     , createStripePattern
+    , getFillColorAt
     , getPatternColorAt
     , setPatternTransform
     ) where
@@ -18,22 +22,14 @@ import Transform (Transform, identity)
 import Space (Point (..))
 
 data PatternRules =
-      Checker3dRules
-        { getFirstColor :: Color
-        , getSecondColor :: Color
-        }
-    | GradientRules
-        { getFirstColor :: Color
-        , getSecondColor :: Color
-        }
-    | RingRules
-        { getFirstColor :: Color
-        , getSecondColor :: Color
-        }
-    | StripeRules
-        { getFirstColor :: Color
-        , getSecondColor :: Color
-        }
+      CheckerRules Fill Fill
+    | Checker3dRules Fill Fill
+    | GradientRules Color Color
+    | RingRules Fill Fill
+    | StripeRules Fill Fill
+    deriving (Eq, Show)
+
+data Fill = PatternFill Pattern | SolidFill Color
     deriving (Eq, Show)
 
 data Pattern = Pattern
@@ -42,33 +38,55 @@ data Pattern = Pattern
     , getPatternInverseTransform :: Transform
     } deriving (Eq, Show)
 
+createCheckerPattern :: Color -> Color -> Pattern
+createCheckerPattern firstColor secondColor =
+    Pattern (CheckerRules (SolidFill firstColor) (SolidFill secondColor)) identity identity
+
 createChecker3dPattern :: Color -> Color -> Pattern
-createChecker3dPattern firstColor secondColor = Pattern (Checker3dRules firstColor secondColor) identity identity
+createChecker3dPattern firstColor secondColor =
+    Pattern (Checker3dRules (SolidFill firstColor) (SolidFill secondColor)) identity identity
+
+createCombinedRingPattern :: Pattern -> Pattern -> Pattern
+createCombinedRingPattern firstPattern secondPattern =
+    Pattern (RingRules (PatternFill firstPattern) (PatternFill secondPattern)) identity identity
 
 createGradientPattern :: Color -> Color -> Pattern
-createGradientPattern firstColor secondColor = Pattern (GradientRules firstColor secondColor) identity identity
+createGradientPattern firstColor secondColor =
+    Pattern (GradientRules firstColor secondColor) identity identity
 
 createRingPattern :: Color -> Color -> Pattern
-createRingPattern firstColor secondColor = Pattern (RingRules firstColor secondColor) identity identity
+createRingPattern firstColor secondColor =
+    Pattern (RingRules (SolidFill firstColor) (SolidFill secondColor)) identity identity
 
 createStripePattern :: Color -> Color -> Pattern
-createStripePattern firstColor secondColor = Pattern (StripeRules firstColor secondColor) identity identity
+createStripePattern firstColor secondColor =
+    Pattern (StripeRules (SolidFill firstColor) (SolidFill secondColor)) identity identity
 
 setPatternTransform :: Pattern -> Transform -> Pattern
 setPatternTransform (Pattern rules _ _) transform
     = Pattern rules transform (inverse transform)
 
+getFillColorAt :: Fill -> Point -> Color
+getFillColorAt (SolidFill color) _ = color
+getFillColorAt (PatternFill patt) point =
+    getPatternColorAt patt point
+
 getPatternColorAt :: Pattern -> Point -> Color
-getPatternColorAt (Pattern (Checker3dRules firstColor secondColor) _ _) (Point x y z)
-    | (floor x + floor y + floor z :: Int) `mod'` 2 == 0 = firstColor
-    | otherwise = secondColor
+getPatternColorAt (Pattern (CheckerRules firstFill secondFill) _ _) point
+    | ((floor . getPointX $ point) + (floor . getPointZ $ point) :: Int) `mod'` 2 == 0 =
+        getFillColorAt firstFill point
+    | otherwise = getFillColorAt secondFill point
+getPatternColorAt (Pattern (Checker3dRules firstFill secondFill) _ _) point
+    | ((floor . getPointX $ point) + (floor . getPointY $ point) + (floor . getPointZ $ point) :: Int) `mod'` 2 == 0 =
+        getFillColorAt firstFill point
+    | otherwise = getFillColorAt secondFill point
 getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x _ _) =
     let shift = secondColor `subtractColor` firstColor
         fraction = snd @Int . properFraction $ x
     in firstColor `addColor` (shift `multiplyByScalar` fraction)
-getPatternColorAt (Pattern (RingRules firstColor secondColor) _ _) (Point x y _)
-    | sqrt (x ** 2 + y ** 2) `mod'` 2 < 1 = firstColor
-    | otherwise = secondColor
-getPatternColorAt (Pattern (StripeRules firstColor secondColor) _ _) (Point x _ _)
-    | x `mod'` 2 < 1 = firstColor
-    | otherwise = secondColor
+getPatternColorAt (Pattern (RingRules firstFill secondFill) _ _) point
+    | sqrt (getPointX point ** 2 + getPointY point ** 2) `mod'` 2 < 1 = getFillColorAt firstFill point
+    | otherwise = getFillColorAt secondFill point
+getPatternColorAt (Pattern (StripeRules firstFill secondFill) _ _) point
+    | getPointX point `mod'` 2 < 1 = getFillColorAt firstFill point
+    | otherwise = getFillColorAt secondFill point
