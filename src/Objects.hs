@@ -6,7 +6,7 @@ module Objects
 import Drawing (Color (..), addColor, multiplyByColor, multiplyByScalar)
 import Lights (PointLight (..))
 import Objects.Materials (Material (..))
-import Objects.Patterns (Pattern (..), getPatternColorAt)
+import Objects.Patterns (Pattern, getPatternColorAt, getPatternInverseTransform)
 import Objects.Shapes (Shape (..))
 import Space
     ( Point (..)

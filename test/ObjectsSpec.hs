@@ -10,9 +10,9 @@ import Objects
     )
 import Objects.Materials (Material (..), defaultMaterial)
 import Objects.Patterns
-    ( Pattern (..)
+    (createStripePattern
+    , getPatternInverseTransform
     , setPatternTransform
-    , createStripePattern
     )
 import Objects.Shapes
     ( Shape (..)

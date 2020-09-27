@@ -5,8 +5,7 @@ module Objects.PatternsSpec where
 import Data.Fixed (mod')
 import Drawing (Color (..))
 import Objects.Patterns
-    ( Fill (..)
-    , Pattern (..)
+    ( Fill (..)    
     , PatternRules (..)
     , createCheckerPattern
     , createChecker3dPattern
@@ -15,10 +14,14 @@ import Objects.Patterns
     , createRingPattern
     , getFillColorAt
     , getPatternColorAt
+    , getPatternInverseTransform
+    , getPatternRules
+    , setPatternTransform
     )
 import Space (Point (..))
 import Test.Hspec
 import Test.QuickCheck
+import Transform (scaling, transformPoint)
 
 spec :: Spec
 spec = do
@@ -32,43 +35,23 @@ spec = do
     
     describe "createCheckerPattern" $ do
         it "creates a solid color checker pattern" $ do
-            case checker of
-                (Pattern (CheckerRules (SolidFill firstColor) (SolidFill secondColor)) _ _) ->
-                    do firstColor `shouldBe` white
-                       secondColor `shouldBe` black
-                _ -> expectationFailure "Not a Checker pattern"
+            getPatternRules checker `shouldBe` CheckerRules (SolidFill white) (SolidFill black)
 
     describe "createChecker3dPattern" $ do
         it "creates a solid color 3D checker pattern" $ do
-            case checker3d of
-                (Pattern (Checker3dRules (SolidFill firstColor) (SolidFill secondColor)) _ _) ->
-                    do firstColor `shouldBe` white
-                       secondColor `shouldBe` black
-                _ -> expectationFailure "Not a Checker3d pattern"
-    
+            getPatternRules checker3d `shouldBe` Checker3dRules (SolidFill white) (SolidFill black)
+
     describe "createGradientPattern" $ do
         it "creates a gradient pattern" $ do
-            case gradient of
-                (Pattern (GradientRules firstColor secondColor) _ _) ->
-                    do firstColor `shouldBe` black
-                       secondColor `shouldBe` white
-                _ -> expectationFailure "Not a Gradient pattern"
+            getPatternRules gradient `shouldBe` GradientRules black white
     
     describe "createRingPattern" $ do
         it "creates a solid color ring pattern" $ do
-            case ring of
-                (Pattern (RingRules (SolidFill firstColor) (SolidFill secondColor)) _ _) ->
-                    do firstColor `shouldBe` white
-                       secondColor `shouldBe` black
-                _ -> expectationFailure "Not a solid color Ring pattern"
+            getPatternRules ring `shouldBe` RingRules (SolidFill white) (SolidFill black)
 
     describe "createStripePattern" $ do
         it "creates a solid color stripe pattern" $ do
-            case stripe of
-                (Pattern (StripeRules (SolidFill firstColor) (SolidFill secondColor)) _ _) ->
-                    do firstColor `shouldBe` white
-                       secondColor `shouldBe` black
-                _ -> expectationFailure "Not a Stripe pattern"
+            getPatternRules stripe `shouldBe` StripeRules (SolidFill white) (SolidFill black)
     
     describe "getFillColorAt" $ do
         let whiteFill = SolidFill white
@@ -76,8 +59,16 @@ spec = do
             \x y z -> whiteFill `getFillColorAt` Point x y z `shouldBe` white
         
         let patternRingFill = PatternFill ring
-        it "returns pattern color at any point for PatternFill" $ property $
+        it "returns pattern color at any point for PatternFill with non-transformed pattern" $ property $
             \x y -> patternRingFill `getFillColorAt` Point x y 0 `shouldBe` ring `getPatternColorAt` Point x y 0
+        
+        let transformedRingPattern = setPatternTransform ring (scaling 0.5 0.5 0.5)
+            transformedPatternRingFill = PatternFill transformedRingPattern
+        it "returns pattern color at any point for PatternFill with transformed pattern by translating point into pattern space" $ property $
+            \x y -> do 
+                let point = Point x y 0
+                    transformedPoint = transformPoint point (getPatternInverseTransform transformedRingPattern)
+                transformedPatternRingFill `getFillColorAt` point `shouldBe` ring `getPatternColorAt` transformedPoint
 
     describe "getPatternColorAt" $ do
         describe "for solid color checker pattern" $ do
