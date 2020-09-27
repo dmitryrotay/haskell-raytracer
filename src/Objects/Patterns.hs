@@ -4,6 +4,7 @@ module Objects.Patterns
     ( Fill (..)
     , Pattern
     , PatternRules (..)
+    , createBlendedPattern
     , createCheckerPattern
     , createCombinedCheckerPattern
     , createChecker3dPattern
@@ -20,6 +21,7 @@ module Objects.Patterns
     , setPatternTransform
     ) where
 
+import Common (average)
 import Data.Fixed (mod')
 import Drawing (Color (..), addColor, multiplyByScalar, subtractColor)
 import Matrix (inverse)
@@ -27,7 +29,8 @@ import Transform (Transform, identity, transformPoint)
 import Space (Point (..))
 
 data PatternRules =
-      CheckerRules Fill Fill
+      BlendedRules [Fill] 
+    | CheckerRules Fill Fill
     | Checker3dRules Fill Fill
     | GradientRules Color Color
     | RingRules Fill Fill
@@ -42,6 +45,9 @@ data Pattern = Pattern
     , getTransform :: Transform
     , getInverseTransform :: Transform
     } deriving (Eq, Show)
+
+createBlendedPattern :: [Fill] -> Pattern
+createBlendedPattern fs = Pattern (BlendedRules fs) identity identity
 
 createCheckerPattern :: Color -> Color -> Pattern
 createCheckerPattern firstColor secondColor =
@@ -99,15 +105,21 @@ getFillColorAt (PatternFill patt) point =
 
 getPatternColorAt :: Pattern -> Point -> Color
 
+getPatternColorAt (Pattern (BlendedRules []) _ _) _ =
+    Color 0 0 0
+getPatternColorAt (Pattern (BlendedRules fills) _ _) point =
+    let colors = map (`getFillColorAt` point) fills
+    in Color (average $ map getRed colors) (average $ map getGreen colors) (average $ map getBlue colors)
+
 getPatternColorAt (Pattern (CheckerRules firstFill secondFill) _ _) point
     | ((floor . getPointX $ point) + (floor . getPointZ $ point) :: Int) `mod'` 2 == 0 =
-        getFillColorAt firstFill point
-    | otherwise = getFillColorAt secondFill point
+        firstFill `getFillColorAt` point
+    | otherwise = secondFill `getFillColorAt` point
 
 getPatternColorAt (Pattern (Checker3dRules firstFill secondFill) _ _) point
     | ((floor . getPointX $ point) + (floor . getPointY $ point) + (floor . getPointZ $ point) :: Int) `mod'` 2 == 0 =
-        getFillColorAt firstFill point
-    | otherwise = getFillColorAt secondFill point
+        firstFill `getFillColorAt` point
+    | otherwise = secondFill `getFillColorAt` point
 
 getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x _ _) =
     let shift = secondColor `subtractColor` firstColor
@@ -115,9 +127,9 @@ getPatternColorAt (Pattern (GradientRules firstColor secondColor) _ _) (Point x 
     in firstColor `addColor` (shift `multiplyByScalar` fraction)
 
 getPatternColorAt (Pattern (RingRules firstFill secondFill) _ _) point
-    | sqrt (getPointX point ** 2 + getPointY point ** 2) `mod'` 2 < 1 = getFillColorAt firstFill point
-    | otherwise = getFillColorAt secondFill point
+    | sqrt (getPointX point ** 2 + getPointY point ** 2) `mod'` 2 < 1 = firstFill `getFillColorAt` point
+    | otherwise = secondFill `getFillColorAt` point
 
 getPatternColorAt (Pattern (StripeRules firstFill secondFill) _ _) point
-    | getPointX point `mod'` 2 < 1 = getFillColorAt firstFill point
-    | otherwise = getFillColorAt secondFill point
+    | getPointX point `mod'` 2 < 1 = firstFill `getFillColorAt` point
+    | otherwise = secondFill `getFillColorAt` point

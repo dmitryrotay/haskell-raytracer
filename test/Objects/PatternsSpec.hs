@@ -7,6 +7,7 @@ import Drawing (Color (..))
 import Objects.Patterns
     ( Fill (..)    
     , PatternRules (..)
+    , createBlendedPattern
     , createCheckerPattern
     , createChecker3dPattern
     , createGradientPattern
@@ -32,6 +33,12 @@ spec = do
         gradient = createGradientPattern black white
         ring = createRingPattern white black
         stripe = createStripePattern white black
+
+    describe "createBlendedPattern" $ do
+        it "creates a pattern with BlendedRules and a list of passed Fills" $ do
+            let (firstFill, secondFill, thirdFill) = (SolidFill white, PatternFill checker, PatternFill ring)
+            getPatternRules (createBlendedPattern [firstFill, secondFill, thirdFill])
+                `shouldBe` BlendedRules [firstFill, secondFill, thirdFill]
     
     describe "createCheckerPattern" $ do
         it "creates a solid color checker pattern" $ do
@@ -71,6 +78,15 @@ spec = do
                 transformedPatternRingFill `getFillColorAt` point `shouldBe` ring `getPatternColorAt` transformedPoint
 
     describe "getPatternColorAt" $ do
+        describe "for blended pattern" $ do
+            it "returns color with components calculated as averages of fills' colors at the point for two patterns" $
+                let blendedTwoColorPattern = createBlendedPattern [SolidFill black, SolidFill white]
+                in property $ \x y z -> blendedTwoColorPattern `getPatternColorAt` Point x y z `shouldBe` Color 0.5 0.5 0.5
+            
+            it "returns color with components calculated as averages of fills' colors at the point for three patterns" $
+                let blendedThreeColorPattern = createBlendedPattern [SolidFill black, SolidFill white, SolidFill (Color 0.2 0.2 0.2)]
+                in property $ \x y z -> blendedThreeColorPattern `getPatternColorAt` Point x y z `shouldBe` Color 0.4 0.4 0.4
+            
         describe "for solid color checker pattern" $ do
             it "returns alternating values if changing X coordinate" $ property $
                 \x -> checker `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
