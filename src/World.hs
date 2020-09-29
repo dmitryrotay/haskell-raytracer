@@ -65,6 +65,7 @@ colorAt _ _ = Color 0 0 0
 shadeHit :: World -> Shape -> Computations -> Color
 shadeHit world object comps =
     case world of
+        (World _ Nothing) -> Color 0 0 0
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
             in computeObjectPerceivedColor
@@ -75,7 +76,6 @@ shadeHit world object comps =
                     (getCompEyeVector comps)
                     (getCompNormalVector comps)
                     shadowed
-        _ -> Color 0 0 0
 
 isShadowed :: World -> Point -> Bool
 isShadowed world point =

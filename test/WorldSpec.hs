@@ -8,6 +8,7 @@ import Objects.Materials (Material (..))
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Test.Hspec
+import Test.QuickCheck
 import Transform (scaling, translation)
 import World
     ( World (..)
@@ -106,14 +107,22 @@ spec = do
             let world = defaultWorld
                 point = Point (-2) 2 (-2)
             in isShadowed world point `shouldBe` False
-    
+        
+        let worldWithoutLight = defaultWorld { getLight = Nothing }
+        it "return True at any point for a World without light" $ property $
+            \x y z -> isShadowed worldWithoutLight (Point x y z) `shouldBe` True
+
     describe "shadeHit" $ do
+        let (sphere1, id1) = createSphere 0
+            (sphere2, _) = createSphere id1
+            sphere2' = setTransform sphere2 (translation 0 0 10)
+            world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
+            ray = Ray (Point 0 0 5) (Vector 0 0 1)
+            i = Intersection sphere2' 4 
+            comps = prepareComputations i ray
+        
         it "computes color when given an intersection in shadow" $
-            let (sphere1, id1) = createSphere 0
-                (sphere2, _) = createSphere id1
-                sphere2' = setTransform sphere2 (translation 0 0 10)
-                world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
-                ray = Ray (Point 0 0 5) (Vector 0 0 1)
-                i = Intersection sphere2' 4 
-                comps = prepareComputations i ray
-            in shadeHit world sphere2' comps `shouldBe` Color 0.1 0.1 0.1
+            shadeHit world sphere2' comps `shouldBe` Color 0.1 0.1 0.1
+        
+        it "returns black color if the world has no light" $
+            shadeHit (world { getLight = Nothing }) sphere2' comps `shouldBe` Color 0 0 0
