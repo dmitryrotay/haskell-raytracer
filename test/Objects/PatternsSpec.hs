@@ -5,14 +5,19 @@ module Objects.PatternsSpec where
 import Data.Fixed (mod')
 import Drawing (Color (..))
 import Objects.Patterns
-    ( Fill (..)    
+    ( Pattern,
+      Fill (..)    
     , PatternRules (..)
     , createBlendedPattern
     , createCheckerPattern
+    , createCombinedCheckerPattern
     , createChecker3dPattern
+    , createCombinedChecker3dPattern
     , createGradientPattern
     , createStripePattern
+    , createCombinedStripePattern
     , createRingPattern
+    , createCombinedRingPattern
     , getFillColorAt
     , getPatternColorAt
     , getPatternInverseTransform
@@ -33,6 +38,26 @@ spec = do
         gradient = createGradientPattern black white
         ring = createRingPattern white black
         stripe = createStripePattern white black
+        fills = 
+            [ PatternFill checker
+            , PatternFill checker3d
+            , PatternFill gradient
+            , PatternFill ring
+            , PatternFill stripe
+            , SolidFill white
+            , SolidFill black
+            ]
+        
+        testCombinedPatternConstructor :: (Fill -> Fill -> Pattern) -> (Fill -> Fill -> PatternRules) -> Property
+        testCombinedPatternConstructor constructor rulesConstructor =
+            property $ do
+            i <- choose (0, length fills - 1)
+            j <- choose (0, length fills - 1)
+            let firstFill = fills !! i
+                secondFill = fills !! j
+                patt = constructor firstFill secondFill
+            return $ getPatternRules patt `shouldBe` rulesConstructor firstFill secondFill
+
 
     describe "createBlendedPattern" $ do
         it "creates a pattern with BlendedRules and a list of passed Fills" $ do
@@ -44,9 +69,17 @@ spec = do
         it "creates a solid color checker pattern" $ do
             getPatternRules checker `shouldBe` CheckerRules (SolidFill white) (SolidFill black)
 
+    describe "createCombinedCheckerPattern" $ do
+        it "creates a checker pattern with two passed fills" $
+            testCombinedPatternConstructor createCombinedCheckerPattern CheckerRules
+
     describe "createChecker3dPattern" $ do
         it "creates a solid color 3D checker pattern" $ do
             getPatternRules checker3d `shouldBe` Checker3dRules (SolidFill white) (SolidFill black)
+
+    describe "createCombinedChecker3dPattern" $ do
+        it "creates a 3D checker pattern with two passed fills" $
+            testCombinedPatternConstructor createCombinedChecker3dPattern Checker3dRules
 
     describe "createGradientPattern" $ do
         it "creates a gradient pattern" $ do
@@ -56,9 +89,17 @@ spec = do
         it "creates a solid color ring pattern" $ do
             getPatternRules ring `shouldBe` RingRules (SolidFill white) (SolidFill black)
 
+    describe "createCombinedRingPattern" $ do
+        it "creates a ring pattern with two passed fills" $
+            testCombinedPatternConstructor createCombinedRingPattern RingRules
+
     describe "createStripePattern" $ do
         it "creates a solid color stripe pattern" $ do
             getPatternRules stripe `shouldBe` StripeRules (SolidFill white) (SolidFill black)
+
+    describe "createCombinedStripePattern" $ do
+        it "creates a stripe pattern with two passed fills" $
+            testCombinedPatternConstructor createCombinedStripePattern StripeRules
     
     describe "getFillColorAt" $ do
         let whiteFill = SolidFill white
@@ -86,6 +127,10 @@ spec = do
             it "returns color with components calculated as averages of fills' colors at the point for three patterns" $
                 let blendedThreeColorPattern = createBlendedPattern [SolidFill black, SolidFill white, SolidFill (Color 0.2 0.2 0.2)]
                 in property $ \x y z -> blendedThreeColorPattern `getPatternColorAt` Point x y z `shouldBe` Color 0.4 0.4 0.4
+
+            it "return black color for blended pattern with no composing patterns" $
+                let emptyBlendedPattern = createBlendedPattern []
+                in property $ \x y z -> emptyBlendedPattern `getPatternColorAt` Point x y z `shouldBe` Color 0 0 0
             
         describe "for solid color checker pattern" $ do
             it "returns alternating values if changing X coordinate" $ property $
