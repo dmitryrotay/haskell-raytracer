@@ -3,6 +3,7 @@ module Objects.ShapesSpec where
 import Objects.Materials (defaultMaterial)
 import Objects.Shapes
     ( Shape (..)
+    , ShapeType (..)
     , createSphere
     , createPlane
     , localNormalAt
@@ -10,18 +11,27 @@ import Objects.Shapes
     , setTransform
     )
 import Test.Hspec
+import Test.QuickCheck
 import Transform (identity, rotationZ, scaling, translation, (|<>|))
 import Space (Vector (..), Point(..), normalize)
 
 spec :: Spec
 spec = do
     describe "createSphere" $ do
+        let (sphere, _) = createSphere 0
+        
         it "constructs sphere with identity transformation" $
-            let (sphere, _) = createSphere 0
-            in getShapeTransform sphere `shouldBe` identity
+            getShapeTransform sphere `shouldBe` identity
         it "constructs sphere with default material" $
-            let (sphere, _) = createSphere 0
-            in getShapeMaterial sphere `shouldBe` defaultMaterial
+            getShapeMaterial sphere `shouldBe` defaultMaterial
+        it "constructs shape with correct ShapeType" $
+            getShapeType sphere `shouldBe` Sphere
+        it "constructs sphere with passed id value" $ property $
+            \x -> let (newSphere, _) = createSphere x
+                  in getShapeId newSphere `shouldBe` x
+        it "returns next id along with the sphere object from constructor" $ property $
+            \x -> let (_, nextId) = createSphere x
+                  in nextId `shouldBe` x + 1
     
     describe "localNormalAt" $ do
         describe "for Plane" $ do
