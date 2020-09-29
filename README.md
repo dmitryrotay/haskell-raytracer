@@ -140,3 +140,23 @@ Finally! Now there is a basic abstraction for shapes that we render. It's hard f
 ### Image Samples
 
 [Using planes to render a hexagonal room around the three spheres.](/samples/hexagonal-room.png)
+
+## Chapter 10
+
+### Changes
+
+* Addition of `Pattern` data type, adjusting shape point color computation to use patterns.
+* Implementation of a few basic solid color patterns.
+* Extension of the patterns to allow combined and blended patterns.
+
+### Thoughts
+
+Working on the previous chapter I had to move a lot of code from different modules into a single module. One of the major changes working on the current chapter was splitting that back into a number of sub-modules. The process was a bit tedious but I got to clean up and organize the code in a more structured fashion. Now, the logic which might cause cyclic dependencies lives in the root `Objects` module, while all the bits and pieces required for it to work are placed in four sub-modules.
+
+Using QuickCheck for some of the tests now. The tool seems pretty powerful, although it feels a bit weird repeating code logic in tests. I probably be more thoughtful of when to use it.
+
+It felt a bit weird having to implement (more like google copy/paste, of course) my own `average` function. Numeric types and which typeclasses they belong to are not obvious to me in Haskell. Got to find some decent reading on the topic.
+
+### Image Samples
+
+[Using simple and blended patterns to render the three spheres sitting on the surface.](/samples/render-with-patterns.png)

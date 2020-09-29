@@ -1,52 +1,26 @@
-module Shapes
-    ( Shape (..)
-    , Computations (..)
+module Objects.Intersections
+    ( Computations (..) 
     , Intersection (..)
-    , createSphere
-    , createPlane    
+    , hit
     , intersect
     , localIntersect
-    , normalAt
-    , localNormalAt
     , prepareComputations
-    , hit
-    , setMaterial
-    , setTransform
     ) where
 
 import Common (epsilon)
 import Data.Function (on)
-import Materials (Material, defaultMaterial)
-import Matrix (inverse, transpose)
+import Objects.Shapes (Shape (..), ShapeType (..), normalAt)
 import Ray (Ray (..), position, transformRay)
 import Space
     ( Point (..)
     , Vector (..)
-    , multiplyVector
     , addVectorP
-    , negateV
     , dot
-    , normalize
+    , multiplyVector
+    , negateV
     , subtractPoint
     )
-import Transform (Transform, identity, transformPoint, transformVector)
 
-data ShapeType = Sphere | Plane deriving (Show, Eq)
-
-data Shape = Shape
-            { getShapeType :: ShapeType
-            , getShapeId :: Int
-            , getShapeTransform :: Transform
-            , getShapeInverseTransform :: Transform
-            , getShapeMaterial :: Material
-            } deriving (Show, Eq)
-
-data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
-    deriving (Show, Eq)
-
-instance Ord Intersection where
-    compare = compare `on` getDistance
-   
 data Computations = Computations
     { getCompShape :: Shape
     , getCompDistance :: Double
@@ -57,29 +31,18 @@ data Computations = Computations
     , getIsInside :: Bool
     } deriving (Show, Eq)
 
-createSphere :: Int -> (Shape, Int)
-createSphere = createShape Sphere
+data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
+    deriving (Show, Eq)
 
-createPlane :: Int -> (Shape, Int)
-createPlane = createShape Plane
+instance Ord Intersection where
+    compare = compare `on` getDistance
 
-createShape :: ShapeType -> Int -> (Shape, Int)
-createShape shapeType newId =
-    let newShape = Shape shapeType newId identity identity defaultMaterial
-    in (newShape, newId + 1)
-
-normalAt :: Shape -> Point -> Vector
-normalAt shape point =
-    let shapePoint = transformPoint point (getShapeInverseTransform shape)
-        shapeNormal = localNormalAt shape shapePoint
-        worldNormal = transformVector
-                      shapeNormal
-                      (transpose . getShapeInverseTransform $ shape)
-    in normalize worldNormal
-
-localNormalAt :: Shape -> Point -> Vector
-localNormalAt (Shape Sphere _ _ _ _) point = point `subtractPoint` Point 0 0 0
-localNormalAt (Shape Plane _ _ _ _) _ = Vector 0 1 0
+hit :: [Intersection] -> Maybe Intersection
+hit xs = 
+    let positiveIntersections = filter ((>=0) . getDistance) xs
+    in case positiveIntersections of
+        [] -> Nothing
+        _ -> Just $ minimum positiveIntersections
 
 intersect :: Shape -> Ray -> [Intersection]
 intersect shape ray =
@@ -127,17 +90,3 @@ prepareComputations (Intersection shape distance) ray =
             | otherwise = normalVector
         overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
     in Computations shape distance point overPoint eyeVector normalVector' isInside
-
-hit :: [Intersection] -> Maybe Intersection
-hit xs = 
-    let positiveIntersections = filter ((>=0) . getDistance) xs
-    in case positiveIntersections of
-        [] -> Nothing
-        _ -> Just $ minimum positiveIntersections
-
-setTransform :: Shape -> Transform -> Shape
-setTransform (Shape shapeType shapeId _ _ m) newTransform =
-    Shape shapeType shapeId newTransform (inverse newTransform) m
-
-setMaterial :: Shape -> Material -> Shape
-setMaterial (Shape shapeType shapeId t it _) = Shape shapeType shapeId t it

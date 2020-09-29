@@ -12,19 +12,17 @@ module World
 import Data.List (sort)
 import Drawing (Color (..))
 import Lights (PointLight (..))
-import Materials (Material (..), lighting)
-import Ray (Ray (..))
-import Shapes
-    ( Shape (..)
-    , Intersection (..)
+import Objects (computeObjectPerceivedColor)
+import Objects.Intersections
+    ( Intersection (..)
     , Computations (..)
-    , createSphere
     , hit
     , intersect
     , prepareComputations
-    , setMaterial
-    , setTransform
     )
+import Objects.Materials (Material (..))
+import Objects.Shapes (Shape (..), createSphere, setMaterial, setTransform)
+import Ray (Ray (..))
 import Space (Point (..), subtractPoint, magnitude, normalize)
 import Transform (scaling)
 
@@ -39,7 +37,7 @@ createWorld = World [] Nothing
 defaultWorld :: World
 defaultWorld =
     let (sphere1, nextId) = createSphere 0
-        sphere1' = setMaterial sphere1 (Material (Color 0.8 1.0 0.6) 0.1 0.7 0.2 200.0)
+        sphere1' = setMaterial sphere1 (Material (Color 0.8 1.0 0.6) 0.1 0.7 0.2 200.0 Nothing)
         (sphere2, _) = createSphere nextId
         sphere2' = setTransform sphere2  (scaling 0.5 0.5 0.5)
         light = PointLight (Point (-10) 10 (-10)) (Color 1 1 1)
@@ -60,23 +58,24 @@ colorAt (World shapes (Just light)) ray =
                   Nothing -> Color 0 0 0
                   Just intersection ->
                     let comps = prepareComputations intersection ray
-                    in shadeHit world comps
+                    in shadeHit world (getShape intersection) comps
     in color
 colorAt _ _ = Color 0 0 0
 
-shadeHit :: World -> Computations -> Color
-shadeHit world comps =
+shadeHit :: World -> Shape -> Computations -> Color
+shadeHit world object comps =
     case world of
+        (World _ Nothing) -> Color 0 0 0
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
-            in lighting
+            in computeObjectPerceivedColor
                     (getShapeMaterial $ getCompShape comps)
+                    object
                     light
                     (getCompOverPoint comps)
                     (getCompEyeVector comps)
                     (getCompNormalVector comps)
                     shadowed
-        _ -> Color 0 0 0
 
 isShadowed :: World -> Point -> Bool
 isShadowed world point =

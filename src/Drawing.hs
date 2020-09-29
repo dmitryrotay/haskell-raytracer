@@ -34,6 +34,7 @@ multiplyByColor :: Color -> Color -> Color
 Color r1 g1 b1 `multiplyByColor` Color r2 g2 b2 = Color (r1 * r2) (g1 * g2) (b1 * b2)
 
 data Canvas = Canvas { getWidth :: Int, getHeight :: Int, getPixels :: [Color] }
+    deriving (Eq)
 
 instance Show Canvas where 
     show (Canvas width height _) = "Canvas {width = " ++ show width ++ ", height = " ++ show height ++ "}"
