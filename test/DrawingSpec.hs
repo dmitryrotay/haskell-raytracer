@@ -37,3 +37,8 @@ spec = do
             let red = Color 1 0 0
                 canvas = setPixel (blankCanvas 10 20) 2 3 red
             in pixelAt canvas 2 3 `shouldBe` red
+
+        it "setting pixel outside canvas yields the same canvas" $
+            let red = Color 1 0 0
+                blank = blankCanvas 10 20
+            in setPixel blank 20 20 red `shouldBe` blank
