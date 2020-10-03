@@ -19,6 +19,7 @@ import Space
     , multiplyVector
     , negateV
     , subtractPoint
+    , reflectVector
     )
 
 data Computations = Computations
@@ -28,6 +29,7 @@ data Computations = Computations
     , getCompOverPoint :: Point
     , getCompEyeVector :: Vector
     , getCompNormalVector :: Vector
+    , getReflectionVector :: Vector
     , getIsInside :: Bool
     } deriving (Show, Eq)
 
@@ -89,4 +91,5 @@ prepareComputations (Intersection shape distance) ray =
             | isInside = negateV normalVector
             | otherwise = normalVector
         overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
-    in Computations shape distance point overPoint eyeVector normalVector' isInside
+        reflectedVector = reflectVector (getDirection ray) normalVector'
+    in Computations shape distance point overPoint eyeVector normalVector' reflectedVector isInside

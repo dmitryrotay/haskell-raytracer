@@ -128,15 +128,22 @@ spec = do
                     getCompNormalVector comps `shouldBe` Vector 0 0 (-1)
                     getIsInside comps `shouldBe` True
 
-            it "offsets the point of the hit" $
+            it "offsets the point of the hit" $ do
                 let ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
                     (sphere, _) = createSphere 0
                     sphere' = setTransform sphere (translation 0 0 1)
                     i = Intersection sphere' 5
                     comps = prepareComputations i ray
-                in do
-                    getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
-                    getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
+                getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
+                getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
+            
+            it "computes the reflection vector" $ do
+                let (shape, _) = createPlane 0
+                    ray = Ray (Point 0 1 (-1)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
+                    i = Intersection shape (sqrt 2)
+                    comps = prepareComputations i ray
+                getReflectionVector comps `shouldBe` Vector 0 (sqrt 2 / 2) (sqrt 2 / 2)
+                
 
 raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> [Intersection]
 raySphereIntersection originX originY originZ directionX directionY directionZ =
