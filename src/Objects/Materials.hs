@@ -12,6 +12,7 @@ data Material = Material
     , getDiffuse :: Double
     , getSpecular :: Double
     , getShininess :: Double
+    , getReflective :: Double
     , getPattern :: Maybe Pattern
     } deriving (Eq, Show)
 
@@ -22,5 +23,6 @@ defaultMaterial =
         diffuse = 0.9
         specular = 0.9
         shininess = 200.0
+        reflective = 0.0
         patt = Nothing
-    in Material color ambient diffuse specular shininess patt
+    in Material color ambient diffuse specular shininess reflective patt

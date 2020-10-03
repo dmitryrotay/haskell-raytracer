@@ -37,7 +37,7 @@ createWorld = World [] Nothing
 defaultWorld :: World
 defaultWorld =
     let (sphere1, nextId) = createSphere 0
-        sphere1' = setMaterial sphere1 (Material (Color 0.8 1.0 0.6) 0.1 0.7 0.2 200.0 Nothing)
+        sphere1' = setMaterial sphere1 (Material (Color 0.8 1.0 0.6) 0.1 0.7 0.2 200.0 0.0 Nothing)
         (sphere2, _) = createSphere nextId
         sphere2' = setTransform sphere2  (scaling 0.5 0.5 0.5)
         light = PointLight (Point (-10) 10 (-10)) (Color 1 1 1)
