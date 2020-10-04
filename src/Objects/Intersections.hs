@@ -29,7 +29,7 @@ data Computations = Computations
     , getCompOverPoint :: Point
     , getCompEyeVector :: Vector
     , getCompNormalVector :: Vector
-    , getReflectionVector :: Vector
+    , getCompReflectionVector :: Vector
     , getIsInside :: Bool
     } deriving (Show, Eq)
 

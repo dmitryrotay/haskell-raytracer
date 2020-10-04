@@ -142,7 +142,7 @@ spec = do
                     ray = Ray (Point 0 1 (-1)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                     i = Intersection shape (sqrt 2)
                     comps = prepareComputations i ray
-                getReflectionVector comps `shouldBe` Vector 0 (sqrt 2 / 2) (sqrt 2 / 2)
+                getCompReflectionVector comps `shouldBe` Vector 0 (sqrt 2 / 2) (sqrt 2 / 2)
                 
 
 raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> [Intersection]

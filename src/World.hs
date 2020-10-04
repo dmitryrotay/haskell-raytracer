@@ -7,10 +7,12 @@ module World
     , shadeHit
     , colorAt
     , isShadowed
+    , reflectedColor
+    , reflectedColorWithBounceCount
     ) where
 
 import Data.List (sort)
-import Drawing (Color (..))
+import Drawing (Color (..), addColor, multiplyByScalar)
 import Lights (PointLight (..))
 import Objects (computeObjectPerceivedColor)
 import Objects.Intersections
@@ -31,6 +33,9 @@ data World = World
     , getLight :: Maybe PointLight
     } deriving (Show, Eq)
 
+bounceLimit :: Int
+bounceLimit = 5
+
 createWorld :: World
 createWorld = World [] Nothing
 
@@ -50,7 +55,10 @@ setLight :: World -> PointLight -> World
 setLight (World shapes _) light = World shapes (Just light)
 
 colorAt :: World -> Ray -> Color
-colorAt (World shapes (Just light)) ray =
+colorAt world ray = colorAtWithBounceLimit world ray bounceLimit
+
+colorAtWithBounceLimit :: World -> Ray -> Int -> Color
+colorAtWithBounceLimit (World shapes (Just light)) ray remainingBounces =
     let world = World shapes (Just light)
         xs = intersectWorld world ray
         objectHit = hit xs
@@ -58,24 +66,29 @@ colorAt (World shapes (Just light)) ray =
                   Nothing -> Color 0 0 0
                   Just intersection ->
                     let comps = prepareComputations intersection ray
-                    in shadeHit world (getShape intersection) comps
+                    in shadeHitWithBounceLimit world (getShape intersection) comps remainingBounces
     in color
-colorAt _ _ = Color 0 0 0
+colorAtWithBounceLimit _ _ _ = Color 0 0 0
 
 shadeHit :: World -> Shape -> Computations -> Color
-shadeHit world object comps =
+shadeHit world object comps = shadeHitWithBounceLimit world object comps bounceLimit
+
+shadeHitWithBounceLimit :: World -> Shape -> Computations -> Int -> Color
+shadeHitWithBounceLimit world object comps remainingBounces =
     case world of
         (World _ Nothing) -> Color 0 0 0
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
-            in computeObjectPerceivedColor
-                    (getShapeMaterial $ getCompShape comps)
-                    object
-                    light
-                    (getCompOverPoint comps)
-                    (getCompEyeVector comps)
-                    (getCompNormalVector comps)
-                    shadowed
+                surface = computeObjectPerceivedColor
+                            (getShapeMaterial $ getCompShape comps)
+                            object
+                            light
+                            (getCompOverPoint comps)
+                            (getCompEyeVector comps)
+                            (getCompNormalVector comps)
+                            shadowed
+                reflected = reflectedColorWithBounceCount world comps remainingBounces
+            in surface `addColor` reflected
 
 isShadowed :: World -> Point -> Bool
 isShadowed world point =
@@ -91,3 +104,15 @@ isShadowed world point =
             in case h of
                 Nothing -> False
                 Just (Intersection _ t) -> t < distance
+
+reflectedColor :: World -> Computations -> Color
+reflectedColor world comps = reflectedColorWithBounceCount world comps bounceLimit
+
+reflectedColorWithBounceCount :: World -> Computations -> Int -> Color
+reflectedColorWithBounceCount world comps remainingBounces
+    | remainingBounces <= 0 = Color 0 0 0
+    | otherwise = case (getReflective . getShapeMaterial . getCompShape) comps of
+                    0.0 -> Color 0 0 0
+                    ref -> let reflectionRay = Ray (getCompOverPoint comps) (getCompReflectionVector comps)
+                               color = colorAtWithBounceLimit world reflectionRay (remainingBounces - 1)
+                           in color `multiplyByScalar` ref
