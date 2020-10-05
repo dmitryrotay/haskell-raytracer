@@ -1,9 +1,10 @@
 module Objects.ShapesSpec where
 
-import Objects.Materials (defaultMaterial)
+import Objects.Materials (Material (..), defaultMaterial)
 import Objects.Shapes
     ( Shape (..)
     , ShapeType (..)
+    , createGlassSphere
     , createSphere
     , createPlane
     , localNormalAt
@@ -17,6 +18,12 @@ import Space (Vector (..), Point(..), normalize)
 
 spec :: Spec
 spec = do
+    describe "createGlassSphere" $ do
+        it "creates a sphere with a glassy material" $ do
+            let (sphere, _) = createGlassSphere 0
+            (getTransparency . getShapeMaterial) sphere `shouldBe` 1.0
+            (getRefractiveIndex . getShapeMaterial) sphere `shouldBe` 1.5
+
     describe "createSphere" $ do
         let (sphere, _) = createSphere 0
         

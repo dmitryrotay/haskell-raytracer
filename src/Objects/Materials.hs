@@ -7,13 +7,15 @@ import Drawing (Color (..))
 import Objects.Patterns (Pattern)
 
 data Material = Material
-    { getColor :: Color
-    , getAmbient :: Double
+    { getAmbient :: Double
+    , getColor :: Color
     , getDiffuse :: Double
-    , getSpecular :: Double
-    , getShininess :: Double
-    , getReflective :: Double
     , getPattern :: Maybe Pattern
+    , getReflective :: Double
+    , getRefractiveIndex :: Double
+    , getShininess :: Double
+    , getSpecular :: Double
+    , getTransparency :: Double
     } deriving (Eq, Show)
 
 defaultMaterial :: Material
@@ -22,7 +24,9 @@ defaultMaterial =
         ambient = 0.1
         diffuse = 0.9
         specular = 0.9
-        shininess = 200.0
-        reflective = 0.0
+        shininess = 200.0        
         patt = Nothing
-    in Material color ambient diffuse specular shininess reflective patt
+        reflective = 0.0
+        transparency = 0
+        refractiveIndex = 1.0
+    in Material ambient color diffuse patt reflective refractiveIndex shininess specular transparency
