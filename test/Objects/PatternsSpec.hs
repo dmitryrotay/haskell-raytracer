@@ -49,8 +49,7 @@ spec = do
             ]
         
         testCombinedPatternConstructor :: (Fill -> Fill -> Pattern) -> (Fill -> Fill -> PatternRules) -> Property
-        testCombinedPatternConstructor constructor rulesConstructor =
-            property $ do
+        testCombinedPatternConstructor constructor rulesConstructor = property $ do
             i <- choose (0, length fills - 1)
             j <- choose (0, length fills - 1)
             let firstFill = fills !! i

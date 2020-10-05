@@ -116,7 +116,7 @@ spec = do
                 shape = getShapes world !! 1
                 shape' = shape { getShapeMaterial = (getShapeMaterial shape) { getAmbient = 1.0 } }
                 i = Intersection shape' 1
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in reflectedColor world comps `shouldBe` Color 0 0 0
         
         it "returns reflected color for reflective material" $
@@ -126,7 +126,7 @@ spec = do
                 world' = world { getShapes = shape' : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in reflectedColor world' comps `shouldBe` Color 0.19033 0.23792 0.14274
         
         it "returns black color at maximum bounces count" $
@@ -136,7 +136,7 @@ spec = do
                 world' = world { getShapes = shape' : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in reflectedColorWithBounceCount world' comps 0 `shouldBe` Color 0 0 0
 
     describe "shadeHit" $ do
@@ -145,7 +145,7 @@ spec = do
                 ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
                 shape = head (getShapes world)
                 i = Intersection shape 4
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in shadeHit world shape comps `shouldBe` Color 0.38066 0.47583 0.2855
         
         it "shades an intersection from the inside" $
@@ -155,7 +155,7 @@ spec = do
                 ray = Ray (Point 0 0 0) (Vector 0 0 1)
                 shape = getShapes world !! 1
                 i = Intersection shape 0.5
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in shadeHit world' shape comps `shouldBe` Color 0.90498 0.90498 0.90498
         
         it "returns black color if the world has no light" $
@@ -163,7 +163,7 @@ spec = do
                 shape = getShapes world !! 1
                 ray = Ray (Point 0 0 0) (Vector 0 0 1)
                 i = Intersection shape 0.5 
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in shadeHit world shape comps `shouldBe` Color 0 0 0
         
         it "computes color when given an intersection in shadow" $
@@ -173,7 +173,7 @@ spec = do
                 world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
                 ray = Ray (Point 0 0 5) (Vector 0 0 1)
                 i = Intersection sphere2' 4 
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in shadeHit world sphere2' comps `shouldBe` Color 0.1 0.1 0.1
         
         it "computes color for reflective material" $
@@ -183,5 +183,5 @@ spec = do
                 world' = world { getShapes = shape' : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
-                comps = prepareComputations i ray
+                comps = prepareComputations i ray []
             in shadeHit world' shape' comps `shouldBe` Color 0.87675 0.92434 0.82917

@@ -9,7 +9,8 @@ import Objects.Intersections
     , localIntersect
     , prepareComputations
     )
-import Objects.Shapes (createPlane, createSphere, setTransform)
+import Objects.Materials (Material (..))
+import Objects.Shapes (Shape (..), createGlassSphere, createPlane, createSphere, setTransform)
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Test.Hspec
@@ -106,7 +107,7 @@ spec = do
                 let ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
                     (sphere, _) = createSphere 0
                     i = Intersection sphere 4
-                    comps = prepareComputations i ray
+                    comps = prepareComputations i ray []
                 in do
                     getCompShape comps `shouldBe` sphere
                     getCompDistance comps `shouldBe` getDistance i
@@ -119,7 +120,7 @@ spec = do
                 let ray = Ray (Point 0 0 0) (Vector 0 0 1)
                     (sphere, _) = createSphere 0
                     i = Intersection sphere 1
-                    comps = prepareComputations i ray
+                    comps = prepareComputations i ray []
                 in do
                     getCompShape comps `shouldBe` sphere
                     getCompDistance comps `shouldBe` getDistance i
@@ -133,7 +134,7 @@ spec = do
                     (sphere, _) = createSphere 0
                     sphere' = setTransform sphere (translation 0 0 1)
                     i = Intersection sphere' 5
-                    comps = prepareComputations i ray
+                    comps = prepareComputations i ray []
                 getPointZ (getCompOverPoint comps) < (-epsilon / 2) `shouldBe` True
                 getPointZ (getCompPoint comps) > getPointZ (getCompOverPoint comps) `shouldBe` True
             
@@ -141,9 +142,36 @@ spec = do
                 let (shape, _) = createPlane 0
                     ray = Ray (Point 0 1 (-1)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                     i = Intersection shape (sqrt 2)
-                    comps = prepareComputations i ray
+                    comps = prepareComputations i ray []
                 getCompReflectionVector comps `shouldBe` Vector 0 (sqrt 2 / 2) (sqrt 2 / 2)
-                
+            
+            it "finds n1 and n2 for refraction at various intersections" $ do
+                let (a, aId) = createGlassSphere 0
+                    (b, bId) = createGlassSphere aId
+                    (c, _) = createGlassSphere bId
+                    a' = setTransform (a { getShapeMaterial = (getShapeMaterial a) { getRefractiveIndex = 1.5 } }) (scaling 2 2 2)
+                    b' = setTransform (b { getShapeMaterial = (getShapeMaterial b) { getRefractiveIndex = 2.0 } }) (translation 0 0 (-0.25))
+                    c' = setTransform (c { getShapeMaterial = (getShapeMaterial c) { getRefractiveIndex = 2.5 } }) (translation 0 0 0.25)
+                    ray = Ray (Point 0 0 (-4)) (Vector 0 0 1)
+                    intersections = 
+                        [ Intersection a' 2.0
+                        , Intersection b' 2.75
+                        , Intersection c' 3.25
+                        , Intersection b' 4.75
+                        , Intersection c' 5.25
+                        , Intersection a' 6
+                        ]
+                    expectedResults =
+                        [ (1.0, 1.5)
+                        , (1.5, 2.0)
+                        , (2.0, 2.5)
+                        , (2.5, 2.5)
+                        , (2.5, 1.5)
+                        , (1.5 , 1.0)
+                        ]
+                map (\i -> let comps = prepareComputations i ray intersections
+                           in (getCompN1 comps, getCompN2 comps)) intersections
+                    `shouldBe` expectedResults
 
 raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> [Intersection]
 raySphereIntersection originX originY originZ directionX directionY directionZ =

@@ -65,7 +65,7 @@ colorAtWithBounceLimit (World shapes (Just light)) ray remainingBounces =
         color = case objectHit of
                   Nothing -> Color 0 0 0
                   Just intersection ->
-                    let comps = prepareComputations intersection ray
+                    let comps = prepareComputations intersection ray []
                     in shadeHitWithBounceLimit world (getShape intersection) comps remainingBounces
     in color
 colorAtWithBounceLimit _ _ _ = Color 0 0 0

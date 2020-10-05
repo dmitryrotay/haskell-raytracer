@@ -9,6 +9,8 @@ module Objects.Intersections
 
 import Common (epsilon)
 import Data.Function (on)
+import Data.List (delete)
+import Objects.Materials (Material (..))
 import Objects.Shapes (Shape (..), ShapeType (..), normalAt)
 import Ray (Ray (..), position, transformRay)
 import Space
@@ -31,6 +33,8 @@ data Computations = Computations
     , getCompNormalVector :: Vector
     , getCompReflectionVector :: Vector
     , getIsInside :: Bool
+    , getCompN1 :: Double
+    , getCompN2 :: Double
     } deriving (Show, Eq)
 
 data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
@@ -81,9 +85,11 @@ localIntersect (Shape Plane sphereId t it m) (Ray origin direction) =
                 let distance = -getPointY origin / directionY
                 in [Intersection plane distance]
 
-prepareComputations :: Intersection -> Ray -> Computations
-prepareComputations (Intersection shape distance) ray =
-    let point = position ray distance
+prepareComputations :: Intersection -> Ray -> [Intersection] -> Computations
+prepareComputations intersection ray allIntersections =
+    let shape = getShape intersection
+        distance = getDistance intersection
+        point = position ray distance
         normalVector = normalAt shape point
         eyeVector = negateV (getDirection ray)
         isInside = dot normalVector eyeVector < 0
@@ -92,4 +98,28 @@ prepareComputations (Intersection shape distance) ray =
             | otherwise = normalVector
         overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
         reflectedVector = reflectVector (getDirection ray) normalVector'
-    in Computations shape distance point overPoint eyeVector normalVector' reflectedVector isInside
+        (n1, n2) = computeRefractionParameters intersection allIntersections
+    in Computations shape distance point overPoint eyeVector normalVector' reflectedVector isInside n1 n2
+
+computeRefractionParameters :: Intersection -> [Intersection] -> (Double, Double)
+computeRefractionParameters intersection allIntersections =
+    let processIntersection :: ([Shape], Double, Double) -> Intersection -> ([Shape], Double, Double)
+        processIntersection (containers, currentN1, currentN2) i =
+            let n1' = if i == intersection
+                      then case containers of
+                          [] -> 1.0
+                          x:_ -> (getRefractiveIndex . getShapeMaterial) x
+                      else currentN1
+                shape = getShape i
+                containers' = if shape `elem` containers
+                              then delete shape containers
+                              else shape : containers
+                n2' = if i == intersection
+                      then case containers' of
+                          [] -> 1.0
+                          x:_ -> (getRefractiveIndex . getShapeMaterial) x
+                      else currentN2
+            in (containers', n1', n2')
+
+        (_, n1, n2) = foldl processIntersection ([], 1.0, 1.0) allIntersections
+    in (n1, n2)
