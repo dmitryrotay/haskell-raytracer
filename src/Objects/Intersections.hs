@@ -21,6 +21,7 @@ import Space
     , multiplyVector
     , negateV
     , subtractPoint
+    , subtractVectorP
     , reflectVector
     )
 
@@ -29,6 +30,7 @@ data Computations = Computations
     , getCompDistance :: Double
     , getCompPoint :: Point
     , getCompOverPoint :: Point
+    , getCompUnderPoint :: Point
     , getCompEyeVector :: Vector
     , getCompNormalVector :: Vector
     , getCompReflectionVector :: Vector
@@ -96,10 +98,12 @@ prepareComputations intersection ray allIntersections =
         normalVector'
             | isInside = negateV normalVector
             | otherwise = normalVector
-        overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
+        normalEpsilonVector = normalVector' `multiplyVector` epsilon
+        overPoint = point `addVectorP` normalEpsilonVector
+        underPoint = point `subtractVectorP` normalEpsilonVector
         reflectedVector = reflectVector (getDirection ray) normalVector'
         (n1, n2) = computeRefractionParameters intersection allIntersections
-    in Computations shape distance point overPoint eyeVector normalVector' reflectedVector isInside n1 n2
+    in Computations shape distance point overPoint underPoint eyeVector normalVector' reflectedVector isInside n1 n2
 
 computeRefractionParameters :: Intersection -> [Intersection] -> (Double, Double)
 computeRefractionParameters intersection allIntersections =
