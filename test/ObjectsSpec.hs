@@ -10,7 +10,8 @@ import Objects
     )
 import Objects.Materials (Material (..), defaultMaterial)
 import Objects.Patterns
-    (createStripePattern
+    ( createStripePattern
+    , createTestPattern
     , getPatternInverseTransform
     , setPatternTransform
     )
@@ -42,6 +43,7 @@ spec = do
                     return $ getPatternColorForObjectAt stripe object' point
                             `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
             in check
+        
         it "respects pattern transformation" $ property $
             let check = do
                     s <- choose (epsilon, 9999)
@@ -53,6 +55,7 @@ spec = do
                     return $ getPatternColorForObjectAt patt' object point
                             `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
             in check
+        
         it "respects both object and pattern transformations" $ property $
             let check = do
                     s <- choose (epsilon, 9999)
@@ -66,6 +69,24 @@ spec = do
                     return $ getPatternColorForObjectAt patt' object' point
                             `shouldBe` if getPointX transformedPoint `mod'` 2 < 1 then white else black
             in check
+
+        describe "for test pattern" $ do
+            it "respects pattern transformation" $ do
+                let (object, _) = createSphere 0
+                    patt = setPatternTransform createTestPattern (scaling 2 2 2)
+                getPatternColorForObjectAt patt object (Point 2 3 4) `shouldBe` Color 1 1.5 2
+            
+            it "respects object transformation" $ do
+                let (object, _) = createSphere 0
+                    object' = setTransform object (scaling 2 2 2)
+                    patt = createTestPattern
+                getPatternColorForObjectAt patt object' (Point 2 3 4) `shouldBe` Color 1 1.5 2
+
+            it "correctly computes color for combined pattern and object transformations" $ do
+                let (object, _) = createSphere 0
+                    object' = setTransform object (scaling 2 2 2)
+                    patt = setPatternTransform createTestPattern (translation 0.5 1 1.5)
+                getPatternColorForObjectAt patt object' (Point 2.5 3 3.5) `shouldBe` Color 0.75 0.5 0.25
     
     describe "computeObjectPerceivedColor" $ do
         let (material, object, position, normalVector) = lightingCommonParameters

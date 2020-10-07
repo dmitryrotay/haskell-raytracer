@@ -27,6 +27,6 @@ defaultMaterial =
         shininess = 200.0        
         patt = Nothing
         reflective = 0.0
-        transparency = 0
+        transparency = 0.0
         refractiveIndex = 1.0
     in Material ambient color diffuse patt reflective refractiveIndex shininess specular transparency

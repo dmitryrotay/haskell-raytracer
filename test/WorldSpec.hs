@@ -3,8 +3,9 @@ module WorldSpec where
 import Drawing (Color (..))
 import Lights (PointLight (..))
 import Objects.Intersections (Intersection (..), prepareComputations)
-import Objects.Shapes (Shape (..), createSphere, createPlane, setMaterial, setTransform)
 import Objects.Materials (Material (..), defaultMaterial)
+import Objects.Patterns (createTestPattern)
+import Objects.Shapes (Shape (..), createSphere, createPlane, setMaterial, setTransform)
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Test.Hspec
@@ -21,6 +22,8 @@ import World
     , isShadowed
     , reflectedColor
     , reflectedColorWithBounceCount
+    , refractedColor
+    , refractedColorWithBounceCount
     )
 
 spec :: Spec
@@ -138,6 +141,45 @@ spec = do
                 i = Intersection shape' (sqrt 2)
                 comps = prepareComputations i ray []
             in reflectedColorWithBounceCount world' comps 0 `shouldBe` Color 0 0 0
+    
+    describe "reflectedColor" $ do
+        it "returns black color for opaque material" $ 
+            let world = defaultWorld
+                ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
+                shape = head (getShapes world)
+                intersections = [Intersection shape 4, Intersection shape 6]
+                comps = prepareComputations (head intersections) ray intersections
+            in refractedColor world comps `shouldBe` Color 0 0 0
+        
+        it "returns black color at maximum bounces count" $ 
+            let world = defaultWorld
+                ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
+                shape = head (getShapes world)
+                shape' = shape { getShapeMaterial = (getShapeMaterial shape) { getTransparency = 1.0, getRefractiveIndex = 1.5 } }
+                intersections = [Intersection shape' 4, Intersection shape' 6]
+                comps = prepareComputations (head intersections) ray intersections
+            in refractedColorWithBounceCount world comps 0 `shouldBe` Color 0 0 0
+
+        it "returns black color in case of total internal reflection" $ 
+            let world = defaultWorld
+                ray = Ray (Point 0 0 (sqrt 2 / 2)) (Vector 0 1 0)
+                shape = head (getShapes world)
+                shape' = shape { getShapeMaterial = (getShapeMaterial shape) { getTransparency = 1.0, getRefractiveIndex = 1.5 } }
+                intersections = [Intersection shape' (-sqrt 2 / 2), Intersection shape' (sqrt 2 / 2)]
+                comps = prepareComputations (intersections !! 1) ray intersections
+            in refractedColor world comps `shouldBe` Color 0 0 0
+        
+        it "returns refracted color with a refracted ray" $
+            let world = defaultWorld
+                a = head (getShapes world)
+                a' = a { getShapeMaterial = (getShapeMaterial a) { getAmbient = 1.0, getPattern = Just createTestPattern } }
+                b = getShapes world !! 1
+                b' = b { getShapeMaterial = (getShapeMaterial b) { getTransparency = 1.0, getRefractiveIndex = 1.5 } }
+                world' = world { getShapes = [a', b'] }
+                ray = Ray (Point 0 0 0.1) (Vector 0 1 0)
+                intersections = [Intersection a' (-0.9899), Intersection b' (-0.4899), Intersection b' 0.4899, Intersection a' 0.9899]
+                comps = prepareComputations (intersections !! 2) ray intersections
+            in refractedColor world' comps `shouldBe` Color 0 0.99887 0.047218
 
     describe "shadeHit" $ do
         it "shades an intersection from the outside" $
@@ -146,7 +188,7 @@ spec = do
                 shape = head (getShapes world)
                 i = Intersection shape 4
                 comps = prepareComputations i ray []
-            in shadeHit world shape comps `shouldBe` Color 0.38066 0.47583 0.2855
+            in shadeHit world comps `shouldBe` Color 0.38066 0.47583 0.2855
         
         it "shades an intersection from the inside" $
             let world = defaultWorld
@@ -156,7 +198,7 @@ spec = do
                 shape = getShapes world !! 1
                 i = Intersection shape 0.5
                 comps = prepareComputations i ray []
-            in shadeHit world' shape comps `shouldBe` Color 0.90498 0.90498 0.90498
+            in shadeHit world' comps `shouldBe` Color 0.90498 0.90498 0.90498
         
         it "returns black color if the world has no light" $
             let world = defaultWorld { getLight = Nothing}
@@ -164,7 +206,7 @@ spec = do
                 ray = Ray (Point 0 0 0) (Vector 0 0 1)
                 i = Intersection shape 0.5 
                 comps = prepareComputations i ray []
-            in shadeHit world shape comps `shouldBe` Color 0 0 0
+            in shadeHit world comps `shouldBe` Color 0 0 0
         
         it "computes color when given an intersection in shadow" $
             let (sphere1, id1) = createSphere 0
@@ -174,7 +216,7 @@ spec = do
                 ray = Ray (Point 0 0 5) (Vector 0 0 1)
                 i = Intersection sphere2' 4 
                 comps = prepareComputations i ray []
-            in shadeHit world sphere2' comps `shouldBe` Color 0.1 0.1 0.1
+            in shadeHit world comps `shouldBe` Color 0.1 0.1 0.1
         
         it "computes color for reflective material" $
             let world = defaultWorld
@@ -184,4 +226,16 @@ spec = do
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
                 comps = prepareComputations i ray []
-            in shadeHit world' shape' comps `shouldBe` Color 0.87675 0.92434 0.82917
+            in shadeHit world' comps `shouldBe` Color 0.87675 0.92434 0.82917
+
+        it "computes color for transparent material with refraction" $
+            let world = defaultWorld
+                (floorShape, _) = createPlane 0
+                floor' = setTransform (floorShape { getShapeMaterial = defaultMaterial { getTransparency = 0.5, getRefractiveIndex = 1.5 } }) (translation 0 (-1) 0)
+                (ball, _) = createSphere 0
+                ball' = setTransform (ball { getShapeMaterial = defaultMaterial { getColor = Color 1 0 0, getAmbient = 0.5 }}) (translation 0 (-3.5) (-0.5))
+                world' = world { getShapes = ball' : floor' : getShapes world }
+                ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 /2) (sqrt 2 / 2))
+                intersection = Intersection floor' (sqrt 2)
+                comps = prepareComputations intersection ray [intersection]
+            in shadeHit world' comps `shouldBe` Color 0.93642 0.68642 0.68642
