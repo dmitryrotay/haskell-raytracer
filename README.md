@@ -161,7 +161,7 @@ It felt a bit weird having to implement (more like google copy/paste, of course)
 
 [Using simple and blended patterns to render the three spheres sitting on the surface.](/samples/render-with-patterns.png)
 
-## Chapter 10
+## Chapter 11
 
 ### Changes
 
@@ -174,4 +174,4 @@ Removed the annoying `id` parameter from shape constructors as it is still not n
 
 ### Image Samples
 
-Spheres from the previous example with different backdrop [before](/samples/render-with-refractions-before.png) and [after](/samples/render-with-refractions-after.png) adding a glass sphere to the scene.
+Spheres from the previous example with different backdrop [before](/samples/render-with-refraction-before.png) and [after](/samples/render-with-refraction-after.png) adding a glass sphere to the scene.
