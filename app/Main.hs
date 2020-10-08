@@ -1,6 +1,6 @@
 module Main where
 
-import WorldRenderWithReflections (renderWorld)
+import GlassSphereCheckeredFloor (renderWorld)
 
 main :: IO ()
 main = renderWorld

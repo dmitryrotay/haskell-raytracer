@@ -13,6 +13,7 @@ module World
     , refractedColorWithBounceCount
     ) where
 
+import Debug.Trace
 import Data.List (sort)
 import Drawing (Color (..), addColor, multiplyByScalar)
 import Lights (PointLight (..))

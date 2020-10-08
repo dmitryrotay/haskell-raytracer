@@ -7,7 +7,7 @@ module Common
 import Data.List (genericLength)
 
 epsilon :: Double
-epsilon = 1e-5
+epsilon = 1e-4
 
 (~==) :: Double -> Double -> Bool
 x ~== y = abs (x - y) < epsilon

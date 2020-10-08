@@ -1,5 +1,6 @@
 module WorldSpec where
 
+import Debug.Trace
 import Drawing (Color (..))
 import Lights (PointLight (..))
 import Objects.Intersections (Intersection (..), prepareComputations)
@@ -130,7 +131,7 @@ spec = do
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
                 comps = prepareComputations i ray []
-            in reflectedColor world' comps `shouldBe` Color 0.19033 0.23792 0.14274
+            in trace (show comps) $ reflectedColor world' comps `shouldBe` Color 0.19032 0.2379 0.14274
         
         it "returns black color at maximum bounces count" $
             let world = defaultWorld
@@ -142,7 +143,7 @@ spec = do
                 comps = prepareComputations i ray []
             in reflectedColorWithBounceCount world' comps 0 `shouldBe` Color 0 0 0
     
-    describe "reflectedColor" $ do
+    describe "refractedColor" $ do
         it "returns black color for opaque material" $ 
             let world = defaultWorld
                 ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)
@@ -226,7 +227,7 @@ spec = do
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape' (sqrt 2)
                 comps = prepareComputations i ray []
-            in shadeHit world' comps `shouldBe` Color 0.87675 0.92434 0.82917
+            in shadeHit world' comps `shouldBe` Color 0.87677 0.92436 0.82918
 
         it "computes color for transparent material with refraction" $
             let world = defaultWorld
