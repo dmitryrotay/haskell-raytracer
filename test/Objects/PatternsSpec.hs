@@ -18,6 +18,7 @@ import Objects.Patterns
     , createCombinedStripePattern
     , createRingPattern
     , createCombinedRingPattern
+    , createTestPattern
     , getFillColorAt
     , getPatternColorAt
     , getPatternInverseTransform
@@ -27,7 +28,7 @@ import Objects.Patterns
 import Space (Point (..))
 import Test.Hspec
 import Test.QuickCheck
-import Transform (scaling, transformPoint)
+import Transform (identity, scaling, transformPoint)
 
 spec :: Spec
 spec = do
@@ -49,8 +50,7 @@ spec = do
             ]
         
         testCombinedPatternConstructor :: (Fill -> Fill -> Pattern) -> (Fill -> Fill -> PatternRules) -> Property
-        testCombinedPatternConstructor constructor rulesConstructor =
-            property $ do
+        testCombinedPatternConstructor constructor rulesConstructor = property $ do
             i <- choose (0, length fills - 1)
             j <- choose (0, length fills - 1)
             let firstFill = fills !! i
@@ -100,6 +100,13 @@ spec = do
     describe "createCombinedStripePattern" $ do
         it "creates a stripe pattern with two passed fills" $
             testCombinedPatternConstructor createCombinedStripePattern StripeRules
+
+    describe "createTestPattern" $ do
+        it "creates a test pattern with identity transformation" $
+            let patt = createTestPattern
+            in do
+                getPatternRules patt `shouldBe` TestRules
+                getPatternInverseTransform patt `shouldBe` identity
     
     describe "getFillColorAt" $ do
         let whiteFill = SolidFill white
@@ -175,4 +182,4 @@ spec = do
             it "returns constant value if changing Y and Z coordinates" $ property $
                 \y z -> stripe `getPatternColorAt` Point 0 y z `shouldBe` white
             it "returns alternating values if changing X coordinate" $ property $
-                \x -> stripe `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black
+                \x -> stripe `getPatternColorAt` Point x 0 0 `shouldBe` if x `mod'` 2 < 1 then white else black        

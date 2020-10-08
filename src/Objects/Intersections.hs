@@ -5,10 +5,13 @@ module Objects.Intersections
     , intersect
     , localIntersect
     , prepareComputations
+    , schlick
     ) where
 
 import Common (epsilon)
 import Data.Function (on)
+import Data.List (delete)
+import Objects.Materials (Material (..))
 import Objects.Shapes (Shape (..), ShapeType (..), normalAt)
 import Ray (Ray (..), position, transformRay)
 import Space
@@ -19,6 +22,8 @@ import Space
     , multiplyVector
     , negateV
     , subtractPoint
+    , subtractVectorP
+    , reflectVector
     )
 
 data Computations = Computations
@@ -26,9 +31,13 @@ data Computations = Computations
     , getCompDistance :: Double
     , getCompPoint :: Point
     , getCompOverPoint :: Point
+    , getCompUnderPoint :: Point
     , getCompEyeVector :: Vector
     , getCompNormalVector :: Vector
+    , getCompReflectionVector :: Vector
     , getIsInside :: Bool
+    , getCompN1 :: Double
+    , getCompN2 :: Double
     } deriving (Show, Eq)
 
 data Intersection = Intersection { getShape :: Shape, getDistance :: Double }
@@ -79,14 +88,56 @@ localIntersect (Shape Plane sphereId t it m) (Ray origin direction) =
                 let distance = -getPointY origin / directionY
                 in [Intersection plane distance]
 
-prepareComputations :: Intersection -> Ray -> Computations
-prepareComputations (Intersection shape distance) ray =
-    let point = position ray distance
+prepareComputations :: Intersection -> Ray -> [Intersection] -> Computations
+prepareComputations intersection ray allIntersections =
+    let shape = getShape intersection
+        distance = getDistance intersection
+        point = position ray distance
         normalVector = normalAt shape point
         eyeVector = negateV (getDirection ray)
         isInside = dot normalVector eyeVector < 0
         normalVector'
             | isInside = negateV normalVector
             | otherwise = normalVector
-        overPoint = addVectorP point . multiplyVector normalVector' $ epsilon
-    in Computations shape distance point overPoint eyeVector normalVector' isInside
+        normalEpsilonVector = normalVector' `multiplyVector` epsilon
+        overPoint = point `addVectorP` normalEpsilonVector
+        underPoint = point `subtractVectorP` normalEpsilonVector
+        reflectedVector = reflectVector (getDirection ray) normalVector'
+        (n1, n2) = computeRefractionParameters intersection allIntersections
+    in Computations shape distance point overPoint underPoint eyeVector normalVector' reflectedVector isInside n1 n2
+
+computeRefractionParameters :: Intersection -> [Intersection] -> (Double, Double)
+computeRefractionParameters intersection allIntersections =
+    let processIntersection :: ([Shape], Double, Double) -> Intersection -> ([Shape], Double, Double)
+        processIntersection (containers, currentN1, currentN2) i =
+            let n1' = if i == intersection
+                      then case containers of
+                          [] -> 1.0
+                          x:_ -> (getRefractiveIndex . getShapeMaterial) x
+                      else currentN1
+                shape = getShape i
+                containers' = if shape `elem` containers
+                              then delete shape containers
+                              else shape : containers
+                n2' = if i == intersection
+                      then case containers' of
+                          [] -> 1.0
+                          x:_ -> (getRefractiveIndex . getShapeMaterial) x
+                      else currentN2
+            in (containers', n1', n2')
+
+        (_, n1, n2) = foldl processIntersection ([], 1.0, 1.0) allIntersections
+    in (n1, n2)
+
+schlick :: Computations -> Double
+schlick comps =
+    let cosI = getCompEyeVector comps `dot` getCompNormalVector comps
+        n1 = getCompN1 comps
+        n2 = getCompN2 comps
+        nRatio = n1 / n2
+        sin2t = nRatio ** 2 * (1 - cosI ** 2)
+    in if n1 > n2 && sin2t > 1.0 then 1.0
+       else 
+           let cosI' = if n1 > n2 then sqrt (1.0 - sin2t) else cosI
+               r0 = ((n1 - n2) / (n1 + n2)) ** 2
+           in r0 + (1 - r0) * (1 - cosI') ** 5

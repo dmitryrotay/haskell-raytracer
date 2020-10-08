@@ -14,6 +14,7 @@ module Objects.Patterns
     , createCombinedRingPattern
     , createStripePattern
     , createCombinedStripePattern
+    , createTestPattern
     , getPatternInverseTransform
     , getPatternRules
     , getFillColorAt
@@ -35,6 +36,7 @@ data PatternRules =
     | GradientRules Color Color
     | RingRules Fill Fill
     | StripeRules Fill Fill
+    | TestRules
     deriving (Eq, Show)
 
 data Fill = PatternFill Pattern | SolidFill Color
@@ -84,6 +86,9 @@ createCombinedStripePattern :: Fill -> Fill -> Pattern
 createCombinedStripePattern firstFill secondFill =
     Pattern (StripeRules firstFill secondFill) identity
 
+createTestPattern :: Pattern
+createTestPattern = Pattern TestRules identity
+
 getPatternInverseTransform :: Pattern -> Transform
 getPatternInverseTransform = getInverseTransform
 
@@ -132,3 +137,5 @@ getPatternColorAt (Pattern (RingRules firstFill secondFill) _) point
 getPatternColorAt (Pattern (StripeRules firstFill secondFill) _) point
     | getPointX point `mod'` 2 < 1 = firstFill `getFillColorAt` point
     | otherwise = secondFill `getFillColorAt` point
+
+getPatternColorAt (Pattern TestRules _) (Point x y z) = Color x y z

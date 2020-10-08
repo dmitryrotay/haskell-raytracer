@@ -1,6 +1,7 @@
 module Objects.Shapes
     ( Shape (..)
     , ShapeType (..)
+    , createGlassSphere
     , createSphere
     , createPlane
     , normalAt
@@ -10,7 +11,7 @@ module Objects.Shapes
     ) where
 
 import Matrix (inverse, transpose)
-import Objects.Materials (Material, defaultMaterial)
+import Objects.Materials (Material (..), defaultMaterial)
 import Space
     ( Point (..)
     , Vector (..)
@@ -29,16 +30,22 @@ data Shape = Shape
             , getShapeMaterial :: Material
             } deriving (Show, Eq)
 
-createSphere :: Int -> (Shape, Int)
+createSphere :: Shape
 createSphere = createShape Sphere
 
-createPlane :: Int -> (Shape, Int)
+createGlassSphere :: Shape
+createGlassSphere =
+    let sphere = createSphere
+        sphere' = sphere { getShapeMaterial = (getShapeMaterial sphere) { getTransparency = 1.0, getRefractiveIndex = 1.5 } }
+    in sphere'
+
+createPlane :: Shape
 createPlane = createShape Plane
 
-createShape :: ShapeType -> Int -> (Shape, Int)
-createShape shapeType newId =
-    let newShape = Shape shapeType newId identity identity defaultMaterial
-    in (newShape, newId + 1)
+createShape :: ShapeType -> Shape
+createShape shapeType =
+    let newShape = Shape shapeType 0 identity identity defaultMaterial
+    in newShape
 
 normalAt :: Shape -> Point -> Vector
 normalAt shape point =

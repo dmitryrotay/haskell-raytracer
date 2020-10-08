@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4893ebecb2fc10de8a039ec60fe3a5e5b7dc0ede57bc109c9ace70dee93972e6
+-- hash: 38f6c5644a10b8cc056ed88357f53e6ac4b42fd270ceb9e7607407bf4544a0ed
 
 name:           haskell-raytracer
 version:        0.1.0.0
@@ -57,10 +57,12 @@ executable haskell-raytracer-exe
   other-modules:
       CameraWorldRender
       ClockFace
+      GlassSphereCheckeredFloor
       ProjectileTrajectory
       Silhouette
       WorldRenderWithPatterns
       WorldRenderWithPlanes
+      WorldRenderWithRefraction
       Paths_haskell_raytracer
   hs-source-dirs:
       app
