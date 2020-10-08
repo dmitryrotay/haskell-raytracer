@@ -168,6 +168,8 @@ It felt a bit weird having to implement (more like google copy/paste, of course)
 * Implementation of reflection.
 * Implementation of refraction and Fresnel effect.
 
+### Thoughts
+
 Probably the most saturated chapter in terms of maths and a sheer number of tests. Had some problems with the tests. The first one was because of using epsilon value of `1e-5` instead of `1e-4` used in the book. The root of another issue was in trivial Haskell immutability mistake on my part. In any case, it was a good exercise as I got to use trace-debug for the first time.
 
 Removed the annoying `id` parameter from shape constructors as it is still not needed. Better find a good approach for id assignment when I actually get to it.
