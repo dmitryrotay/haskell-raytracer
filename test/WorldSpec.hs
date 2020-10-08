@@ -81,11 +81,9 @@ spec = do
         
         it "successfully computes color for mutually reflective surfaces" $
             let light = PointLight (Point 0 0 0) (Color 1 1 1)
-                (lowerPlane, _) = createPlane 0
-                lowerPlane' = setTransform (lowerPlane { getShapeMaterial = defaultMaterial { getReflective = 1 } }) (translation 0 (-1) 0)
-                (upperPlane, _) = createPlane 0
-                upperPlane' = setTransform (upperPlane { getShapeMaterial = defaultMaterial { getReflective = 1 } }) (translation 0 1 0)
-                world = World [lowerPlane', upperPlane'] (Just light)
+                lowerPlane = setTransform (createPlane { getShapeMaterial = defaultMaterial { getReflective = 1 } }) (translation 0 (-1) 0)
+                upperPlane = setTransform (createPlane { getShapeMaterial = defaultMaterial { getReflective = 1 } }) (translation 0 1 0)
+                world = World [lowerPlane, upperPlane] (Just light)
                 ray = Ray (Point 0 0 0) (Vector 0 1 0)
                 color = colorAt world ray
             in case color of
@@ -122,24 +120,22 @@ spec = do
                 i = Intersection shape' 1
                 comps = prepareComputations i ray []
             in reflectedColor world comps `shouldBe` Color 0 0 0
-        
+
         it "returns reflected color for reflective material" $
             let world = defaultWorld
-                (shape, _) = createPlane 0
-                shape' = setTransform (shape { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
-                world' = world { getShapes = shape' : getShapes world }
+                shape = setTransform (createPlane { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
+                world' = world { getShapes = shape : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
-                i = Intersection shape' (sqrt 2)
+                i = Intersection shape (sqrt 2)
                 comps = prepareComputations i ray []
             in trace (show comps) $ reflectedColor world' comps `shouldBe` Color 0.19032 0.2379 0.14274
         
         it "returns black color at maximum bounces count" $
             let world = defaultWorld
-                (shape, _) = createPlane 0
-                shape' = setTransform (shape { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
-                world' = world { getShapes = shape' : getShapes world }
+                shape = setTransform (createPlane { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
+                world' = world { getShapes = shape : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
-                i = Intersection shape' (sqrt 2)
+                i = Intersection shape (sqrt 2)
                 comps = prepareComputations i ray []
             in reflectedColorWithBounceCount world' comps 0 `shouldBe` Color 0 0 0
     
@@ -210,9 +206,8 @@ spec = do
             in shadeHit world comps `shouldBe` Color 0 0 0
         
         it "computes color when given an intersection in shadow" $
-            let (sphere1, id1) = createSphere 0
-                (sphere2, _) = createSphere id1
-                sphere2' = setTransform sphere2 (translation 0 0 10)
+            let sphere1 = createSphere
+                sphere2' = setTransform createSphere (translation 0 0 10)
                 world = World [sphere1, sphere2'] (Just (PointLight (Point 0 0 (-10)) (Color 1 1 1)))
                 ray = Ray (Point 0 0 5) (Vector 0 0 1)
                 i = Intersection sphere2' 4 
@@ -221,21 +216,18 @@ spec = do
         
         it "computes color for reflective material" $
             let world = defaultWorld
-                (shape, _) = createPlane 0
-                shape' = setTransform (shape { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
-                world' = world { getShapes = shape' : getShapes world }
+                shape = setTransform (createPlane { getShapeMaterial = defaultMaterial { getReflective = 0.5 } }) (translation 0 (-1) 0)
+                world' = world { getShapes = shape : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
-                i = Intersection shape' (sqrt 2)
+                i = Intersection shape (sqrt 2)
                 comps = prepareComputations i ray []
             in shadeHit world' comps `shouldBe` Color 0.87677 0.92436 0.82918
 
         it "computes color for transparent material with refraction" $
             let world = defaultWorld
-                (floorShape, _) = createPlane 0
-                floor' = setTransform (floorShape { getShapeMaterial = defaultMaterial { getTransparency = 0.5, getRefractiveIndex = 1.5 } }) (translation 0 (-1) 0)
-                (ball, _) = createSphere 0
-                ball' = setTransform (ball { getShapeMaterial = defaultMaterial { getColor = Color 1 0 0, getAmbient = 0.5 }}) (translation 0 (-3.5) (-0.5))
-                world' = world { getShapes = ball' : floor' : getShapes world }
+                floor' = setTransform (createPlane { getShapeMaterial = defaultMaterial { getTransparency = 0.5, getRefractiveIndex = 1.5 } }) (translation 0 (-1) 0)
+                ball = setTransform (createSphere { getShapeMaterial = defaultMaterial { getColor = Color 1 0 0, getAmbient = 0.5 }}) (translation 0 (-3.5) (-0.5))
+                world' = world { getShapes = ball : floor' : getShapes world }
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 /2) (sqrt 2 / 2))
                 intersection = Intersection floor' (sqrt 2)
                 comps = prepareComputations intersection ray [intersection]

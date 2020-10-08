@@ -52,12 +52,10 @@ createWorld = World [] Nothing
 
 defaultWorld :: World
 defaultWorld =
-    let (sphere1, nextId) = createSphere 0
-        sphere1' = setMaterial sphere1 (Material 0.1 (Color 0.8 1.0 0.6) 0.7 Nothing 0.0 1.0 200.0 0.2 0.0)
-        (sphere2, _) = createSphere nextId
-        sphere2' = setTransform sphere2 (scaling 0.5 0.5 0.5)
+    let sphere1 = setMaterial createSphere (Material 0.1 (Color 0.8 1.0 0.6) 0.7 Nothing 0.0 1.0 200.0 0.2 0.0)
+        sphere2 = setTransform createSphere (scaling 0.5 0.5 0.5)
         light = PointLight (Point (-10) 10 (-10)) (Color 1 1 1)
-    in World [sphere1', sphere2'] (Just light)
+    in World [sphere1, sphere2] (Just light)
 
 intersectWorld :: World -> Ray -> [Intersection]
 intersectWorld (World shapes _) ray = sort $ flip intersect ray =<< shapes

@@ -30,22 +30,22 @@ data Shape = Shape
             , getShapeMaterial :: Material
             } deriving (Show, Eq)
 
-createSphere :: Int -> (Shape, Int)
+createSphere :: Shape
 createSphere = createShape Sphere
 
-createGlassSphere :: Int -> (Shape, Int)
-createGlassSphere id =
-    let (sphere, newId) = createSphere id
+createGlassSphere :: Shape
+createGlassSphere =
+    let sphere = createSphere
         sphere' = sphere { getShapeMaterial = (getShapeMaterial sphere) { getTransparency = 1.0, getRefractiveIndex = 1.5 } }
-    in (sphere', newId)
+    in sphere'
 
-createPlane :: Int -> (Shape, Int)
+createPlane :: Shape
 createPlane = createShape Plane
 
-createShape :: ShapeType -> Int -> (Shape, Int)
-createShape shapeType newId =
-    let newShape = Shape shapeType newId identity identity defaultMaterial
-    in (newShape, newId + 1)
+createShape :: ShapeType -> Shape
+createShape shapeType =
+    let newShape = Shape shapeType 0 identity identity defaultMaterial
+    in newShape
 
 normalAt :: Shape -> Point -> Vector
 normalAt shape point =

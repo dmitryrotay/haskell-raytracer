@@ -17,8 +17,7 @@ renderWorld = do
     let wallMaterial = defaultMaterial { getColor = Color 1 0.9 0.9, getSpecular = 0 }
         
         floorTransform = scaling 10 0.01 10
-        (fl, fId) = createSphere 0
-        floor' = flip setMaterial wallMaterial . flip setTransform floorTransform $ fl
+        floor' = flip setMaterial wallMaterial . flip setTransform floorTransform $ createSphere
         
         leftWallTransform = combine 
                             [ translation 0 0 5
@@ -26,8 +25,7 @@ renderWorld = do
                             , rotationX (pi / 2)
                             , scaling 10 0.01 10
                             ]
-        (leftWall, lwId) = createSphere fId
-        leftWall' = flip setMaterial wallMaterial . flip setTransform leftWallTransform $ leftWall
+        leftWall = flip setMaterial wallMaterial . flip setTransform leftWallTransform $ createSphere
         
         rightWallTransform = combine 
                             [ translation 0 0 5
@@ -35,8 +33,7 @@ renderWorld = do
                             , rotationX (pi / 2)
                             , scaling 10 0.01 10 
                             ]
-        (rightWall, rwId) = createSphere lwId
-        rightWall' = flip setMaterial wallMaterial . flip setTransform rightWallTransform $ rightWall
+        rightWall = flip setMaterial wallMaterial . flip setTransform rightWallTransform $ createSphere
         
         middleSphereTransform = translation (-0.2) 1 0.5
         middleSphereMaterial = defaultMaterial
@@ -44,9 +41,7 @@ renderWorld = do
                                 , getDiffuse = 0.7
                                 , getSpecular = 0.3
                                 }
-        (middleSphere, mId) = createSphere rwId
-
-        middleSphere' = flip setMaterial middleSphereMaterial . flip setTransform middleSphereTransform $ middleSphere
+        middleSphere = flip setMaterial middleSphereMaterial . flip setTransform middleSphereTransform $ createSphere
                                 
         rightSphereTransform = scaling 0.5 0.5 0.5 |<>| translation 1.5 0.5 (-0.5)
         rightSphereMaterial = defaultMaterial
@@ -54,8 +49,7 @@ renderWorld = do
                                 , getDiffuse = 0.7
                                 , getSpecular = 0.3
                                 }
-        (rightSphere, rId) = createSphere mId
-        rightSphere' = flip setMaterial rightSphereMaterial . flip setTransform rightSphereTransform $ rightSphere
+        rightSphere = flip setMaterial rightSphereMaterial . flip setTransform rightSphereTransform $ createSphere
 
         leftSphereTransform = scaling 0.33 0.33 0.33 |<>| translation (-1.5) 0.33 (-0.75)
         leftSphereMaterial = defaultMaterial
@@ -63,11 +57,10 @@ renderWorld = do
                                 , getDiffuse = 0.7
                                 , getSpecular = 0.3
                                 }
-        (leftSphere, _) = createSphere rId
-        leftSphere' = flip setMaterial leftSphereMaterial . flip setTransform leftSphereTransform $ leftSphere
+        leftSphere = flip setMaterial leftSphereMaterial . flip setTransform leftSphereTransform $ createSphere
 
         light = PointLight (Point 10 10 (-10)) (Color 1 1 1)
-        objects = [floor', leftWall', rightWall', leftSphere', middleSphere', rightSphere']
+        objects = [floor', leftWall, rightWall, leftSphere, middleSphere, rightSphere]
         world = World objects (Just light)
         cameraTransform = viewTransform (Point 0 1.5 (-5)) (Point 0 1 0) (Vector 0 1 0)
         camera = (createCamera 640 480 (pi / 3)) { getCameraTransform = cameraTransform }

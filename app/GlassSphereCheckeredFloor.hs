@@ -16,12 +16,10 @@ import World (World (..))
 renderWorld :: IO ()
 renderWorld = do
     let floorPattern = createCheckerPattern (Color 0.85 0.85 0.85) (Color 0.15 0.15 0.15)
-        (fl, fId) = createPlane 0
-        floor' = setTransform (fl { getShapeMaterial = defaultMaterial { getAmbient = 0.8, getDiffuse = 0.2, getPattern = Just floorPattern } }) (scaling 0.7 0.7 0.7)
+        floor' = setTransform (createPlane { getShapeMaterial = defaultMaterial { getAmbient = 0.8, getDiffuse = 0.2, getPattern = Just floorPattern } }) (scaling 0.7 0.7 0.7)
                        
-        (sphere1, s1id) = createSphere fId
-        sphere1' = setTransform 
-                      sphere1 { getShapeMaterial = defaultMaterial { getColor = Color 0.2 0.2 0.2
+        sphere1 = setTransform 
+                      createSphere { getShapeMaterial = defaultMaterial { getColor = Color 0.2 0.2 0.2
                                                                    , getAmbient = 0.0
                                                                    , getDiffuse = 0.0
                                                                    , getSpecular = 0.9
@@ -32,9 +30,8 @@ renderWorld = do
                                                                    }}
                       (translation 0 4.0 0)
 
-        (sphere2, _) = createSphere s1id
-        sphere2' = setTransform
-                      sphere2 { getShapeMaterial = defaultMaterial { getColor = Color 0.2 0.2 0.2
+        sphere2 = setTransform
+                      createSphere { getShapeMaterial = defaultMaterial { getColor = Color 0.2 0.2 0.2
                                                                    , getAmbient = 0.0
                                                                    , getDiffuse = 0.0
                                                                    , getSpecular = 0.9
@@ -46,7 +43,7 @@ renderWorld = do
                       (scaling 0.5 0.5 0.5 |<>| translation 0 4.0 0)
 
         light = PointLight (Point (-8) 10 (-8)) (Color 1 1 1)
-        objects = [floor', sphere1', sphere2']
+        objects = [floor', sphere1, sphere2]
         world = World objects (Just light)
         cameraTransform = viewTransform (Point 0 8 0) (Point 0 0 0) (Vector (-1) 0 0)
         camera = (createCamera 300 300 0.6) { getCameraTransform = cameraTransform }
