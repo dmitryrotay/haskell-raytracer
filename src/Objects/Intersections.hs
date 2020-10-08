@@ -5,6 +5,7 @@ module Objects.Intersections
     , intersect
     , localIntersect
     , prepareComputations
+    , schlick
     ) where
 
 import Common (epsilon)
@@ -127,3 +128,16 @@ computeRefractionParameters intersection allIntersections =
 
         (_, n1, n2) = foldl processIntersection ([], 1.0, 1.0) allIntersections
     in (n1, n2)
+
+schlick :: Computations -> Double
+schlick comps =
+    let cosI = getCompEyeVector comps `dot` getCompNormalVector comps
+        n1 = getCompN1 comps
+        n2 = getCompN2 comps
+        nRatio = n1 / n2
+        sin2t = nRatio ** 2 * (1 - cosI ** 2)
+    in if n1 > n2 && sin2t > 1.0 then 1.0
+       else 
+           let cosI' = if n1 > n2 then sqrt (1.0 - sin2t) else cosI
+               r0 = ((n1 - n2) / (n1 + n2)) ** 2
+           in r0 + (1 - r0) * (1 - cosI') ** 5

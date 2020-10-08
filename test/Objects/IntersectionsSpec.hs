@@ -1,6 +1,6 @@
 module Objects.IntersectionsSpec where
 
-import Common (epsilon)
+import Common (epsilon, (~==))
 import Objects.Intersections
     ( Computations (..)
     , Intersection (..)
@@ -8,6 +8,7 @@ import Objects.Intersections
     , intersect
     , localIntersect
     , prepareComputations
+    , schlick
     )
 import Objects.Materials (Material (..), defaultMaterial)
 import Objects.Shapes (Shape (..), createGlassSphere, createPlane, createSphere, setTransform)
@@ -178,6 +179,28 @@ spec = do
                 underPointZ = (getPointZ . getCompUnderPoint) comps
             underPointZ `shouldSatisfy` (> epsilon / 2)
             (getPointZ . getCompPoint) comps `shouldSatisfy` (< underPointZ)
+
+    describe "schlick" $ do
+        it "calculates result under total internal reflection" $ do
+            let shape = createGlassSphere
+                ray = Ray (Point 0 0 (sqrt 2 / 2)) (Vector 0 1 0)
+                intersections = [Intersection shape (-sqrt 2 / 2), Intersection shape (sqrt 2 / 2)]
+                comps = prepareComputations (intersections !! 1) ray intersections
+            schlick comps `shouldBe` 1.0
+
+        it "returns small reflectance with perpendicular viewing angle" $ do
+            let shape = createGlassSphere
+                ray = Ray (Point 0 0 0) (Vector 0 1 0)
+                intersections = [Intersection shape (-1), Intersection shape 1]
+                comps = prepareComputations (intersections !! 1) ray intersections
+            schlick comps ~== 0.04 `shouldBe` True
+
+        it "returns significant reflectance with small viewing angle and n2 > n1" $ do
+            let shape = createGlassSphere
+                ray = Ray (Point 0 0.99 (-2)) (Vector 0 0 1)
+                intersection = Intersection shape 1.8589
+                comps = prepareComputations intersection ray [intersection]
+            schlick comps ~== 0.48873 `shouldBe` True
         
 raySphereIntersection :: Double -> Double -> Double -> Double -> Double -> Double -> [Intersection]
 raySphereIntersection originX originY originZ directionX directionY directionZ =

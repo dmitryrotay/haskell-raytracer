@@ -1,6 +1,5 @@
 module WorldSpec where
 
-import Debug.Trace
 import Drawing (Color (..))
 import Lights (PointLight (..))
 import Objects.Intersections (Intersection (..), prepareComputations)
@@ -27,6 +26,7 @@ import World
     , refractedColorWithBounceCount
     )
 
+{-# ANN module "HLint: ignore Reduce duplication" #-}
 spec :: Spec
 spec = do
     describe "createWorld" $ do
@@ -128,7 +128,7 @@ spec = do
                 ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 / 2) (sqrt 2 / 2))
                 i = Intersection shape (sqrt 2)
                 comps = prepareComputations i ray []
-            in trace (show comps) $ reflectedColor world' comps `shouldBe` Color 0.19032 0.2379 0.14274
+            in reflectedColor world' comps `shouldBe` Color 0.19032 0.2379 0.14274
         
         it "returns black color at maximum bounces count" $
             let world = defaultWorld
@@ -232,3 +232,15 @@ spec = do
                 intersection = Intersection floor' (sqrt 2)
                 comps = prepareComputations intersection ray [intersection]
             in shadeHit world' comps `shouldBe` Color 0.93642 0.68642 0.68642
+
+        it "computes color for transparent and reflective material with refraction" $
+            let world = defaultWorld
+                floor' = setTransform
+                            (createPlane { getShapeMaterial = defaultMaterial { getTransparency = 0.5, getReflective = 0.5, getRefractiveIndex = 1.5 } })
+                            (translation 0 (-1) 0)
+                ball = setTransform (createSphere { getShapeMaterial = defaultMaterial { getColor = Color 1 0 0, getAmbient = 0.5 }}) (translation 0 (-3.5) (-0.5))
+                world' = world { getShapes = ball : floor' : getShapes world }
+                ray = Ray (Point 0 0 (-3)) (Vector 0 (-sqrt 2 /2) (sqrt 2 / 2))
+                intersection = Intersection floor' (sqrt 2)
+                comps = prepareComputations intersection ray [intersection]
+            in shadeHit world' comps `shouldBe` Color 0.93391 0.69643 0.69243

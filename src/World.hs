@@ -13,7 +13,6 @@ module World
     , refractedColorWithBounceCount
     ) where
 
-import Debug.Trace
 import Data.List (sort)
 import Drawing (Color (..), addColor, multiplyByScalar)
 import Lights (PointLight (..))
@@ -24,6 +23,7 @@ import Objects.Intersections
     , hit
     , intersect
     , prepareComputations
+    , schlick
     )
 import Objects.Materials (Material (..))
 import Objects.Shapes (Shape (..), createSphere, setMaterial, setTransform)
@@ -88,8 +88,9 @@ shadeHitWithBounceLimit world comps remainingBounces =
         (World _ Nothing) -> Color 0 0 0
         (World _ (Just light)) ->
             let shadowed = isShadowed world (getCompOverPoint comps)
+                material = getShapeMaterial $ getCompShape comps
                 surface = computeObjectPerceivedColor
-                            (getShapeMaterial $ getCompShape comps)
+                            material
                             (getCompShape comps)
                             light
                             (getCompOverPoint comps)
@@ -98,7 +99,13 @@ shadeHitWithBounceLimit world comps remainingBounces =
                             shadowed
                 reflected = reflectedColorWithBounceCount world comps remainingBounces
                 refracted = refractedColorWithBounceCount world comps remainingBounces
-            in surface `addColor` reflected `addColor` refracted
+                color = if getReflective material > 0 && getTransparency material > 0 then
+                            let reflectance = schlick comps
+                            in surface
+                               `addColor` (reflected `multiplyByScalar` reflectance)
+                               `addColor` (refracted `multiplyByScalar` (1 - reflectance))
+                        else surface `addColor` reflected `addColor` refracted
+            in color
 
 isShadowed :: World -> Point -> Bool
 isShadowed world point =
