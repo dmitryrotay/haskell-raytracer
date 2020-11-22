@@ -1,6 +1,7 @@
 module Objects.Shapes
     ( Shape (..)
     , ShapeType (..)
+    , createCube
     , createGlassSphere
     , createSphere
     , createPlane
@@ -20,7 +21,7 @@ import Space
     )
 import Transform (Transform, identity, transformPoint, transformVector)
 
-data ShapeType = Sphere | Plane deriving (Show, Eq)
+data ShapeType = Cube | Plane | Sphere deriving (Show, Eq)
 
 data Shape = Shape
             { getShapeType :: ShapeType
@@ -29,6 +30,9 @@ data Shape = Shape
             , getShapeInverseTransform :: Transform
             , getShapeMaterial :: Material
             } deriving (Show, Eq)
+
+createCube :: Shape
+createCube = createShape Cube
 
 createSphere :: Shape
 createSphere = createShape Sphere

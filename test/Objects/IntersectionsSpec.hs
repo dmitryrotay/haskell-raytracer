@@ -11,7 +11,14 @@ import Objects.Intersections
     , schlick
     )
 import Objects.Materials (Material (..), defaultMaterial)
-import Objects.Shapes (Shape (..), createGlassSphere, createPlane, createSphere, setTransform)
+import Objects.Shapes
+    ( Shape (..)
+    , createCube
+    , createGlassSphere
+    , createPlane
+    , createSphere
+    , setTransform
+    )
 import Ray (Ray (..))
 import Space (Point (..), Vector (..))
 import Test.Hspec
@@ -102,7 +109,31 @@ spec = do
                     ray = Ray (Point 0 (-1) 0) (Vector 0 1 0)
                     xs = localIntersect plane ray
                 in xs `shouldBe` [Intersection plane 1]
-    
+        describe "for Cube" $ do
+            it "returns a point of a ray" $ do
+                let cube = createCube
+                    examples =
+                        [ (Point 5 0.5 0, Vector (-1) 0 0)
+                        , (Point (-5) 0.5 0, Vector 1 0 0)
+                        , (Point 0.5 5 0, Vector 0 (-1) 0)
+                        , (Point 0.5 (-5) 0, Vector 0 1 0)
+                        , (Point 0.5 0 5, Vector 0 0 (-1))
+                        , (Point 0.5 0 (-5), Vector 0 0 1)
+                        , (Point 0 0.5 0, Vector 0 0 1)
+                        ]
+                    resultIntersections =
+                        [ (4, 6)
+                        , (4, 6)
+                        , (4, 6)
+                        , (4, 6)
+                        , (4, 6)
+                        , (4, 6)
+                        , (-1, 1)
+                        ]
+                    result = map (\(origin, direction) -> localIntersect cube (Ray origin direction)) examples
+                    expected = map (\(t1, t2) -> [Intersection cube t1, Intersection cube t2]) resultIntersections
+                result `shouldBe` expected
+                
     describe "prepareComputations" $ do
         it "computes outside hit" $
             let ray = Ray (Point 0 0 (-5)) (Vector 0 0 1)

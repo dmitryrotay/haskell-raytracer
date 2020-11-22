@@ -60,6 +60,15 @@ intersect shape ray =
 
 localIntersect :: Shape -> Ray -> [Intersection]
 
+localIntersect (Shape Cube cubeId t it m) (Ray origin direction) =
+    let cube = Shape Cube cubeId t it m
+        (xtmin, xtmax) = checkCubeAxis (getPointX origin) (getVectorX direction)
+        (ytmin, ytmax) = checkCubeAxis (getPointY origin) (getVectorY direction)
+        (ztmin, ztmax) = checkCubeAxis (getPointZ origin) (getVectorZ direction)
+        tmin = maximum [xtmin, ytmin, ztmin]
+        tmax = minimum [xtmax, ytmax, ztmax]
+    in [Intersection cube tmin, Intersection cube tmax]
+
 localIntersect (Shape Sphere sphereId t it m) (Ray origin direction) =
     let sphere = Shape Sphere sphereId t it m
         sphereToRay = origin `subtractPoint` Point 0 0 0
@@ -77,16 +86,25 @@ localIntersect (Shape Sphere sphereId t it m) (Ray origin direction) =
                 in [p1, p2]
     in result
 
-localIntersect (Shape Plane sphereId t it m) (Ray origin direction) =
+localIntersect (Shape Plane planeId t it m) (Ray origin direction) =
     intersection
     where
-        plane = Shape Plane sphereId t it m
+        plane = Shape Plane planeId t it m
         directionY = getVectorY direction
         intersection
             | abs directionY < epsilon = []
             | otherwise =
                 let distance = -getPointY origin / directionY
                 in [Intersection plane distance]
+
+checkCubeAxis :: Double -> Double -> (Double, Double)
+checkCubeAxis origin direction =
+    let tmin_numerator = (-1) - origin
+        tmax_numerator = 1 - origin
+        (tmin, tmax) = (tmin_numerator / direction, tmax_numerator / direction)
+    in if tmin > tmax
+       then (tmax, tmin)
+       else (tmin, tmax)
 
 prepareComputations :: Intersection -> Ray -> [Intersection] -> Computations
 prepareComputations intersection ray allIntersections =
