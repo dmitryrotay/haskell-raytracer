@@ -133,6 +133,19 @@ spec = do
                     result = map (\(origin, direction) -> localIntersect cube (Ray origin direction)) examples
                     expected = map (\(t1, t2) -> [Intersection cube t1, Intersection cube t2]) resultIntersections
                 result `shouldBe` expected
+            it "returns empty array in case of miss" $ do
+                let cube = createCube
+                    examples =
+                        [ (Point (-2) 0 0, Vector 0.2637 0.5345 0.8018)
+                        , (Point 0 (-2) 0, Vector 0.8018 0.2673 0.5345)
+                        , (Point 0 0 (-2), Vector 0.5345 0.8018 0.2673)
+                        , (Point 2 0 2, Vector 0 0 (-1))
+                        , (Point 0 2 2, Vector 0 (-1) 0)
+                        , (Point 2 2 0, Vector (-1) 0 0)
+                        ]
+                    result = map (\(origin, direction) -> localIntersect cube (Ray origin direction)) examples
+                    expected = map (const []) examples
+                result `shouldBe` expected
                 
     describe "prepareComputations" $ do
         it "computes outside hit" $

@@ -67,7 +67,7 @@ localIntersect (Shape Cube cubeId t it m) (Ray origin direction) =
         (ztmin, ztmax) = checkCubeAxis (getPointZ origin) (getVectorZ direction)
         tmin = maximum [xtmin, ytmin, ztmin]
         tmax = minimum [xtmax, ytmax, ztmax]
-    in [Intersection cube tmin, Intersection cube tmax]
+    in if tmin > tmax then [] else [Intersection cube tmin, Intersection cube tmax]
 
 localIntersect (Shape Sphere sphereId t it m) (Ray origin direction) =
     let sphere = Shape Sphere sphereId t it m
