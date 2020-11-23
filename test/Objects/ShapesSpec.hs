@@ -4,6 +4,7 @@ import Objects.Materials (Material (..), defaultMaterial)
 import Objects.Shapes
     ( Shape (..)
     , ShapeType (..)
+    , createCube
     , createGlassSphere
     , createSphere
     , createPlane
@@ -45,6 +46,32 @@ spec = do
                     n1 `shouldBe` expected
                     n2 `shouldBe` expected
                     n3 `shouldBe` expected
+        
+        describe "for Cube" $ do
+            it "returns normal at any face of the cube" $ do
+                let cube = createCube
+                    examples = 
+                        [ Point 1 0.5 (-0.8)
+                        , Point (-1) (-0.2) 0.9
+                        , Point (-0.4) 1 (-0.1)
+                        , Point 0.3 (-1) (-0.7)
+                        , Point (-0.6) 0.3 1
+                        , Point 0.4 0.4 (-1)
+                        , Point 1 1 1
+                        , Point (-1) (-1) (-1)
+                        ] 
+                    expected = 
+                        [ Vector 1 0 0
+                        , Vector (-1) 0 0
+                        , Vector 0 1 0
+                        , Vector 0 (-1) 0
+                        , Vector 0 0 1
+                        , Vector 0 0 (-1)
+                        , Vector 1 0 0
+                        , Vector (-1) 0 0
+                        ] 
+                    results = map (localNormalAt cube) examples
+                results `shouldBe` expected
 
     describe "normalAt" $ do
         describe "for Sphere" $ do

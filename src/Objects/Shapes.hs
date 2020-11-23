@@ -61,7 +61,17 @@ normalAt shape point =
     in normalize worldNormal
 
 localNormalAt :: Shape -> Point -> Vector
+
+localNormalAt (Shape Cube _ _ _ _) (Point x y z) =
+    normal
+    where maxc = maximum [abs x, abs y, abs z]
+          normal
+            | maxc == abs x = Vector x 0 0
+            | maxc == abs y = Vector 0 y 0
+            | otherwise = Vector 0 0 z
+
 localNormalAt (Shape Sphere _ _ _ _) point = point `subtractPoint` Point 0 0 0
+
 localNormalAt (Shape Plane _ _ _ _) _ = Vector 0 1 0
 
 setTransform :: Shape -> Transform -> Shape
